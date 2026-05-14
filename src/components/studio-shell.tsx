@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useStudio } from '@/components/studio-provider';
-import { Badge } from '@/components/ui';
+import { Badge, Button } from '@/components/ui';
+import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
+import { isAuthRequired } from '@/lib/supabase/env';
 import { joinClasses } from '@/lib/studio-utils';
 import { runStudioVerification } from '@/lib/studio-verifier';
 
@@ -29,7 +31,20 @@ const navigation = [
 export function StudioShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { state } = useStudio();
+  const authRequired = useMemo(() => isAuthRequired(), []);
+  const [signingOut, setSigningOut] = useState(false);
   const verification = runStudioVerification(state);
+
+  const signOut = async () => {
+    setSigningOut(true);
+
+    try {
+      const client = getSupabaseAuthBrowserClient();
+      await client?.auth.signOut();
+    } finally {
+      window.location.href = '/auth/sign-in';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#001F36]">
@@ -87,6 +102,11 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 <Badge tone={verification.score >= 85 ? 'good' : verification.score >= 70 ? 'warning' : 'danger'}>
                   {verification.passedChecks}/{verification.totalChecks} checks OK
                 </Badge>
+                {authRequired ? (
+                  <Button variant="secondary" onClick={signOut} disabled={signingOut}>
+                    {signingOut ? 'Saliendo...' : 'Cerrar sesión'}
+                  </Button>
+                ) : null}
               </div>
             </div>
           </header>

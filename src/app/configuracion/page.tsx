@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { Badge, Button, Card, Field, Input, Textarea } from '@/components/ui';
 import { useStudio } from '@/components/studio-provider';
+import { isAuthRequired } from '@/lib/supabase/env';
 
 export default function ConfiguracionPage() {
-  const { state, setState } = useStudio();
+  const { state, setState, persistence } = useStudio();
+  const authRequired = isAuthRequired();
   const [projectName, setProjectName] = useState(state.config.projectName);
   const [channels, setChannels] = useState(state.config.activeChannels.join('\n'));
   const [formats, setFormats] = useState(state.config.activeFormats.join('\n'));
@@ -77,8 +79,47 @@ export default function ConfiguracionPage() {
         <div className="mt-4 rounded-3xl border border-black/8 bg-white p-4">
           <div className="text-xs uppercase tracking-[0.22em] text-black/40">IA lista para usar</div>
           <p className="mt-3 text-sm leading-6 text-black/58">
-            La app ya puede enviar prompts a Grok o Gemini desde el servidor usando variables de entorno. Solo faltan `XAI_API_KEY` y `GEMINI_API_KEY`.
+            La app ya puede enviar prompts a Grok o Gemini desde el servidor usando variables de entorno. Solo faltan XAI_API_KEY y GEMINI_API_KEY.
           </p>
+        </div>
+
+        <div className="mt-4 rounded-3xl border border-black/8 bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Acceso</div>
+            <Badge tone={authRequired ? 'good' : 'warning'}>
+              {authRequired ? 'Auth requerida' : 'Auth opcional'}
+            </Badge>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-black/58">
+            {authRequired
+              ? 'La app exige sesion valida de Supabase para operar y para acceder a la persistencia remota.'
+              : 'Puedes activar proteccion completa poniendo NEXT_PUBLIC_REQUIRE_AUTH=true en variables de entorno.'}
+          </p>
+        </div>
+
+        <div className="mt-4 rounded-3xl border border-black/8 bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Persistencia</div>
+            <Badge tone={persistence.mode === 'remote' ? 'good' : 'warning'}>
+              {persistence.mode === 'remote' ? 'Supabase activo' : 'Modo local'}
+            </Badge>
+          </div>
+          <div className="mt-3 space-y-3 text-sm leading-6 text-black/58">
+            <p>
+              {persistence.mode === 'remote'
+                ? 'El estado del estudio se esta sincronizando con Supabase y mantiene respaldo local.'
+                : 'La app esta operando con localStorage. Configura Supabase para activar persistencia remota.'}
+            </p>
+            <div className="rounded-2xl bg-[#F5F5F7] px-4 py-3">
+              <div className="font-medium text-[#001F36]">Ultima sincronizacion</div>
+              <div>{persistence.lastSyncedAt ?? 'Todavia no hay sincronizacion remota.'}</div>
+            </div>
+            {persistence.error ? (
+              <div className="rounded-2xl bg-red-50 px-4 py-3 text-[#B85C38]">
+                {persistence.error}
+              </div>
+            ) : null}
+          </div>
         </div>
       </Card>
     </div>
