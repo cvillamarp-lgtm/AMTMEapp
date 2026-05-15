@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
+import { formatZodError, studioStatePutBodySchema } from '@/lib/schemas';
 import { getSupabaseAuthServerClient } from '@/lib/supabase/auth-server';
 import { isSupabaseServerConfigured } from '@/lib/supabase/env';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { loadStudioStateFromRemote, saveStudioStateToRemote } from '@/lib/studio-persistence';
-import type { StudioState } from '@/lib/studio-types';
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
 
 async function resolveOwnerId() {
   if (!isAuthRequired()) {
@@ -53,9 +49,13 @@ export async function PUT(request: Request) {
   }
 
   const body = (await request.json().catch(() => null)) as unknown;
+  const parsedBody = studioStatePutBodySchema.safeParse(body);
 
-  if (!isRecord(body) || !('state' in body)) {
-    return NextResponse.json({ success: false, error: 'Se requiere un estado valido para guardar.' }, { status: 400 });
+  if (!parsedBody.success) {
+    return NextResponse.json(
+      { success: false, error: `Payload inválido: ${formatZodError(parsedBody.error)}` },
+      { status: 400 },
+    );
   }
 
   try {
@@ -65,7 +65,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: false, error: 'No autorizado.' }, { status: 401 });
     }
 
-    const result = await saveStudioStateToRemote(ownerId, body.state as StudioState);
+    const result = await saveStudioStateToRemote(ownerId, parsedBody.data.state);
     return NextResponse.json({ success: true, data: result });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'No se pudo guardar el estado remoto.';

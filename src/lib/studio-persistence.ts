@@ -1,4 +1,4 @@
-import { initialStudioState } from '@/lib/studio-data';
+import { formatZodError, studioStateSchema } from '@/lib/schemas';
 import { getStudioStateKey } from '@/lib/supabase/env';
 import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
@@ -11,16 +11,14 @@ type StudioStatePayload = {
   updatedAt: string | null;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
+function parseStudioStateOrThrow(value: unknown): StudioState {
+  const parsed = studioStateSchema.safeParse(value);
 
-function isStudioState(value: unknown): value is StudioState {
-  if (!isRecord(value)) {
-    return false;
+  if (!parsed.success) {
+    throw new Error(`StudioState inválido: ${formatZodError(parsed.error)}`);
   }
 
-  return 'config' in value && 'episodes' in value && 'masterSections' in value;
+  return parsed.data as StudioState;
 }
 
 function getServiceClientOrThrow() {
@@ -53,12 +51,8 @@ export async function loadStudioStateFromRemote(ownerId: string): Promise<Studio
     };
   }
 
-  if (!isStudioState(data.payload)) {
-    throw new Error('El estado remoto no tiene un formato compatible.');
-  }
-
   return {
-    state: data.payload,
+    state: parseStudioStateOrThrow(data.payload),
     updatedAt: data.updated_at,
   };
 }
@@ -66,7 +60,7 @@ export async function loadStudioStateFromRemote(ownerId: string): Promise<Studio
 export async function saveStudioStateToRemote(ownerId: string, state: StudioState): Promise<{ updatedAt: string }> {
   const client = getServiceClientOrThrow();
   const updatedAt = new Date().toISOString();
-  const nextState = isStudioState(state) ? state : initialStudioState;
+  const nextState = parseStudioStateOrThrow(state);
 
   const { data, error } = await client
     .from('studio_state')

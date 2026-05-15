@@ -9,6 +9,12 @@ npm install
 npm run dev
 ```
 
+## Verificacion tecnica
+
+```bash
+npm run verify
+```
+
 ## Enfoque
 
 - Dashboard operativo

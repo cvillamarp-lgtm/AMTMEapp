@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateWithProvider } from '@/lib/ai-providers';
-import type { AIProvider, AIWorkMode } from '@/lib/studio-types';
+import { aiGenerateRequestSchema, formatZodError } from '@/lib/schemas';
+import type { AIWorkMode } from '@/lib/studio-types';
 
 const modeGuides: Record<AIWorkMode, string> = {
   Episodio: 'Devuelve un guion breve con estructura, hooks y CTA.',
@@ -11,24 +12,17 @@ const modeGuides: Record<AIWorkMode, string> = {
 };
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => ({}))) as {
-    provider?: AIProvider;
-    mode?: AIWorkMode;
-    prompt?: string;
-    systemPrompt?: string;
-    model?: string;
-  };
+  const body = (await request.json().catch(() => ({}))) as unknown;
+  const parsedBody = aiGenerateRequestSchema.safeParse(body);
 
-  const provider = body.provider ?? 'grok';
-  const prompt = body.prompt?.trim();
-
-  if (!prompt) {
-    return NextResponse.json({ error: 'Se requiere un prompt.' }, { status: 400 });
+  if (!parsedBody.success) {
+    return NextResponse.json({ error: `Payload inválido: ${formatZodError(parsedBody.error)}` }, { status: 400 });
   }
 
+  const { provider, prompt, systemPrompt: customSystemPrompt, mode, model } = parsedBody.data;
   const systemPrompt = [
-    body.systemPrompt?.trim() || 'Eres el asistente operativo de AMTME Studio OS.',
-    body.mode ? modeGuides[body.mode] : 'Devuelve una respuesta concreta y utilizable.',
+    customSystemPrompt || 'Eres el asistente operativo de AMTME Studio OS.',
+    mode ? modeGuides[mode] : 'Devuelve una respuesta concreta y utilizable.',
   ].join(' ');
 
   try {
@@ -36,7 +30,7 @@ export async function POST(request: Request) {
       provider,
       prompt,
       systemPrompt,
-      model: body.model,
+      model,
     });
 
     return NextResponse.json({ provider, result });
