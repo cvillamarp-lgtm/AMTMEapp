@@ -1,9 +1,32 @@
 export type SectionStatus = 'Vigente' | 'Pendiente' | 'Histórico' | 'Requiere decisión';
-export type EpisodeStatus = 'Idea' | 'En investigación' | 'Guion' | 'Grabación' | 'Edición' | 'Publicado' | 'Distribuido' | 'Medido' | 'Archivado';
+export type EpisodeStatus =
+  | 'Idea'
+  | 'En investigación'
+  | 'Guion'
+  | 'Grabación'
+  | 'Edición'
+  | 'Publicado'
+  | 'Distribuido'
+  | 'Medido'
+  | 'Archivado';
 export type ContentStatus = 'Borrador' | 'Listo' | 'Publicado' | 'Archivado';
 export type ChecklistStatus = 'Pendiente' | 'En proceso' | 'Listo';
-export type CalendarStatus = 'Pendiente' | 'En proceso' | 'Listo' | 'Publicado' | 'Medido' | 'Archivado';
-export type MonetizationStatus = 'Nuevo lead' | 'Conversación iniciada' | 'Interesado' | 'Sesión ofrecida' | 'Sesión agendada' | 'Pagado' | 'Perdido' | 'Seguimiento';
+export type CalendarStatus =
+  | 'Pendiente'
+  | 'En proceso'
+  | 'Listo'
+  | 'Publicado'
+  | 'Medido'
+  | 'Archivado';
+export type MonetizationStatus =
+  | 'Nuevo lead'
+  | 'Conversación iniciada'
+  | 'Interesado'
+  | 'Sesión ofrecida'
+  | 'Sesión agendada'
+  | 'Pagado'
+  | 'Perdido'
+  | 'Seguimiento';
 export type AIProvider = 'grok' | 'gemini';
 export type AIWorkMode = 'Episodio' | 'Copy' | 'Visual' | 'Métricas' | 'Monetización';
 export type AIEngine =

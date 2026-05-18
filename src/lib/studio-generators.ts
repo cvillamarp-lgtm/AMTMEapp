@@ -4,7 +4,9 @@ export function buildNarrativeStructure(): string[] {
   return ['Umbral', 'Herida', 'Símbolo', 'Verdad', 'Puente', 'Acción'];
 }
 
-export function generateEpisodeScript(episode: Pick<Episode, 'title' | 'theme' | 'objective'>): string {
+export function generateEpisodeScript(
+  episode: Pick<Episode, 'title' | 'theme' | 'objective'>
+): string {
   return [
     `Apertura: ${episode.title}.`,
     `Tema central: ${episode.theme}.`,
@@ -55,7 +57,9 @@ export function generateContentPack(input: {
   };
 }
 
-export function generateVisualPrompt(asset: Pick<VisualAsset, 'type' | 'mainText' | 'secondaryText' | 'cta' | 'palette'>): string {
+export function generateVisualPrompt(
+  asset: Pick<VisualAsset, 'type' | 'mainText' | 'secondaryText' | 'cta' | 'palette'>
+): string {
   return [
     `Tipo de pieza: ${asset.type}.`,
     `Idea principal: ${asset.mainText}.`,

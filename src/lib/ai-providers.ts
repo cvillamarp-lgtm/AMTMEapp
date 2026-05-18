@@ -27,11 +27,15 @@ async function readJsonResponse(response: Response) {
   const payload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
 
   if (!response.ok) {
-    const message = typeof payload.error === 'string'
-      ? payload.error
-      : typeof payload.error === 'object' && payload.error !== null && 'message' in payload.error
-        ? String((payload.error as { message?: unknown }).message ?? `La API respondió con estado ${response.status}`)
-        : `La API respondió con estado ${response.status}`;
+    const message =
+      typeof payload.error === 'string'
+        ? payload.error
+        : typeof payload.error === 'object' && payload.error !== null && 'message' in payload.error
+          ? String(
+              (payload.error as { message?: unknown }).message ??
+                `La API respondió con estado ${response.status}`
+            )
+          : `La API respondió con estado ${response.status}`;
 
     throw new Error(message);
   }
@@ -39,7 +43,12 @@ async function readJsonResponse(response: Response) {
   return payload;
 }
 
-export async function generateWithProvider({ provider, prompt, systemPrompt, model }: GenerateAIInput) {
+export async function generateWithProvider({
+  provider,
+  prompt,
+  systemPrompt,
+  model,
+}: GenerateAIInput) {
   const env = getProviderEnv(provider);
 
   if (!env.apiKey) {
@@ -63,7 +72,9 @@ export async function generateWithProvider({ provider, prompt, systemPrompt, mod
       }),
     });
 
-    const payload = (await readJsonResponse(response)) as { choices?: Array<{ message?: { content?: string } }> };
+    const payload = (await readJsonResponse(response)) as {
+      choices?: Array<{ message?: { content?: string } }>;
+    };
     const content = payload.choices?.[0]?.message?.content?.trim();
 
     if (!content) {
@@ -73,26 +84,32 @@ export async function generateWithProvider({ provider, prompt, systemPrompt, mod
     return content;
   }
 
-  const response = await fetch(`${env.apiUrl}/${encodeURIComponent(model ?? env.model)}:generateContent?key=${env.apiKey}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      system_instruction: {
-        parts: [{ text: systemPrompt }],
+  const response = await fetch(
+    `${env.apiUrl}/${encodeURIComponent(model ?? env.model)}:generateContent?key=${env.apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.4,
-      },
-    }),
-  });
+      body: JSON.stringify({
+        system_instruction: {
+          parts: [{ text: systemPrompt }],
+        },
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.4,
+        },
+      }),
+    }
+  );
 
   const payload = (await readJsonResponse(response)) as {
     candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
   };
-  const content = payload.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('').trim();
+  const content = payload.candidates?.[0]?.content?.parts
+    ?.map((part) => part.text ?? '')
+    .join('')
+    .trim();
 
   if (!content) {
     throw new Error('Gemini no devolvió contenido utilizable.');

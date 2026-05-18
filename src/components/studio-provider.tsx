@@ -1,6 +1,15 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from 'react';
 import { initialStudioState } from '@/lib/studio-data';
 import { isSupabaseBrowserConfigured } from '@/lib/supabase/env';
 import type { StudioState } from '@/lib/studio-types';
@@ -203,7 +212,11 @@ export function StudioProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timeoutId);
   }, [state]);
 
-  return <StudioContext.Provider value={{ state, setState, persistence }}>{children}</StudioContext.Provider>;
+  return (
+    <StudioContext.Provider value={{ state, setState, persistence }}>
+      {children}
+    </StudioContext.Provider>
+  );
 }
 
 export function useStudio() {

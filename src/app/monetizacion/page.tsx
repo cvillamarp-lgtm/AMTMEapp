@@ -9,7 +9,9 @@ export default function MonetizacionPage() {
   const updateLead = (leadId: string, status: string) => {
     setState((current) => ({
       ...current,
-      monetizationLeads: current.monetizationLeads.map((lead) => (lead.id === leadId ? { ...lead, status: status as typeof lead.status } : lead)),
+      monetizationLeads: current.monetizationLeads.map((lead) =>
+        lead.id === leadId ? { ...lead, status: status as typeof lead.status } : lead
+      ),
     }));
   };
 
@@ -19,19 +21,35 @@ export default function MonetizacionPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Monetización</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">Leads y sesiones</h2>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+              Leads y sesiones
+            </h2>
           </div>
-          <Badge tone="accent">${state.monetizationLeads.reduce((sum, lead) => sum + lead.revenue, 0)} pipeline</Badge>
+          <Badge tone="accent">
+            ${state.monetizationLeads.reduce((sum, lead) => sum + lead.revenue, 0)} pipeline
+          </Badge>
         </div>
         <div className="mt-5 space-y-3">
           {state.monetizationLeads.map((lead) => (
             <div key={lead.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-black/38">{lead.source}</div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-black/38">
+                    {lead.source}
+                  </div>
                   <div className="mt-1 text-base font-semibold text-[#001F36]">{lead.name}</div>
                 </div>
-                <Badge tone={lead.status === 'Pagado' ? 'good' : lead.status === 'Perdido' ? 'danger' : 'accent'}>{lead.status}</Badge>
+                <Badge
+                  tone={
+                    lead.status === 'Pagado'
+                      ? 'good'
+                      : lead.status === 'Perdido'
+                        ? 'danger'
+                        : 'accent'
+                  }
+                >
+                  {lead.status}
+                </Badge>
               </div>
               <div className="mt-3 grid gap-2 text-sm text-black/60 sm:grid-cols-2">
                 <span>Oferta: {lead.offerId}</span>
@@ -49,7 +67,10 @@ export default function MonetizacionPage() {
         <div className="mt-4 space-y-4">
           {state.monetizationLeads.map((lead) => (
             <Field key={lead.id} label={lead.name}>
-              <Select value={lead.status} onChange={(event) => updateLead(lead.id, event.target.value)}>
+              <Select
+                value={lead.status}
+                onChange={(event) => updateLead(lead.id, event.target.value)}
+              >
                 <option>Nuevo lead</option>
                 <option>Conversación iniciada</option>
                 <option>Interesado</option>

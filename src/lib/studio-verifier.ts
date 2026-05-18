@@ -76,7 +76,9 @@ export function runStudioVerification(state: StudioState): VerificationSummary {
       });
     }
 
-    trackCheck(Boolean(episode.spotifyDescription.trim()) || !publishedLike.includes(episode.status));
+    trackCheck(
+      Boolean(episode.spotifyDescription.trim()) || !publishedLike.includes(episode.status)
+    );
     if (publishedLike.includes(episode.status) && !episode.spotifyDescription.trim()) {
       addIssue({
         id: `episode-spotify-${episode.id}`,
@@ -194,14 +196,27 @@ export function runStudioVerification(state: StudioState): VerificationSummary {
     }
   }
 
-  trackCheck(state.masterSections.some((section) => normalizeText(section.title).includes('política') || normalizeText(section.title).includes('politica')));
-  if (!state.masterSections.some((section) => normalizeText(section.title).includes('política') || normalizeText(section.title).includes('politica'))) {
+  trackCheck(
+    state.masterSections.some(
+      (section) =>
+        normalizeText(section.title).includes('política') ||
+        normalizeText(section.title).includes('politica')
+    )
+  );
+  if (
+    !state.masterSections.some(
+      (section) =>
+        normalizeText(section.title).includes('política') ||
+        normalizeText(section.title).includes('politica')
+    )
+  ) {
     addIssue({
       id: 'master-policy',
       area: '00_DOCUMENTO_MAESTRO',
       severity: 'alta',
       title: 'Falta política operativa en fuente central',
-      detail: 'No se detectó una sección de política operativa dentro del documento maestro cargado.',
+      detail:
+        'No se detectó una sección de política operativa dentro del documento maestro cargado.',
       action: 'Registra la política en una sección vigente del documento maestro.',
     });
   }
