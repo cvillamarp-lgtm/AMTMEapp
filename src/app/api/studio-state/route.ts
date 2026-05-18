@@ -25,7 +25,10 @@ async function resolveOwnerId() {
 
 export async function GET() {
   if (!isSupabaseServerConfigured()) {
-    return NextResponse.json({ success: false, error: 'Supabase no esta configurado en el servidor.' }, { status: 503 });
+    return NextResponse.json(
+      { success: false, error: 'Supabase no esta configurado en el servidor.' },
+      { status: 503 }
+    );
   }
 
   try {
@@ -45,7 +48,10 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   if (!isSupabaseServerConfigured()) {
-    return NextResponse.json({ success: false, error: 'Supabase no esta configurado en el servidor.' }, { status: 503 });
+    return NextResponse.json(
+      { success: false, error: 'Supabase no esta configurado en el servidor.' },
+      { status: 503 }
+    );
   }
 
   const body = (await request.json().catch(() => null)) as unknown;
@@ -54,7 +60,7 @@ export async function PUT(request: Request) {
   if (!parsedBody.success) {
     return NextResponse.json(
       { success: false, error: `Payload inválido: ${formatZodError(parsedBody.error)}` },
-      { status: 400 },
+      { status: 400 }
     );
   }
 

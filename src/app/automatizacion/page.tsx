@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Badge, Card } from '@/components/ui';
 import { useStudio } from '@/components/studio-provider';
@@ -12,7 +12,9 @@ export default function AutomatizacionPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Automatización</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">Reglas y disparadores</h2>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+              Reglas y disparadores
+            </h2>
           </div>
           <Badge tone="accent">{state.automationRules.length} reglas</Badge>
         </div>

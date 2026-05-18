@@ -12,7 +12,10 @@ function hasValue(value: string | undefined): value is string {
 }
 
 export function isSupabaseBrowserConfigured(): boolean {
-  return hasValue(process.env.NEXT_PUBLIC_SUPABASE_URL) && hasValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  return (
+    hasValue(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    hasValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  );
 }
 
 export function isSupabaseServerConfigured(): boolean {

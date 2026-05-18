@@ -42,6 +42,8 @@ describe('entity schemas', () => {
   });
 
   it('valida MonetizationLead', () => {
-    expect(monetizationLeadSchema.safeParse(initialStudioState.monetizationLeads[0]).success).toBe(true);
+    expect(monetizationLeadSchema.safeParse(initialStudioState.monetizationLeads[0]).success).toBe(
+      true
+    );
   });
 });

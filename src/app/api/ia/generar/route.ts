@@ -16,7 +16,10 @@ export async function POST(request: Request) {
   const parsedBody = aiGenerateRequestSchema.safeParse(body);
 
   if (!parsedBody.success) {
-    return NextResponse.json({ error: `Payload inválido: ${formatZodError(parsedBody.error)}` }, { status: 400 });
+    return NextResponse.json(
+      { error: `Payload inválido: ${formatZodError(parsedBody.error)}` },
+      { status: 400 }
+    );
   }
 
   const { provider, prompt, systemPrompt: customSystemPrompt, mode, model } = parsedBody.data;
@@ -35,7 +38,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ provider, result });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'No se pudo completar la solicitud de IA.';
+    const message =
+      error instanceof Error ? error.message : 'No se pudo completar la solicitud de IA.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -57,7 +57,10 @@ export async function loadStudioStateFromRemote(ownerId: string): Promise<Studio
   };
 }
 
-export async function saveStudioStateToRemote(ownerId: string, state: StudioState): Promise<{ updatedAt: string }> {
+export async function saveStudioStateToRemote(
+  ownerId: string,
+  state: StudioState
+): Promise<{ updatedAt: string }> {
   const client = getServiceClientOrThrow();
   const updatedAt = new Date().toISOString();
   const nextState = parseStudioStateOrThrow(state);
@@ -72,7 +75,7 @@ export async function saveStudioStateToRemote(ownerId: string, state: StudioStat
         schema_version: STUDIO_STATE_SCHEMA_VERSION,
         updated_at: updatedAt,
       },
-      { onConflict: 'owner_id,key' },
+      { onConflict: 'owner_id,key' }
     )
     .select('updated_at')
     .single();

@@ -12,7 +12,14 @@ import {
 
 describe('studio-generators', () => {
   it('construye estructura narrativa estándar', () => {
-    expect(buildNarrativeStructure()).toEqual(['Umbral', 'Herida', 'Símbolo', 'Verdad', 'Puente', 'Acción']);
+    expect(buildNarrativeStructure()).toEqual([
+      'Umbral',
+      'Herida',
+      'Símbolo',
+      'Verdad',
+      'Puente',
+      'Acción',
+    ]);
   });
 
   it('genera textos base de episodio', () => {
@@ -24,7 +31,9 @@ describe('studio-generators', () => {
 
     expect(script).toContain('Apertura: Título.');
     expect(generateSpotifyDescription({ title: 'Título', theme: 'Tema' })).toContain('Tema');
-    expect(generateAppleDescription({ title: 'Título', objective: 'Objetivo' })).toContain('Título');
+    expect(generateAppleDescription({ title: 'Título', objective: 'Objetivo' })).toContain(
+      'Título'
+    );
   });
 
   it('genera hooks y packs de contenido', () => {

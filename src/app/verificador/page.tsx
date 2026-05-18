@@ -36,11 +36,15 @@ export default function VerificadorPage() {
       <Card className="bg-[#001F36] text-white">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="text-xs uppercase tracking-[0.24em] text-white/45">Verificador del sistema</div>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">Control de orden, duplicidad y calidad</h2>
+            <div className="text-xs uppercase tracking-[0.24em] text-white/45">
+              Verificador del sistema
+            </div>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+              Control de orden, duplicidad y calidad
+            </h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-white/78">
-              Este módulo valida la coherencia operativa de AMTME Studio OS sobre episodios, contenido, marca, calendario,
-              checklists y documento maestro.
+              Este módulo valida la coherencia operativa de AMTME Studio OS sobre episodios,
+              contenido, marca, calendario, checklists y documento maestro.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -55,29 +59,39 @@ export default function VerificadorPage() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card className="bg-[#F5F5F7]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Checks</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">{summary.passedChecks}/{summary.totalChecks}</div>
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">
+            {summary.passedChecks}/{summary.totalChecks}
+          </div>
           <div className="mt-2 text-sm text-black/55">Validaciones aprobadas</div>
         </Card>
         <Card className="bg-[#F5F5F7]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Incidencias altas</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#B85C38]">{highCount}</div>
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#B85C38]">
+            {highCount}
+          </div>
           <div className="mt-2 text-sm text-black/55">Requieren corrección inmediata</div>
         </Card>
         <Card className="bg-[#F5F5F7]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Incidencias medias</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#003D5C]">{mediumCount}</div>
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#003D5C]">
+            {mediumCount}
+          </div>
           <div className="mt-2 text-sm text-black/55">Ajustes operativos sugeridos</div>
         </Card>
         <Card className="bg-[#F5F5F7]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Incidencias bajas</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">{lowCount}</div>
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">
+            {lowCount}
+          </div>
           <div className="mt-2 text-sm text-black/55">Refinamientos de calidad</div>
         </Card>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
         <Card>
-          <div className="text-xs uppercase tracking-[0.22em] text-black/40">Incidencias detectadas</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-black/40">
+            Incidencias detectadas
+          </div>
           <div className="mt-4 space-y-3">
             {summary.issues.length === 0 ? (
               <div className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm text-black/60">
@@ -88,7 +102,9 @@ export default function VerificadorPage() {
                 <div key={issue.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="text-base font-semibold text-[#001F36]">{issue.title}</h3>
-                    <Badge tone={severityTone(issue.severity)}>{issue.severity.toUpperCase()}</Badge>
+                    <Badge tone={severityTone(issue.severity)}>
+                      {issue.severity.toUpperCase()}
+                    </Badge>
                   </div>
                   <div className="mt-2 text-sm text-black/58">Área: {issue.area}</div>
                   <p className="mt-2 text-sm leading-6 text-black/60">{issue.detail}</p>

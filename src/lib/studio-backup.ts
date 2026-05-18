@@ -6,9 +6,9 @@ export function exportStudioStateToJson(state: StudioState): string {
   return JSON.stringify(parsed, null, 2);
 }
 
-export function importStudioStateFromJson(json: string):
-  | { success: true; state: StudioState }
-  | { success: false; error: string } {
+export function importStudioStateFromJson(
+  json: string
+): { success: true; state: StudioState } | { success: false; error: string } {
   let payload: unknown;
 
   try {

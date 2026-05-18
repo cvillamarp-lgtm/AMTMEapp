@@ -18,28 +18,32 @@ export const initialMasterSections: MasterSection[] = [
   {
     id: 'resumen',
     title: 'Resumen ejecutivo',
-    content: 'AMTME es un sistema editorial, emocional y operativo para gestionar contenido, episodios, métricas y monetización desde una sola fuente central.',
+    content:
+      'AMTME es un sistema editorial, emocional y operativo para gestionar contenido, episodios, métricas y monetización desde una sola fuente central.',
     status: 'Vigente',
     lastReviewedAt: '2026-05-14',
   },
   {
     id: 'direccion',
     title: 'Dirección estratégica',
-    content: 'Mantener la consistencia antes que la expansión; convertir el sistema AMTME en una plataforma centralizada, clara y operativa.',
+    content:
+      'Mantener la consistencia antes que la expansión; convertir el sistema AMTME en una plataforma centralizada, clara y operativa.',
     status: 'Vigente',
     lastReviewedAt: '2026-05-14',
   },
   {
     id: 'politica',
     title: 'Política operativa',
-    content: 'La arquitectura oficial es la única ruta activa. Las carpetas temporales están cerradas para trabajo nuevo.',
+    content:
+      'La arquitectura oficial es la única ruta activa. Las carpetas temporales están cerradas para trabajo nuevo.',
     status: 'Vigente',
     lastReviewedAt: '2026-05-14',
   },
   {
     id: 'pendientes',
     title: 'Decisiones pendientes',
-    content: 'Confirmar siguiente ciclo de automatización, priorización de canales y reglas de archivado de versiones antiguas.',
+    content:
+      'Confirmar siguiente ciclo de automatización, priorización de canales y reglas de archivado de versiones antiguas.',
     status: 'Requiere decisión',
     lastReviewedAt: '2026-05-14',
   },
@@ -61,7 +65,10 @@ export const initialEpisodes: Episode[] = [
     spotifyDescription: 'Un episodio sobre el cansancio de sostener lo que ya no tiene sentido.',
     appleDescription: 'Cuando dejar de fingir se convierte en una forma de orden.',
     cta: 'Escríbeme "umbral" si quieres revisar tu propio patrón.',
-    hooks: ['Hay un momento en que fingir se vuelve más caro que decir la verdad.', 'No te cansas de vivir: te cansas de sostener una versión que ya no existe.'],
+    hooks: [
+      'Hay un momento en que fingir se vuelve más caro que decir la verdad.',
+      'No te cansas de vivir: te cansas de sostener una versión que ya no existe.',
+    ],
     publishDate: '2026-05-16',
     notes: 'Revisar corte final de clips y descripción secundaria.',
     nextAction: 'Marcar como distribuido y extraer dos clips.',
@@ -81,7 +88,10 @@ export const initialEpisodes: Episode[] = [
     spotifyDescription: '',
     appleDescription: '',
     cta: '',
-    hooks: ['Hay vínculos que no te buscan: te repiten.', 'A veces vuelves no por amor, sino por memoria.'],
+    hooks: [
+      'Hay vínculos que no te buscan: te repiten.',
+      'A veces vuelves no por amor, sino por memoria.',
+    ],
     publishDate: '2026-05-23',
     notes: 'Pendiente de guion y CTA.',
     nextAction: 'Generar estructura narrativa y guion.',
@@ -101,7 +111,10 @@ export const initialEpisodes: Episode[] = [
     spotifyDescription: '',
     appleDescription: '',
     cta: '',
-    hooks: ['Cuando explicas demasiado, a veces no aclaras: te escondes.', 'No todo merece defensa; algunas cosas solo necesitan decisión.'],
+    hooks: [
+      'Cuando explicas demasiado, a veces no aclaras: te escondes.',
+      'No todo merece defensa; algunas cosas solo necesitan decisión.',
+    ],
     publishDate: '2026-05-30',
     notes: 'Idea prioritaria para el siguiente ciclo.',
     nextAction: 'Definir enfoque emocional y visual.',
@@ -117,7 +130,8 @@ export const initialVisualAssets: VisualAsset[] = [
     mainText: 'Fingir se volvió más caro que la verdad',
     secondaryText: 'AMTME / episodio 34',
     cta: 'Desliza',
-    prompt: 'Diseño editorial sobrio con fondo blanco roto, texto navy profundo, acento amarillo mínimo y jerarquía limpia. Inspiración Apple: aire amplio, bordes suaves, composición precisa.',
+    prompt:
+      'Diseño editorial sobrio con fondo blanco roto, texto navy profundo, acento amarillo mínimo y jerarquía limpia. Inspiración Apple: aire amplio, bordes suaves, composición precisa.',
     technicalSpec: '1080x1350, lectura móvil, un CTA, alto contraste, sin degradados innecesarios.',
     templateVariables: '{titulo}, {subtitulo}, {cta}, {episodio}',
     palette: 'Navy profundo, blanco, crema cálido, amarillo mínimo',
@@ -305,7 +319,12 @@ export const initialStudioState: StudioState = {
     activeChannels: ['Instagram', 'Spotify', 'Apple Podcasts', 'TikTok', 'YouTube Shorts'],
     activeFormats: ['Reel', 'Carrusel', 'Story', 'Podcast', 'DM'],
     frequentCtas: ['Escríbeme “verdad”', 'Guarda esto', 'Desliza', 'Respóndeme por DM'],
-    psychologicalConcepts: ['Identificación emocional', 'Open loop', 'Microcompromiso', 'Conversión por reconocimiento'],
+    psychologicalConcepts: [
+      'Identificación emocional',
+      'Open loop',
+      'Microcompromiso',
+      'Conversión por reconocimiento',
+    ],
     futureApis: ['Supabase', 'IA', 'Google Drive', 'Google Calendar', 'Google Sheets'],
     aiPrimaryProvider: 'grok',
     aiFallbackProvider: 'gemini',
@@ -314,7 +333,8 @@ export const initialStudioState: StudioState = {
       grok: 'grok-2-latest',
       gemini: 'gemini-1.5-pro',
     },
-    aiSystemPrompt: 'Eres el asistente operativo de AMTME Studio OS. Respondes en español neutral, con tono editorial, preciso y orientado a ejecución.',
+    aiSystemPrompt:
+      'Eres el asistente operativo de AMTME Studio OS. Respondes en español neutral, con tono editorial, preciso y orientado a ejecución.',
     aiTone: 'editorial, claro, sobrio, operativo',
     aiImageModel: 'pendiente de definir',
     aiNarrativeStructure: ['Umbral', 'Herida', 'Símbolo', 'Verdad', 'Puente', 'Acción'],

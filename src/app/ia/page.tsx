@@ -27,7 +27,11 @@ export default function IAPage() {
   const [model, setModel] = useState(state.config.aiPreferredModelByProvider[provider]);
   const [prompt, setPrompt] = useState(defaultPromptByMode.Copy);
   const [systemPrompt, setSystemPrompt] = useState(state.config.aiSystemPrompt);
-  const [response, setResponse] = useState<AIResponseState>({ loading: false, error: '', result: '' });
+  const [response, setResponse] = useState<AIResponseState>({
+    loading: false,
+    error: '',
+    result: '',
+  });
 
   const providerLabel = useMemo(() => getProviderLabel(provider), [provider]);
 
@@ -54,13 +58,21 @@ export default function IAPage() {
       const payload = (await result.json()) as { result?: string; error?: string };
 
       if (!result.ok) {
-        setResponse({ loading: false, error: payload.error ?? 'No se pudo generar la respuesta.', result: '' });
+        setResponse({
+          loading: false,
+          error: payload.error ?? 'No se pudo generar la respuesta.',
+          result: '',
+        });
         return;
       }
 
       setResponse({ loading: false, error: '', result: payload.result ?? '' });
     } catch {
-      setResponse({ loading: false, error: 'No se pudo conectar con el servicio de IA.', result: '' });
+      setResponse({
+        loading: false,
+        error: 'No se pudo conectar con el servicio de IA.',
+        result: '',
+      });
     }
   };
 
@@ -70,14 +82,21 @@ export default function IAPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">IA</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">Conexión Grok y Gemini</h2>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+              Conexión Grok y Gemini
+            </h2>
           </div>
-          <Badge tone={state.config.aiEnabled ? 'good' : 'warning'}>{state.config.aiEnabled ? 'IA activa' : 'IA pausada'}</Badge>
+          <Badge tone={state.config.aiEnabled ? 'good' : 'warning'}>
+            {state.config.aiEnabled ? 'IA activa' : 'IA pausada'}
+          </Badge>
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <Field label="Proveedor">
-            <Select value={provider} onChange={(event) => syncProvider(event.target.value as AIProvider)}>
+            <Select
+              value={provider}
+              onChange={(event) => syncProvider(event.target.value as AIProvider)}
+            >
               <option value="grok">Grok</option>
               <option value="gemini">Gemini</option>
             </Select>
@@ -99,19 +118,28 @@ export default function IAPage() {
           </Field>
         </div>
 
-        <Field label="Prompt operativo" hint="Se envía al proveedor seleccionado desde el servidor.">
+        <Field
+          label="Prompt operativo"
+          hint="Se envía al proveedor seleccionado desde el servidor."
+        >
           <Textarea rows={10} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
         </Field>
 
         <Field label="System prompt">
-          <Textarea rows={6} value={systemPrompt} onChange={(event) => setSystemPrompt(event.target.value)} />
+          <Textarea
+            rows={6}
+            value={systemPrompt}
+            onChange={(event) => setSystemPrompt(event.target.value)}
+          />
         </Field>
 
         <div className="mt-5 flex flex-wrap gap-2">
           <Button onClick={runGeneration} disabled={response.loading}>
             {response.loading ? 'Generando…' : 'Generar con IA'}
           </Button>
-          <Button variant="secondary" onClick={() => setPrompt(defaultPromptByMode[mode])}>Restaurar prompt</Button>
+          <Button variant="secondary" onClick={() => setPrompt(defaultPromptByMode[mode])}>
+            Restaurar prompt
+          </Button>
         </div>
       </Card>
 
@@ -120,29 +148,43 @@ export default function IAPage() {
           <div className="text-xs uppercase tracking-[0.22em] text-black/40">Resultado</div>
           <div className="mt-4 min-h-[360px] rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm leading-6 text-[#001F36]">
             {response.error ? <p className="text-[#B85C38]">{response.error}</p> : null}
-            {!response.error && !response.result ? <p className="text-black/45">Aquí aparecerá la respuesta de Grok o Gemini.</p> : null}
-            {response.result ? <pre className="whitespace-pre-wrap font-sans">{response.result}</pre> : null}
+            {!response.error && !response.result ? (
+              <p className="text-black/45">Aquí aparecerá la respuesta de Grok o Gemini.</p>
+            ) : null}
+            {response.result ? (
+              <pre className="whitespace-pre-wrap font-sans">{response.result}</pre>
+            ) : null}
           </div>
         </Card>
 
         <Card>
-          <div className="text-xs uppercase tracking-[0.22em] text-black/40">Estado de conexión</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-black/40">
+            Estado de conexión
+          </div>
           <div className="mt-4 grid gap-3 text-sm text-black/60">
             <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
               <span>Proveedor primario</span>
-              <span className="font-medium text-[#001F36]">{getProviderLabel(state.config.aiPrimaryProvider)}</span>
+              <span className="font-medium text-[#001F36]">
+                {getProviderLabel(state.config.aiPrimaryProvider)}
+              </span>
             </div>
             <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
               <span>Proveedor fallback</span>
-              <span className="font-medium text-[#001F36]">{getProviderLabel(state.config.aiFallbackProvider)}</span>
+              <span className="font-medium text-[#001F36]">
+                {getProviderLabel(state.config.aiFallbackProvider)}
+              </span>
             </div>
             <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
               <span>Modelo Grok</span>
-              <span className="font-medium text-[#001F36]">{state.config.aiPreferredModelByProvider.grok}</span>
+              <span className="font-medium text-[#001F36]">
+                {state.config.aiPreferredModelByProvider.grok}
+              </span>
             </div>
             <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
               <span>Modelo Gemini</span>
-              <span className="font-medium text-[#001F36]">{state.config.aiPreferredModelByProvider.gemini}</span>
+              <span className="font-medium text-[#001F36]">
+                {state.config.aiPreferredModelByProvider.gemini}
+              </span>
             </div>
           </div>
         </Card>

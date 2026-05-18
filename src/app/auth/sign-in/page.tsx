@@ -59,7 +59,9 @@ export default function SignInPage() {
     <div className="mx-auto flex min-h-screen w-full max-w-xl items-center justify-center px-4">
       <Card className="w-full">
         <div className="text-xs uppercase tracking-[0.22em] text-black/40">Acceso</div>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#001F36]">Iniciar sesion</h1>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[#001F36]">
+          Iniciar sesion
+        </h1>
         <p className="mt-3 text-sm leading-6 text-black/58">
           Usa tu correo para recibir un enlace magico y entrar al sistema AMTME.
         </p>
