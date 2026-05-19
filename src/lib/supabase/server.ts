@@ -6,13 +6,18 @@ export function getSupabaseServiceRoleClient(): SupabaseClient<Database> | null 
   const env = getSupabaseServerEnv();
 
   if (!env) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Supabase Server] Configuration incomplete: service role key or URL missing');
+    }
     return null;
   }
 
-  return createClient<Database>(env.url, env.serviceRoleKey, {
+  const client: SupabaseClient<Database> = createClient<Database>(env.url, env.serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
   });
+
+  return client;
 }
