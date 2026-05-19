@@ -4,10 +4,11 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/database.types';
 import { getSupabasePublicEnv } from '@/lib/supabase/env';
 
-let browserClient: SupabaseClient<Database> | null | undefined;
+let browserClient: SupabaseClient<Database> | null = null;
+let isInitialized = false;
 
 export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
-  if (browserClient !== undefined) {
+  if (isInitialized) {
     return browserClient;
   }
 
@@ -15,6 +16,7 @@ export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
 
   if (!env) {
     browserClient = null;
+    isInitialized = true;
     return browserClient;
   }
 
@@ -25,6 +27,8 @@ export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
       persistSession: false,
     },
   });
+
+  isInitialized = true;
 
   return browserClient;
 }
