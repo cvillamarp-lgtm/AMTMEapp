@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/database.types';
 import { getSupabaseServerEnv } from '@/lib/supabase/env';
 
-const getTestStorageKey = () =>
+const generateUniqueTestStorageKey = () =>
   `amtme-studio-os-server-test-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 export function getSupabaseServiceRoleClient(): SupabaseClient<Database> | null {
@@ -19,7 +19,7 @@ export function getSupabaseServiceRoleClient(): SupabaseClient<Database> | null 
     auth: {
       autoRefreshToken: false,
       persistSession: false,
-      ...(process.env.NODE_ENV === 'test' ? { storageKey: getTestStorageKey() } : {}),
+      ...(process.env.NODE_ENV === 'test' ? { storageKey: generateUniqueTestStorageKey() } : {}),
     },
   });
 

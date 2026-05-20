@@ -6,7 +6,7 @@ import { getSupabasePublicEnv } from '@/lib/supabase/env';
 
 let browserClient: SupabaseClient<Database> | null = null;
 let isInitialized = false;
-const getTestStorageKey = () =>
+const generateUniqueTestStorageKey = () =>
   `amtme-studio-os-browser-test-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
@@ -27,7 +27,7 @@ export function getSupabaseBrowserClient(): SupabaseClient<Database> | null {
       autoRefreshToken: false,
       detectSessionInUrl: false,
       persistSession: false,
-      ...(process.env.NODE_ENV === 'test' ? { storageKey: getTestStorageKey() } : {}),
+      ...(process.env.NODE_ENV === 'test' ? { storageKey: generateUniqueTestStorageKey() } : {}),
     },
   });
 
