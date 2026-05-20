@@ -67,6 +67,8 @@ describe('Supabase Server Client', () => {
 
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
+    vi.resetModules();
+
     const { getSupabaseServiceRoleClient } = await import('./server');
     getSupabaseServiceRoleClient();
     getSupabaseServiceRoleClient();
