@@ -59,4 +59,25 @@ describe('Supabase Server Client', () => {
       expect(client).toHaveProperty('auth');
     }
   });
+
+  it('does not emit GoTrue multiple client warning when creating clients repeatedly', async () => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://example.supabase.co';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'a'.repeat(32);
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'b'.repeat(32);
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    vi.resetModules();
+
+    const { getSupabaseServiceRoleClient } = await import('./server');
+    getSupabaseServiceRoleClient();
+    getSupabaseServiceRoleClient();
+
+    const gotrueWarnings = warnSpy.mock.calls
+      .flat()
+      .map((entry) => String(entry))
+      .filter((message) => message.includes('Multiple GoTrueClient instances detected'));
+
+    expect(gotrueWarnings).toHaveLength(0);
+  });
 });
