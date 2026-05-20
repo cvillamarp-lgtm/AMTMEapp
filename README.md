@@ -78,3 +78,10 @@ La autenticacion de Supabase es opcional y se controla con:
 ## Deploy
 
 Consulta la guia completa en `docs/DEPLOYMENT.md`.
+
+## Estado operativo y documentación final
+
+- Estado de fases y criterio de cierre: `docs/AMTME_PHASES_COMPLETION.md`
+- Guía operativa: `docs/AMTME_OPERATING_GUIDE.md`
+- Guía de testing: `docs/AMTME_TESTING.md`
+- Guía de deploy de cierre: `docs/AMTME_DEPLOYMENT.md`
