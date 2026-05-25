@@ -9,7 +9,6 @@ import {
   splitLineByHighlight,
   toHeadlineLines,
   wrapLinesByWidth,
-  HighlightDescriptor,
   TextSegment,
 } from './shared';
 

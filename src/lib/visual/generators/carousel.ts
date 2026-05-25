@@ -11,7 +11,6 @@ import {
   wrapLinesByWidth,
   HighlightDescriptor,
   TextSegment,
-  HighlightMatch,
 } from './shared';
 
 /**
