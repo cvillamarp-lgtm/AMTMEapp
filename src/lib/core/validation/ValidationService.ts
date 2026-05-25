@@ -52,7 +52,7 @@ export class ValidationService {
     }
   }
 
-  static isSafe<T>(schema: ZodSchema, data: unknown): boolean {
+  static isSafe(schema: ZodSchema, data: unknown): boolean {
     const result = schema.safeParse(data);
     return result.success;
   }
