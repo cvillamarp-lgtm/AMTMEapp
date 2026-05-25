@@ -19,7 +19,15 @@ export type AiEditorScope = z.infer<typeof AiEditorScopeSchema>;
 export const RiskLevelSchema = z.enum(['low', 'medium', 'high', 'critical', 'blocked']);
 export type RiskLevel = z.infer<typeof RiskLevelSchema>;
 
-export const ValidationStatusSchema = z.enum(['pending', 'running', 'passed', 'failed', 'skipped']);
+export const ValidationStatusSchema = z.enum([
+  'pending',
+  'running',
+  'passed',
+  'failed',
+  'skipped',
+  // Phase 2: validation scheduled but not yet executed (e.g. CI must run externally)
+  'deferred',
+]);
 export type ValidationStatus = z.infer<typeof ValidationStatusSchema>;
 
 export const ChangeStatusSchema = z.enum([
@@ -27,6 +35,14 @@ export const ChangeStatusSchema = z.enum([
   'analyzed',
   'patch_ready',
   'validating',
+  // Phase 2 explicit states
+  'validation_pending',
+  'validation_running',
+  'validation_passed',
+  'validation_failed',
+  'ready_to_apply',
+  'apply_blocked',
+  // Legacy / future states kept for compatibility
   'approved',
   'applied',
   'discarded',
@@ -102,6 +118,10 @@ export const ChangeHistoryEntrySchema = z.object({
   mode: AiEditorModeSchema,
   scope: AiEditorScopeSchema,
   plan: AiChangePlanSchema.optional(),
+  // Phase 2: proposed branch name when status === 'ready_to_apply'
+  branchName: z.string().optional(),
+  // Phase 2: 'session' = in-memory only; 'persistent' = saved to DB
+  persistenceType: z.enum(['session', 'persistent']).optional(),
 });
 export type ChangeHistoryEntry = z.infer<typeof ChangeHistoryEntrySchema>;
 

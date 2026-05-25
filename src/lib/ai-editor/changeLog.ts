@@ -7,9 +7,14 @@ import type {
   RiskLevel,
 } from './types';
 
-// ── In-memory change log (phase 1) ────────────────────────────────────────
-// Phase 1: client-side in-memory store.
-// Phase 2: replace with Supabase `ai_editor_changes` table.
+// ── Persistence contract ───────────────────────────────────────────────────
+// Phase 2: all entries are session-scoped (in-memory, lost on page refresh).
+// Phase 3: replace with Supabase `ai_editor_changes` table and set
+// persistenceType: 'persistent'.
+
+export const CHANGE_LOG_STORAGE = 'session' as const;
+
+// ── In-memory change log ───────────────────────────────────────────────────
 
 const _log: ChangeHistoryEntry[] = [];
 
@@ -29,7 +34,8 @@ export function buildHistoryEntry(
   status: ChangeStatus,
   riskLevel: RiskLevel,
   filesChanged: string[],
-  plan?: AiChangePlan
+  plan?: AiChangePlan,
+  branchName?: string
 ): ChangeHistoryEntry {
   return {
     id,
@@ -38,10 +44,13 @@ export function buildHistoryEntry(
     status,
     filesChanged,
     riskLevel,
-    rollbackAvailable: status === 'applied',
+    // Rollback is meaningful only when a plan was prepared or actually applied
+    rollbackAvailable: status === 'ready_to_apply' || status === 'applied',
     mode,
     scope,
     plan,
+    branchName,
+    persistenceType: CHANGE_LOG_STORAGE,
   };
 }
 
@@ -49,6 +58,6 @@ export function updateChangeLogStatus(id: string, status: ChangeStatus): void {
   const entry = _log.find((e) => e.id === id);
   if (entry) {
     entry.status = status;
-    entry.rollbackAvailable = status === 'applied';
+    entry.rollbackAvailable = status === 'ready_to_apply' || status === 'applied';
   }
 }

@@ -101,7 +101,11 @@ export function NaturalLanguageEditor() {
     }
   };
 
-  const addHistoryEntry = (plan: AiChangePlan | null, status: ChangeHistoryEntry['status']) => {
+  const addHistoryEntry = (
+    plan: AiChangePlan | null,
+    status: ChangeHistoryEntry['status'],
+    branchName?: string
+  ) => {
     const entry: ChangeHistoryEntry = {
       id: `req-${Date.now()}`,
       createdAt: new Date().toISOString(),
@@ -109,10 +113,12 @@ export function NaturalLanguageEditor() {
       status,
       filesChanged: plan?.affectedFiles ?? [],
       riskLevel: plan?.riskLevel ?? 'low',
-      rollbackAvailable: status === 'applied',
+      rollbackAvailable: status === 'ready_to_apply' || status === 'applied',
       mode,
       scope,
       plan: plan ?? undefined,
+      branchName,
+      persistenceType: 'session',
     };
     setHistory((prev) => [entry, ...prev]);
   };
@@ -128,17 +134,23 @@ export function NaturalLanguageEditor() {
         body: JSON.stringify({ requestId: `req-${Date.now()}`, plan: state.plan, mode }),
       });
 
-      const data = (await res.json()) as { error?: string; message?: string };
+      const data = (await res.json()) as {
+        error?: string;
+        message?: string;
+        status?: string;
+        branchName?: string;
+      };
 
       if (!res.ok) {
-        setState((prev) => ({ ...prev, error: data.error ?? 'No se pudo aplicar el cambio.' }));
+        setState((prev) => ({ ...prev, error: data.error ?? 'No se pudo preparar el cambio.' }));
       } else {
-        addHistoryEntry(state.plan, 'applied');
+        const entryStatus = (data.status as ChangeHistoryEntry['status']) ?? 'ready_to_apply';
+        addHistoryEntry(state.plan, entryStatus, data.branchName);
         setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
         setPrompt('');
       }
     } catch {
-      setState((prev) => ({ ...prev, error: 'Error al aplicar el cambio.' }));
+      setState((prev) => ({ ...prev, error: 'Error al preparar el cambio.' }));
     } finally {
       setApplying(false);
     }
@@ -269,9 +281,18 @@ export function NaturalLanguageEditor() {
       {/* History */}
       {history.length > 0 ? (
         <Card>
-          <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
-            Historial de cambios
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
+              Historial de cambios
+            </div>
+            <span className="rounded bg-amtme-slate/10 px-1.5 py-0.5 font-mono text-xs text-amtme-navy">
+              solo sesión
+            </span>
           </div>
+          <p className="mt-1 text-xs text-semantic-muted">
+            Este historial se pierde al recargar la página. Persistencia en base de datos pendiente
+            (fase 3).
+          </p>
           <div className="mt-4">
             <ChangeHistory entries={history} onRollback={handleRollback} />
           </div>

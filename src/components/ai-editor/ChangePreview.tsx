@@ -13,12 +13,13 @@ interface ChangePreviewProps {
   applying: boolean;
 }
 
-const statusLabel: Record<string, string> = {
+const validationStatusLabel: Record<string, string> = {
   pending: 'Pendiente',
   running: 'Validando…',
   passed: 'Validaciones OK',
   failed: 'Validación fallida',
   skipped: 'Omitida',
+  deferred: 'Diferido — requiere CI',
 };
 
 export function ChangePreview({
@@ -29,10 +30,23 @@ export function ChangePreview({
   onSaveAsTask,
   applying,
 }: ChangePreviewProps) {
-  const canApply =
-    plan.validationStatus === 'passed' &&
-    plan.riskLevel !== 'blocked' &&
-    plan.riskLevel !== 'critical';
+  const validationFailed =
+    plan.validationStatus === 'failed' ||
+    plan.riskLevel === 'blocked' ||
+    plan.riskLevel === 'critical';
+
+  const validationDeferred = plan.validationStatus === 'deferred';
+
+  // Can proceed to prepare branch when validations are deferred or passed,
+  // but block when validations have actually failed (security/destructive patterns)
+  const canPrepare = !validationFailed;
+
+  // Label reflects what the action actually does in Phase 2
+  const applyLabel = applying
+    ? 'Preparando…'
+    : validationDeferred
+      ? 'Preparar rama'
+      : 'Aplicar cambio';
 
   return (
     <div className="space-y-5">
@@ -103,8 +117,10 @@ export function ChangePreview({
           <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
             Validaciones
           </div>
-          <span className="text-xs text-semantic-muted">
-            {statusLabel[plan.validationStatus] ?? plan.validationStatus}
+          <span
+            className={`text-xs ${validationFailed ? 'text-amtme-red' : validationDeferred ? 'text-amtme-navy' : 'text-semantic-muted'}`}
+          >
+            {validationStatusLabel[plan.validationStatus] ?? plan.validationStatus}
           </span>
         </div>
         <div className="mt-3">
@@ -112,16 +128,29 @@ export function ChangePreview({
         </div>
       </Card>
 
+      {/* Nota CI cuando validaciones diferidas */}
+      {validationDeferred ? (
+        <div className="rounded-2xl border border-amtme-navy/20 bg-amtme-navy/5 px-4 py-3 text-sm text-amtme-navy">
+          <p className="font-medium">⚠️ Validaciones CI pendientes</p>
+          <p className="mt-1 text-xs leading-5 text-semantic-muted">
+            Antes de mergear la rama propuesta, ejecuta localmente o en CI:
+          </p>
+          <pre className="mt-2 rounded bg-semantic-surface-soft p-2 font-mono text-xs text-amtme-navy">
+            {`npm run type-check && npm run lint && npm run test && npm run build`}
+          </pre>
+        </div>
+      ) : null}
+
       {/* Acciones */}
       <Card>
         <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">Acciones</div>
         <div className="mt-4 flex flex-wrap gap-3">
           <button
             onClick={onApply}
-            disabled={!canApply || applying}
+            disabled={!canPrepare || applying}
             className="inline-flex items-center justify-center rounded-full bg-amtme-navy px-4 py-2 text-sm font-medium text-amtme-white transition hover:bg-amtme-black disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {applying ? 'Aplicando…' : 'Aplicar cambio'}
+            {applyLabel}
           </button>
           <button
             onClick={onDiscard}

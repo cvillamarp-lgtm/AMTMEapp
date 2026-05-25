@@ -5,43 +5,57 @@ import type { ValidationCheck, ValidationStatus, DiffHunk, RiskLevel } from './t
 export interface ValidationResult {
   status: ValidationStatus;
   checks: ValidationCheck[];
+  /** true only when all checks actually executed and none failed */
   passed: boolean;
+  /**
+   * true when at least one check was not executed (deferred to CI).
+   * deferred checks must NOT be interpreted as passing.
+   */
+  deferred: boolean;
 }
 
+// ── CI command map ─────────────────────────────────────────────────────────
+
+const CI_COMMANDS: Record<string, string> = {
+  typecheck: 'npm run type-check',
+  lint: 'npm run lint',
+  test: 'npm run test',
+  build: 'npm run build',
+};
+
 // ── Validate patch before applying ────────────────────────────────────────
-// In phase 1, validation is architecture-ready but runs simulated checks.
-// When real CI integration is available, replace the simulation with actual
-// npm run typecheck / lint / test / build calls.
+// Phase 2: policy checks (blocked/critical/destructive patterns) execute
+// immediately server-side. CI checks (typecheck, lint, test, build) are
+// deferred — they cannot run from within Next.js at request time.
+// Deferred status ≠ passed. The UI must make this explicit.
 
 export function validatePatch(diff: DiffHunk[], riskLevel: RiskLevel): ValidationResult {
   const checks: ValidationCheck[] = [];
 
-  // Typecheck simulation
-  checks.push(runSimulatedCheck('typecheck', diff, riskLevel));
-
-  // Lint simulation
-  checks.push(runSimulatedCheck('lint', diff, riskLevel));
-
-  // Test simulation
-  checks.push(runSimulatedCheck('test', diff, riskLevel));
-
-  // Build simulation
-  checks.push(runSimulatedCheck('build', diff, riskLevel));
+  for (const name of ['typecheck', 'lint', 'test', 'build'] as const) {
+    checks.push(runCheck(name, diff, riskLevel));
+  }
 
   const anyFailed = checks.some((c) => c.status === 'failed');
-  const allPassed = checks.every((c) => c.status === 'passed');
+  const anyDeferred = checks.some((c) => c.status === 'deferred');
 
   return {
-    status: anyFailed ? 'failed' : allPassed ? 'passed' : 'pending',
+    status: anyFailed ? 'failed' : anyDeferred ? 'deferred' : 'passed',
     checks,
-    passed: !anyFailed,
+    // Only truly passed when ALL checks executed and none failed
+    passed: !anyFailed && !anyDeferred,
+    deferred: anyDeferred,
   };
 }
 
-// ── Simulated check ────────────────────────────────────────────────────────
+// ── Individual check ───────────────────────────────────────────────────────
 
-function runSimulatedCheck(name: string, diff: DiffHunk[], riskLevel: RiskLevel): ValidationCheck {
-  // Blocked or critical risk: mark as failed with explanation
+function runCheck(
+  name: keyof typeof CI_COMMANDS,
+  diff: DiffHunk[],
+  riskLevel: RiskLevel
+): ValidationCheck {
+  // Policy failures — can be determined without running CI
   if (riskLevel === 'blocked') {
     return {
       name,
@@ -60,7 +74,7 @@ function runSimulatedCheck(name: string, diff: DiffHunk[], riskLevel: RiskLevel)
     };
   }
 
-  // Detect suspicious patterns in diff
+  // Destructive pattern detection in diff — server-side, no CI needed
   const allLines = diff.flatMap((h) => h.lines.map((l) => l.content));
   const hasDestructivePattern = allLines.some(
     (l) => /rm\s+-rf/i.test(l) || /drop\s+table/i.test(l) || /delete\s+from/i.test(l)
@@ -70,20 +84,15 @@ function runSimulatedCheck(name: string, diff: DiffHunk[], riskLevel: RiskLevel)
     return {
       name,
       status: 'failed',
-      error: `Patrón destructivo detectado en el diff durante validación de ${name}.`,
+      error: `Patrón destructivo detectado en el diff (validación de ${name}).`,
       recommendation: 'Elimina las líneas con comandos destructivos antes de continuar.',
     };
   }
 
-  // Simulate passing for low/medium risk, warning for high
-  if (riskLevel === 'high') {
-    return {
-      name,
-      status: 'passed',
-      recommendation:
-        'Riesgo alto: verifica manualmente el resultado antes de aplicar en producción.',
-    };
-  }
-
-  return { name, status: 'passed' };
+  // All other checks must be deferred to CI — cannot run npm commands at request time
+  return {
+    name,
+    status: 'deferred',
+    recommendation: `Ejecuta manualmente: ${CI_COMMANDS[name]}`,
+  };
 }

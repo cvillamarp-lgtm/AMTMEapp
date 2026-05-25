@@ -2,37 +2,43 @@ import type { AiChangePlan } from './types';
 
 // ── Rollback result ────────────────────────────────────────────────────────
 
+export type RollbackType = 'discard' | 'revert';
+
 export interface RollbackResult {
   success: boolean;
   message: string;
   restoredFiles: string[];
+  /**
+   * 'discard' — no real commit existed; rollback means cancelling the prepared plan.
+   * 'revert'  — a real commit was made and has been reverted (Phase 3+).
+   */
+  rollbackType: RollbackType;
 }
 
-// ── Create rollback snapshot ───────────────────────────────────────────────
-// Phase 1: Architecture-ready stub. Real implementation connects to GitHub API
-// to revert commits on the temporary branch.
+// ── Create rollback ────────────────────────────────────────────────────────
+// Phase 2: No real commits are created by applyPatch (which returns
+// 'ready_to_apply', not 'applied'). Therefore rollback is always a plan
+// discard operation — no files are restored from Git.
+//
+// When Phase 3 implements a real GitHub branch + commit via the API,
+// this function should detect a real commit and perform an actual revert,
+// returning rollbackType: 'revert' with the restored file list.
 
 export function createRollback(plan: AiChangePlan, requestId: string): RollbackResult {
   if (!plan.rollbackAvailable) {
     return {
       success: false,
-      message: 'No hay snapshot de rollback disponible para este cambio.',
+      message: 'No hay operación activa para deshacer en esta solicitud.',
       restoredFiles: [],
+      rollbackType: 'discard',
     };
   }
 
-  if (plan.affectedFiles.length === 0) {
-    return {
-      success: false,
-      message: 'No hay archivos afectados registrados para revertir.',
-      restoredFiles: [],
-    };
-  }
-
-  // In real implementation: call GitHub API to revert the branch or commit
+  // Phase 2: no real commit was made, so rollback = discard the prepared plan
   return {
     success: true,
-    message: `Rollback preparado para solicitud ${requestId}. ${plan.affectedFiles.length} archivo(s) revertido(s) al estado anterior.`,
-    restoredFiles: plan.affectedFiles,
+    message: `Plan descartado para solicitud ${requestId}. No se realizó ningún commit real — el diff propuesto ha sido cancelado.`,
+    restoredFiles: [],
+    rollbackType: 'discard',
   };
 }

@@ -7,6 +7,7 @@ const statusIcon: Record<string, string> = {
   running: '…',
   pending: '○',
   skipped: '—',
+  deferred: '⏸',
 };
 
 const statusClass: Record<string, string> = {
@@ -15,9 +16,14 @@ const statusClass: Record<string, string> = {
   running: 'text-amtme-slate',
   pending: 'text-amtme-slate',
   skipped: 'text-amtme-slate',
+  deferred: 'text-amtme-navy',
 };
 
-export function ValidationPanel({ checks }: { checks: ValidationCheck[] }) {
+interface ValidationPanelProps {
+  checks: ValidationCheck[];
+}
+
+export function ValidationPanel({ checks }: ValidationPanelProps) {
   if (checks.length === 0) {
     return (
       <p className="text-sm text-semantic-muted">
@@ -26,8 +32,22 @@ export function ValidationPanel({ checks }: { checks: ValidationCheck[] }) {
     );
   }
 
+  const hasDeferredChecks = checks.some((c) => c.status === 'deferred');
+
   return (
     <div className="space-y-2">
+      {hasDeferredChecks ? (
+        <div className="rounded-2xl border border-amtme-navy/20 bg-amtme-navy/5 px-4 py-3">
+          <p className="text-xs font-medium text-amtme-navy">
+            ⏸ Validaciones diferidas — no ejecutadas en runtime
+          </p>
+          <p className="mt-1 text-xs text-semantic-muted">
+            Estas validaciones no pueden ejecutarse desde el servidor web. Deben correr en CI/CD o
+            localmente antes de aplicar el cambio a producción.
+          </p>
+        </div>
+      ) : null}
+
       {checks.map((check) => (
         <div
           key={check.name}
@@ -43,8 +63,17 @@ export function ValidationPanel({ checks }: { checks: ValidationCheck[] }) {
               <span className="mr-2 font-mono">{statusIcon[check.status] ?? '?'}</span>
               {check.name}
             </span>
-            <span className="rounded-full bg-amtme-slate/15 px-2 py-0.5 text-xs text-amtme-navy">
-              {check.status}
+            <span
+              className={joinClasses(
+                'rounded-full px-2 py-0.5 text-xs',
+                check.status === 'deferred'
+                  ? 'bg-amtme-navy/10 text-amtme-navy'
+                  : check.status === 'failed'
+                    ? 'bg-amtme-red/10 text-amtme-red'
+                    : 'bg-amtme-slate/15 text-amtme-navy'
+              )}
+            >
+              {check.status === 'deferred' ? 'diferido' : check.status}
             </span>
           </div>
 
