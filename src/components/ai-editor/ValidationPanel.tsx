@@ -89,6 +89,22 @@ export function ValidationPanel({ checks }: ValidationPanelProps) {
           {check.recommendation ? (
             <p className="mt-1 text-xs text-semantic-muted">💡 {check.recommendation}</p>
           ) : null}
+          {check.command ? (
+            <p className="mt-1 font-mono text-xs text-semantic-muted">Comando: {check.command}</p>
+          ) : null}
+          {check.executionSource ? (
+            <p className="mt-1 text-xs text-semantic-muted">Fuente: {check.executionSource}</p>
+          ) : null}
+          {check.evidenceUrl ? (
+            <a
+              href={check.evidenceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-block text-xs text-amtme-navy underline underline-offset-2"
+            >
+              Ver evidencia
+            </a>
+          ) : null}
         </div>
       ))}
     </div>

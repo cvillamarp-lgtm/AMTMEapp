@@ -20,11 +20,13 @@ export async function POST(request: Request) {
 
   const { plan } = parsed.data;
 
-  const result = validatePatch(plan.diff, plan.riskLevel);
+  const result = await validatePatch(plan.diff, plan.riskLevel);
 
   return NextResponse.json({
     status: result.status,
     checks: result.checks,
     passed: result.passed,
+    deferred: result.deferred,
+    validationRun: result.validationRun,
   });
 }

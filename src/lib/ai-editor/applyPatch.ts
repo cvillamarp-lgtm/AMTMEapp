@@ -1,4 +1,5 @@
 import type { AiChangePlan, AiEditorMode, ChangeStatus } from './types';
+import { prepareGitHubChange } from './githubIntegration';
 
 // ── Apply patch result ─────────────────────────────────────────────────────
 
@@ -6,11 +7,16 @@ export interface ApplyPatchResult {
   success: boolean;
   status: ChangeStatus;
   message: string;
-  /**
-   * Proposed branch name. In Phase 2 this branch is NOT yet created in GitHub —
-   * it is the name that should be used when applying the diff manually or via CI.
-   */
   branchName?: string;
+  branchType?: 'real' | 'proposed';
+  commitSha?: string;
+  executionSource?: 'simulation' | 'github_api';
+  rollbackMetadata?: {
+    strategy: string;
+    patchFilePath?: string;
+    details?: string;
+  };
+  evidenceUrl?: string;
 }
 
 // ── Apply patch ────────────────────────────────────────────────────────────
@@ -20,11 +26,12 @@ export interface ApplyPatchResult {
 // 'applied'. When a real GitHub integration is available (Phase 3), this
 // function should create a branch via the GitHub API and return 'applied'.
 
-export function applyPatch(
+export async function applyPatch(
   plan: AiChangePlan,
   mode: AiEditorMode,
-  requestId: string
-): ApplyPatchResult {
+  requestId: string,
+  prompt?: string
+): Promise<ApplyPatchResult> {
   // Block when validations explicitly failed (policy or destructive patterns)
   if (plan.validationStatus === 'failed') {
     return {
@@ -59,8 +66,7 @@ export function applyPatch(
     };
   }
 
-  // Phase 2: generate a proposed branch name only — no real commit is created
-  const branchName = `ai-editor/${requestId.slice(0, 8)}`;
+  const githubIntegration = await prepareGitHubChange(plan, requestId, prompt);
 
   const deferredNote =
     plan.validationStatus === 'deferred'
@@ -70,7 +76,16 @@ export function applyPatch(
   return {
     success: true,
     status: 'ready_to_apply',
-    message: `Plan preparado. Rama propuesta: "${branchName}".${deferredNote} Aplica el diff en esa rama y ejecuta CI para completar.`,
-    branchName,
+    message: `${githubIntegration.message}${deferredNote} ${
+      githubIntegration.diffAppliedToFiles
+        ? 'El diff fue aplicado sobre archivos del branch técnico.'
+        : 'El diff quedó registrado como artefacto técnico; la aplicación sobre archivos de producto sigue pendiente de ejecución controlada.'
+    }`,
+    branchName: githubIntegration.branchName,
+    branchType: githubIntegration.branchType,
+    commitSha: githubIntegration.commitSha,
+    executionSource: githubIntegration.executionSource,
+    rollbackMetadata: githubIntegration.rollbackMetadata,
+    evidenceUrl: githubIntegration.evidenceUrl,
   };
 }

@@ -90,7 +90,34 @@ export function ChangeHistory({ entries, onRollback }: ChangeHistoryProps) {
             ) : null}
 
             {entry.branchName ? (
-              <p className="mt-1 font-mono text-xs text-amtme-navy">🌿 {entry.branchName}</p>
+              <p className="mt-1 font-mono text-xs text-amtme-navy">
+                🌿 {entry.branchName} ({entry.branchType === 'real' ? 'real' : 'propuesta'})
+              </p>
+            ) : null}
+            {entry.commitSha ? (
+              <p className="mt-1 font-mono text-xs text-amtme-navy">🧾 {entry.commitSha}</p>
+            ) : null}
+            {entry.validationRun ? (
+              <p className="mt-1 text-xs text-semantic-muted">
+                Validación: {entry.validationRun.status} · fuente {entry.validationRun.source}
+                {entry.validationRun.runUrl ? (
+                  <>
+                    {' '}
+                    ·{' '}
+                    <a
+                      href={entry.validationRun.runUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-amtme-navy underline underline-offset-2"
+                    >
+                      evidencia
+                    </a>
+                  </>
+                ) : null}
+              </p>
+            ) : null}
+            {entry.rollbackType ? (
+              <p className="mt-1 text-xs text-semantic-muted">Rollback: {entry.rollbackType}</p>
             ) : null}
 
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-semantic-muted">

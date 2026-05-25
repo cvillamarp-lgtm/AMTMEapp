@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { detectBlockedAction } from '@/lib/ai-editor/types';
 import { parseInstruction } from '@/lib/ai-editor/parseInstruction';
 import { resolveAffectedFiles, assessRisk } from '@/lib/ai-editor/fileResolver';
@@ -12,6 +12,14 @@ import {
   getChangeLog,
   CHANGE_LOG_STORAGE,
 } from '@/lib/ai-editor/changeLog';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  delete process.env.AI_EDITOR_GITHUB_TOKEN;
+  delete process.env.AI_EDITOR_GITHUB_OWNER;
+  delete process.env.AI_EDITOR_GITHUB_REPO;
+  delete process.env.AI_EDITOR_GITHUB_BASE_BRANCH;
+});
 
 // ── detectBlockedAction ────────────────────────────────────────────────────
 
@@ -145,7 +153,7 @@ describe('generatePatch', () => {
 // ── validatePatch — Phase 2 contracts ────────────────────────────────────
 
 describe('validatePatch', () => {
-  it('riesgo low → validaciones diferidas, no passed', () => {
+  it('riesgo low → validaciones diferidas, no passed', async () => {
     const diff = generatePatch({
       affectedFiles: ['src/app/ia/editor/page.tsx'],
       intent: 'update_copy',
@@ -153,41 +161,43 @@ describe('validatePatch', () => {
       prompt: 'actualiza el texto',
       mode: 'assisted',
     });
-    const result = validatePatch(diff, 'low');
+    const result = await validatePatch(diff, 'low');
     // Phase 2: CI checks cannot run at request time — they are deferred
     expect(result.passed).toBe(false);
     expect(result.deferred).toBe(true);
     expect(result.status).toBe('deferred');
     expect(result.checks.every((c) => c.status === 'deferred')).toBe(true);
+    expect(result.validationRun.source).toMatch(/github_actions|deferred_ci/);
   });
 
-  it('riesgo medium → validaciones diferidas, no passed', () => {
-    const result = validatePatch([], 'medium');
+  it('riesgo medium → validaciones diferidas, no passed', async () => {
+    const result = await validatePatch([], 'medium');
     expect(result.passed).toBe(false);
     expect(result.deferred).toBe(true);
   });
 
-  it('riesgo high → validaciones diferidas, no passed', () => {
-    const result = validatePatch([], 'high');
+  it('riesgo high → validaciones diferidas, no passed', async () => {
+    const result = await validatePatch([], 'high');
     expect(result.passed).toBe(false);
     expect(result.deferred).toBe(true);
   });
 
-  it('falla validación con riesgo blocked', () => {
-    const result = validatePatch([], 'blocked');
+  it('falla validación con riesgo blocked', async () => {
+    const result = await validatePatch([], 'blocked');
     expect(result.passed).toBe(false);
     expect(result.deferred).toBe(false);
     expect(result.status).toBe('failed');
     expect(result.checks.every((c) => c.status === 'failed')).toBe(true);
+    expect(result.validationRun.source).toBe('policy_engine');
   });
 
-  it('falla validación con riesgo critical', () => {
-    const result = validatePatch([], 'critical');
+  it('falla validación con riesgo critical', async () => {
+    const result = await validatePatch([], 'critical');
     expect(result.passed).toBe(false);
     expect(result.status).toBe('failed');
   });
 
-  it('detecta patrones destructivos en diff y falla', () => {
+  it('detecta patrones destructivos en diff y falla', async () => {
     const diff = [
       {
         file: 'danger.ts',
@@ -196,15 +206,16 @@ describe('validatePatch', () => {
         lines: [{ type: 'add' as const, content: '+ rm -rf /' }],
       },
     ];
-    const result = validatePatch(diff, 'low');
+    const result = await validatePatch(diff, 'low');
     expect(result.passed).toBe(false);
     expect(result.status).toBe('failed');
   });
 
-  it('checks diferidos incluyen comando CI en recommendation', () => {
-    const result = validatePatch([], 'low');
+  it('checks diferidos incluyen comando CI en recommendation', async () => {
+    const result = await validatePatch([], 'low');
     const typecheckCheck = result.checks.find((c) => c.name === 'typecheck');
     expect(typecheckCheck?.recommendation).toContain('npm run');
+    expect(typecheckCheck?.command).toBe('npm run type-check');
   });
 });
 
@@ -224,60 +235,85 @@ describe('applyPatch', () => {
     rollbackAvailable: false,
   };
 
-  it('retorna ready_to_apply (no applied) con validaciones passed', () => {
-    const result = applyPatch(basePlan, 'direct', 'test-id-123');
+  it('retorna ready_to_apply (no applied) con validaciones passed', async () => {
+    const result = await applyPatch(basePlan, 'direct', 'test-id-123');
     expect(result.success).toBe(true);
     expect(result.status).toBe('ready_to_apply');
     expect(result.status).not.toBe('applied');
     expect(result.branchName).toContain('ai-editor/');
+    expect(result.branchType).toBe('proposed');
   });
 
-  it('permite preparar rama con validaciones diferidas', () => {
+  it('permite preparar rama con validaciones diferidas', async () => {
     const plan = { ...basePlan, validationStatus: 'deferred' as const };
-    const result = applyPatch(plan, 'direct', 'test-deferred');
+    const result = await applyPatch(plan, 'direct', 'test-deferred');
     expect(result.success).toBe(true);
     expect(result.status).toBe('ready_to_apply');
     expect(result.message).toContain('CI');
   });
 
-  it('bloquea cuando validaciones fallaron explícitamente', () => {
+  it('bloquea cuando validaciones fallaron explícitamente', async () => {
     const plan = { ...basePlan, validationStatus: 'failed' as const };
-    const result = applyPatch(plan, 'direct', 'test-fail');
+    const result = await applyPatch(plan, 'direct', 'test-fail');
     expect(result.success).toBe(false);
     expect(result.status).toBe('apply_blocked');
   });
 
-  it('no aplica en modo safe', () => {
-    const result = applyPatch(basePlan, 'safe', 'test-safe');
+  it('no aplica en modo safe', async () => {
+    const result = await applyPatch(basePlan, 'safe', 'test-safe');
     expect(result.success).toBe(false);
     expect(result.status).toBe('draft');
   });
 
-  it('no aplica si riesgo bloqueado', () => {
+  it('no aplica si riesgo bloqueado', async () => {
     const plan = { ...basePlan, riskLevel: 'blocked' as const };
-    const result = applyPatch(plan, 'direct', 'test-blocked');
+    const result = await applyPatch(plan, 'direct', 'test-blocked');
     expect(result.success).toBe(false);
     expect(result.status).toBe('apply_blocked');
   });
 
-  it('no aplica si riesgo crítico', () => {
+  it('no aplica si riesgo crítico', async () => {
     const plan = { ...basePlan, riskLevel: 'critical' as const };
-    const result = applyPatch(plan, 'direct', 'test-critical');
+    const result = await applyPatch(plan, 'direct', 'test-critical');
     expect(result.success).toBe(false);
     expect(result.status).toBe('apply_blocked');
   });
 
-  it('mensaje deja claro que no hubo commit real', () => {
-    const result = applyPatch(basePlan, 'direct', 'test-msg');
+  it('mensaje deja claro que no hubo commit real', async () => {
+    const result = await applyPatch(basePlan, 'direct', 'test-msg');
     expect(result.message).not.toContain('aplicado');
-    expect(result.message).toContain('Aplica el diff');
+    expect(result.message).toContain('artefacto');
+    expect(result.commitSha).toBeUndefined();
+  });
+
+  it('si hay integración GitHub configurada retorna branch real y commitSha', async () => {
+    process.env.AI_EDITOR_GITHUB_TOKEN = 'x'.repeat(40);
+    process.env.AI_EDITOR_GITHUB_OWNER = 'owner';
+    process.env.AI_EDITOR_GITHUB_REPO = 'repo';
+    process.env.AI_EDITOR_GITHUB_BASE_BRANCH = 'main';
+
+    const fetchMock = vi
+      .spyOn(global, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ object: { sha: 'base-sha' } }), { status: 200 })
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 201 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ commit: { sha: 'commit-123' } }), { status: 200 })
+      );
+
+    const result = await applyPatch(basePlan, 'direct', 'test-github', 'prompt');
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(result.branchType).toBe('real');
+    expect(result.commitSha).toBe('commit-123');
+    expect(result.executionSource).toBe('github_api');
   });
 });
 
 // ── createRollback — Phase 2 contracts ───────────────────────────────────
 
 describe('createRollback', () => {
-  it('descarta plan (rollbackType: discard) cuando rollback disponible', () => {
+  it('descarta plan (rollbackType: discard) cuando rollback disponible', async () => {
     const plan = {
       intent: 'update_config',
       summary: 'test',
@@ -290,7 +326,7 @@ describe('createRollback', () => {
       validationChecks: [],
       rollbackAvailable: true,
     };
-    const result = createRollback(plan, 'req-abc');
+    const result = await createRollback(plan, 'req-abc');
     expect(result.success).toBe(true);
     // Phase 2: rollback is always a discard — no real commit was made
     expect(result.rollbackType).toBe('discard');
@@ -299,7 +335,7 @@ describe('createRollback', () => {
     expect(result.message).toContain('commit');
   });
 
-  it('falla si rollback no disponible', () => {
+  it('falla si rollback no disponible', async () => {
     const plan = {
       intent: 'test',
       summary: 'test',
@@ -312,7 +348,70 @@ describe('createRollback', () => {
       validationChecks: [],
       rollbackAvailable: false,
     };
-    const result = createRollback(plan, 'req-no');
+    const result = await createRollback(plan, 'req-no');
+    expect(result.success).toBe(false);
+    expect(result.rollbackType).toBe('discard');
+  });
+
+  it('usa rollback real cuando hay commitSha, branch y metadata', async () => {
+    process.env.AI_EDITOR_GITHUB_TOKEN = 'x'.repeat(40);
+    process.env.AI_EDITOR_GITHUB_OWNER = 'owner';
+    process.env.AI_EDITOR_GITHUB_REPO = 'repo';
+
+    vi.spyOn(global, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ sha: 'file-sha' }), { status: 200 }))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ commit: { sha: 'rollback-commit' } }), { status: 200 })
+      );
+
+    const plan = {
+      intent: 'update_config',
+      summary: 'test',
+      affectedFiles: ['src/app/configuracion/page.tsx'],
+      affectedRoutes: ['/configuracion'],
+      riskLevel: 'low' as const,
+      requiresApproval: false,
+      diff: [],
+      validationStatus: 'passed' as const,
+      validationChecks: [],
+      rollbackAvailable: true,
+    };
+
+    const result = await createRollback(plan, 'req-real', {
+      branchName: 'ai-editor/req-real',
+      commitSha: 'commit-123',
+      rollbackMetadata: {
+        strategy: 'delete_patch_artifact',
+        patchFilePath: '.ai-editor/requests/req-real.json',
+      },
+    });
+    expect(result.success).toBe(true);
+    expect(result.rollbackType).toBe('revert');
+    expect(result.rollbackCommitSha).toBe('rollback-commit');
+  });
+
+  it('no miente cuando existe commit pero no hay integración para rollback real', async () => {
+    const plan = {
+      intent: 'update_config',
+      summary: 'test',
+      affectedFiles: ['src/app/configuracion/page.tsx'],
+      affectedRoutes: ['/configuracion'],
+      riskLevel: 'low' as const,
+      requiresApproval: false,
+      diff: [],
+      validationStatus: 'passed' as const,
+      validationChecks: [],
+      rollbackAvailable: true,
+    };
+
+    const result = await createRollback(plan, 'req-real-fail', {
+      branchName: 'ai-editor/req-real-fail',
+      commitSha: 'commit-123',
+      rollbackMetadata: {
+        strategy: 'delete_patch_artifact',
+        patchFilePath: '.ai-editor/requests/req-real-fail.json',
+      },
+    });
     expect(result.success).toBe(false);
     expect(result.rollbackType).toBe('discard');
   });
