@@ -7,9 +7,9 @@ import { formatDate } from '@/lib/studio-utils';
 
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <Card className="bg-[#F5F5F7]">
+    <Card className="bg-[#F5F2EA]">
       <div className="text-xs uppercase tracking-[0.22em] text-black/40">{label}</div>
-      <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">{value}</div>
+      <div className="mt-3 text-3xl font-semibold tracking-tight text-[#0C1F36]">{value}</div>
       <div className="mt-2 text-sm text-black/55">{detail}</div>
     </Card>
   );
@@ -32,7 +32,7 @@ export default function DashboardPage() {
       (episode) => `Episodio ${episode.episodeNumber} sin cierre operativo completo.`
     ),
     ...state.visualAssets
-      .filter((asset) => !asset.palette.includes('#001F36') && !asset.palette.includes('Navy'))
+      .filter((asset) => !asset.palette.includes('#0C1F36') && !asset.palette.includes('Navy'))
       .map((asset) => `Pieza visual ${asset.title} sin referencia clara a la paleta oficial.`),
     ...state.archiveItems
       .filter((item) => item.status !== 'Archivado')
@@ -42,7 +42,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5 pb-24">
       <section className="grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
-        <Card className="overflow-hidden bg-[#001F36] text-white shadow-[0_20px_60px_rgba(0,31,54,0.28)]">
+        <Card className="overflow-hidden bg-[#0C1F36] text-white shadow-[0_20px_60px_rgba(0,31,54,0.28)]">
           <div className="flex h-full flex-col justify-between gap-8">
             <div className="max-w-2xl">
               <Badge tone="accent">Centro de control operativo</Badge>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
               <div className="text-xs uppercase tracking-[0.22em] text-black/40">
                 Pendientes críticos
               </div>
-              <h3 className="mt-1 text-xl font-semibold text-[#001F36]">
+              <h3 className="mt-1 text-xl font-semibold text-[#0C1F36]">
                 Lo que necesita atención ahora
               </h3>
             </div>
@@ -125,9 +125,9 @@ export default function DashboardPage() {
               qualityAlerts.map((alert) => (
                 <div
                   key={alert}
-                  className="flex items-start gap-3 rounded-2xl border border-black/8 bg-[#F5F5F7] px-4 py-3 text-sm text-[#001F36]"
+                  className="flex items-start gap-3 rounded-2xl border border-black/8 bg-[#F5F2EA] px-4 py-3 text-sm text-[#0C1F36]"
                 >
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#B85C38]" />
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#E0211E]" />
                   <span>{alert}</span>
                 </div>
               ))
@@ -164,7 +164,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs uppercase tracking-[0.22em] text-black/40">Episodios</div>
-              <h3 className="mt-1 text-xl font-semibold text-[#001F36]">Producción actual</h3>
+              <h3 className="mt-1 text-xl font-semibold text-[#0C1F36]">Producción actual</h3>
             </div>
             <Button href="/episodios" variant="ghost">
               Ver todos
@@ -175,14 +175,14 @@ export default function DashboardPage() {
               <Link
                 key={episode.id}
                 href="/episodios"
-                className="block rounded-2xl border border-black/8 bg-[#F5F5F7] px-4 py-4 transition hover:bg-white"
+                className="block rounded-2xl border border-black/8 bg-[#F5F2EA] px-4 py-4 transition hover:bg-white"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <div className="text-xs uppercase tracking-[0.2em] text-black/38">
                       Episodio {episode.episodeNumber}
                     </div>
-                    <div className="mt-1 text-base font-semibold text-[#001F36]">
+                    <div className="mt-1 text-base font-semibold text-[#0C1F36]">
                       {episode.title}
                     </div>
                   </div>

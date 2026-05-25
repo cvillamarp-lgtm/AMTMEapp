@@ -33,6 +33,8 @@ const monetizationStatusSchema = z.enum([
   'Seguimiento',
 ]);
 const aiProviderSchema = z.enum(['grok', 'gemini']);
+const interfaceDensitySchema = z.enum(['compacta', 'estandar']);
+const integrationStatusSchema = z.enum(['No configurada', 'Preparada', 'Conectada']);
 const aiEngineSchema = z.enum([
   'AI Episodios',
   'AI Visual',
@@ -251,12 +253,33 @@ const aiHistoryEntrySchema = z
 const appConfigSchema = z
   .object({
     projectName: z.string(),
+    projectDescriptor: z.string(),
+    uiLanguage: z.string(),
+    timeZone: z.string(),
+    currency: z.string(),
+    operationalContext: z.string(),
     paletteLocked: z.boolean(),
     activeChannels: z.array(z.string()),
     activeFormats: z.array(z.string()),
+    defaultChannel: z.string(),
+    defaultFrequency: z.string(),
+    publishingWindows: z.array(z.string()),
     frequentCtas: z.array(z.string()),
+    defaultNarrativeStructure: z.array(z.string()),
+    editorialTone: z.string(),
     psychologicalConcepts: z.array(z.string()),
     futureApis: z.array(z.string()),
+    futureIntegrations: z.array(
+      z
+        .object({
+          id: z.enum(['supabase', 'drive', 'calendar', 'sheets', 'webhooks']),
+          label: z.string(),
+          status: integrationStatusSchema,
+          mode: z.enum(['solo lectura', 'pendiente']),
+          detail: z.string(),
+        })
+        .passthrough()
+    ),
     aiPrimaryProvider: aiProviderSchema,
     aiFallbackProvider: aiProviderSchema,
     aiEnabled: z.boolean(),
@@ -266,12 +289,24 @@ const appConfigSchema = z
         gemini: z.string(),
       })
       .passthrough(),
+    aiVisibleModelsByProvider: z
+      .object({
+        grok: z.array(z.string()),
+        gemini: z.array(z.string()),
+      })
+      .passthrough(),
     aiSystemPrompt: z.string(),
     aiTone: z.string(),
     aiImageModel: z.string(),
     aiNarrativeStructure: z.array(z.string()),
     aiQualityRules: z.array(z.string()),
+    aiBaseQualityChecklist: z.array(z.string()),
     aiConnectionStatus: z.string(),
+    persistenceMode: z.enum(['local', 'remote', 'hibrido']),
+    environmentReadOnlyFlags: z.array(z.string()),
+    uiDensity: interfaceDensitySchema,
+    compactCards: z.boolean(),
+    showInterfaceHelp: z.boolean(),
   })
   .passthrough();
 

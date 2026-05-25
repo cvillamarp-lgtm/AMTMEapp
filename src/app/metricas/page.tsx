@@ -39,7 +39,7 @@ export default function MetricasPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Métricas</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Lectura operativa del sistema
             </h2>
           </div>
@@ -48,13 +48,13 @@ export default function MetricasPage() {
 
         <div className="mt-5 space-y-4">
           {state.metricsMonthly.map((metric) => (
-            <div key={metric.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
+            <div key={metric.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-black/38">
                     {metric.month} · {metric.platform}
                   </div>
-                  <div className="mt-1 text-base font-semibold text-[#001F36]">
+                  <div className="mt-1 text-base font-semibold text-[#0C1F36]">
                     {metric.insight}
                   </div>
                 </div>
@@ -79,7 +79,7 @@ export default function MetricasPage() {
           {state.metricsEpisode.map((metric) => (
             <div key={metric.id} className="rounded-3xl border border-black/8 bg-white p-4">
               <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-semibold text-[#001F36]">
+                <div className="text-sm font-semibold text-[#0C1F36]">
                   Episodio {metric.episodeId}
                 </div>
                 <Badge tone="neutral">Retención {metric.retention}%</Badge>

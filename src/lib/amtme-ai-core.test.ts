@@ -29,7 +29,7 @@ describe('amtme-ai-core', () => {
 
     expect(prompt).toContain('Motor: AI Episodios');
     expect(prompt).toContain('Módulo: Episodios');
-    expect(prompt).toContain('Paleta oficial: Navy #001F36');
+    expect(prompt).toContain('Paleta oficial: Navy #0C1F36');
     expect(prompt).toContain(
       'Política operativa: La arquitectura oficial es la única ruta activa.'
     );

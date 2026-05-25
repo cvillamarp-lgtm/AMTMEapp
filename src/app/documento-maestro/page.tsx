@@ -63,7 +63,7 @@ export default function DocumentoMaestroPage() {
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">
               Documento Maestro
             </div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Fuente central de conocimiento
             </h2>
           </div>
@@ -82,7 +82,7 @@ export default function DocumentoMaestroPage() {
               <button
                 key={section.id}
                 onClick={() => syncSelected(section.id)}
-                className={`w-full rounded-3xl border px-4 py-4 text-left transition ${selected?.id === section.id ? 'border-[#001F36] bg-[#001F36] text-white shadow-[0_12px_30px_rgba(0,31,54,0.18)]' : 'border-black/8 bg-[#F5F5F7] text-[#001F36] hover:bg-white'}`}
+                className={`w-full rounded-3xl border px-4 py-4 text-left transition ${selected?.id === section.id ? 'border-[#0C1F36] bg-[#0C1F36] text-white shadow-[0_12px_30px_rgba(0,31,54,0.18)]' : 'border-black/8 bg-[#F5F2EA] text-[#0C1F36] hover:bg-white'}`}
               >
                 <div className="flex items-center justify-between gap-2">
                   <div>
@@ -118,7 +118,7 @@ export default function DocumentoMaestroPage() {
                 <div className="text-xs uppercase tracking-[0.22em] text-black/40">
                   Sección activa
                 </div>
-                <h3 className="mt-1 text-2xl font-semibold text-[#001F36]">{draft.title}</h3>
+                <h3 className="mt-1 text-2xl font-semibold text-[#0C1F36]">{draft.title}</h3>
               </div>
               <Badge
                 tone={

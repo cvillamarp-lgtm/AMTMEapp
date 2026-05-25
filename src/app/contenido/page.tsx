@@ -45,7 +45,7 @@ export default function ContenidoPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Contenido</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Piezas listas para publicar
             </h2>
           </div>
@@ -164,7 +164,7 @@ export default function ContenidoPage() {
               onChange={(event) => setDraft({ ...draft, metricGoal: event.target.value })}
             />
           </Field>
-          <div className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm text-black/58">
+          <div className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm text-black/58">
             Publicación sugerida: {formatDate(draft.publishDate)} · Episodio{' '}
             {episode?.episodeNumber || 'nuevo'}
           </div>

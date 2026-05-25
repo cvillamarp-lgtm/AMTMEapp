@@ -47,13 +47,15 @@ export function StudioShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] text-[#001F36]">
+    <div className="min-h-screen bg-semantic-bg text-semantic-text">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
-        <aside className="hidden w-[280px] shrink-0 border-r border-black/8 bg-white/90 px-5 py-6 backdrop-blur md:block">
+        <aside className="hidden w-[280px] shrink-0 border-r border-semantic-border bg-semantic-surface px-5 py-6 md:block">
           <div className="mb-8">
-            <div className="text-xs uppercase tracking-[0.26em] text-black/45">AMTME</div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight">Studio OS</div>
-            <p className="mt-3 text-sm leading-6 text-black/55">
+            <div className="text-xs uppercase tracking-[0.26em] text-semantic-muted">AMTME</div>
+            <div className="mt-2 text-2xl font-semibold tracking-tight text-amtme-navy">
+              Studio OS
+            </div>
+            <p className="mt-3 text-sm leading-6 text-semantic-muted">
               Sistema operativo editorial y documental con foco en orden, velocidad y control.
             </p>
           </div>
@@ -68,22 +70,22 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   className={joinClasses(
                     'flex items-center justify-between rounded-2xl px-4 py-3 text-sm transition',
                     active
-                      ? 'bg-[#001F36] text-white shadow-[0_10px_24px_rgba(0,31,54,0.22)]'
-                      : 'text-[#001F36] hover:bg-black/5'
+                      ? 'bg-amtme-navy text-amtme-white shadow-[0_10px_24px_rgba(12,31,54,0.24)]'
+                      : 'text-amtme-navy hover:bg-amtme-slate/18'
                   )}
                 >
                   <span>{item.label}</span>
-                  {active ? <span className="h-2 w-2 rounded-full bg-[#E8FF40]" /> : null}
+                  {active ? <span className="h-2 w-2 rounded-full bg-amtme-lemon" /> : null}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="mt-8 rounded-[24px] border border-black/8 bg-[#F5EFE6] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-black/45">
+          <div className="mt-8 rounded-[24px] border border-semantic-border bg-semantic-surface-soft p-4">
+            <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted">
               Estado del sistema
             </div>
-            <div className="mt-2 text-sm font-medium">Operativo</div>
+            <div className="mt-2 text-sm font-medium text-amtme-black">Operativo</div>
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge tone="accent">Política activa</Badge>
               <Badge tone="good">Estructura oficial</Badge>
@@ -92,13 +94,13 @@ export function StudioShell({ children }: { children: ReactNode }) {
         </aside>
 
         <main className="flex min-h-screen min-w-0 flex-1 flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-          <header className="sticky top-0 z-20 mb-5 rounded-[28px] border border-black/8 bg-white/85 px-4 py-4 backdrop-blur-xl sm:px-6">
+          <header className="sticky top-0 z-20 mb-5 rounded-[28px] border border-semantic-border bg-semantic-surface px-4 py-4 sm:px-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <div className="text-xs uppercase tracking-[0.24em] text-black/40">
+                <div className="text-xs uppercase tracking-[0.24em] text-semantic-muted">
                   AMTME Studio OS
                 </div>
-                <h1 className="mt-1 text-xl font-semibold tracking-tight text-[#001F36] sm:text-2xl">
+                <h1 className="mt-1 text-xl font-semibold tracking-tight text-amtme-navy sm:text-2xl">
                   {state.config.projectName}
                 </h1>
               </div>
@@ -131,7 +133,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-black/8 bg-white px-3 py-2 md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-semantic-border bg-semantic-surface px-3 py-2 md:hidden">
         <div className="flex gap-2 overflow-x-auto">
           {navigation.slice(0, 6).map((item) => {
             const active = pathname === item.href;
@@ -141,7 +143,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 href={item.href}
                 className={joinClasses(
                   'whitespace-nowrap rounded-full px-3 py-2 text-xs',
-                  active ? 'bg-[#001F36] text-white' : 'bg-black/5 text-[#001F36]'
+                  active ? 'bg-amtme-navy text-amtme-white' : 'bg-amtme-slate/18 text-amtme-navy'
                 )}
               >
                 {item.label}

@@ -35,7 +35,7 @@ export default function CalendarioPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Calendario</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Secuencia operativa
             </h2>
           </div>
@@ -43,13 +43,13 @@ export default function CalendarioPage() {
         </div>
         <div className="mt-5 space-y-3">
           {state.calendarEvents.map((event) => (
-            <div key={event.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
+            <div key={event.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-black/38">
                     {event.date} · {event.time}
                   </div>
-                  <div className="mt-1 text-base font-semibold text-[#001F36]">{event.title}</div>
+                  <div className="mt-1 text-base font-semibold text-[#0C1F36]">{event.title}</div>
                 </div>
                 <Badge tone={event.status === 'Listo' ? 'good' : 'neutral'}>{event.status}</Badge>
               </div>

@@ -28,6 +28,8 @@ export type MonetizationStatus =
   | 'Perdido'
   | 'Seguimiento';
 export type AIProvider = 'grok' | 'gemini';
+export type InterfaceDensity = 'compacta' | 'estandar';
+export type IntegrationStatus = 'No configurada' | 'Preparada' | 'Conectada';
 export type AIWorkMode = 'Episodio' | 'Copy' | 'Visual' | 'Métricas' | 'Monetización';
 export type AIEngine =
   | 'AI Episodios'
@@ -217,24 +219,50 @@ export interface AIHistoryEntry {
   resultSummary: string;
 }
 
+export interface FutureIntegration {
+  id: 'supabase' | 'drive' | 'calendar' | 'sheets' | 'webhooks';
+  label: string;
+  status: IntegrationStatus;
+  mode: 'solo lectura' | 'pendiente';
+  detail: string;
+}
+
 export interface AppConfig {
   projectName: string;
+  projectDescriptor: string;
+  uiLanguage: string;
+  timeZone: string;
+  currency: string;
+  operationalContext: string;
   paletteLocked: boolean;
   activeChannels: string[];
   activeFormats: string[];
+  defaultChannel: string;
+  defaultFrequency: string;
+  publishingWindows: string[];
   frequentCtas: string[];
+  defaultNarrativeStructure: string[];
+  editorialTone: string;
   psychologicalConcepts: string[];
   futureApis: string[];
+  futureIntegrations: FutureIntegration[];
   aiPrimaryProvider: AIProvider;
   aiFallbackProvider: AIProvider;
   aiEnabled: boolean;
   aiPreferredModelByProvider: Record<AIProvider, string>;
+  aiVisibleModelsByProvider: Record<AIProvider, string[]>;
   aiSystemPrompt: string;
   aiTone: string;
   aiImageModel: string;
   aiNarrativeStructure: string[];
   aiQualityRules: string[];
+  aiBaseQualityChecklist: string[];
   aiConnectionStatus: string;
+  persistenceMode: 'local' | 'remote' | 'hibrido';
+  environmentReadOnlyFlags: string[];
+  uiDensity: InterfaceDensity;
+  compactCards: boolean;
+  showInterfaceHelp: boolean;
 }
 
 export interface StudioState {

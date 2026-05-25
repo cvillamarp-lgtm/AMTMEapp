@@ -12,7 +12,7 @@ export default function HistoricoPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Histórico</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Material de referencia
             </h2>
           </div>
@@ -20,9 +20,9 @@ export default function HistoricoPage() {
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {state.archiveItems.map((item) => (
-            <div key={item.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
+            <div key={item.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-lg font-semibold text-[#001F36]">{item.name}</h3>
+                <h3 className="text-lg font-semibold text-[#0C1F36]">{item.name}</h3>
                 <Badge tone={item.status === 'Archivado' ? 'neutral' : 'warning'}>
                   {item.status}
                 </Badge>

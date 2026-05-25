@@ -10,51 +10,37 @@ La paleta de marca AMTME consta de 7 colores específicos con uso controlado:
 
 | Color | Hex Code | Uso Principal |
 |-------|----------|---------------|
-| Rojo AMTME | `#EF4444` | Llamadas a acción, headlines, énfasis |
-| Negro | `#000000` | Textos, bordes, fondos de alto contraste |
+| Lemon Lime | `#FEE94B` | Acento principal, foco visual, CTA secundaria |
+| Navy Profundo | `#0C1F36` | Base editorial, titulares, navegación |
+| Crema Editorial | `#F5F2EA` | Fondo operativo principal |
 | Blanco | `#FFFFFF` | Fondos, espacios negativos |
-| Gris Oscuro | `#374151` | Textos secundarios, elementos neutros |
-| Gris Claro | `#E5E7EB` | Divisores, bordes sutiles |
-| Azul Acento | `#3B82F6` | Elementos interactivos, enlaces |
-| Naranja Acento | `#F97316` | Avisos, destacados alternativos |
+| Azul Grisáceo | `#90A4B8` | Apoyo visual, estados neutros, fondos suaves |
+| Rojo AMTME | `#E0211E` | Error, bloqueo, alertas críticas |
+| Negro Interfaz | `#111111` | Texto de alto contraste y cierre visual |
 
 ## Reglas de Color
 
-### Rojo AMTME (`#EF4444`)
-- Máximo 40% de cobertura visual en una composición
-- Uso obligatorio en botones de acción principal
-- Nunca como fondo de texto de cuerpo
-- Válido solo en headlines y CTAs
+### Navy Profundo (`#0C1F36`)
+- Base tipográfica y de navegación del sistema.
+- Prioridad para títulos, menús y componentes de estructura.
 
-### Negro (`#000000`)
-- Máximo 60% de cobertura
-- Uso obligatorio para textos body (tamaño >12px)
-- Contraste mínimo 4.5:1 con fondo (WCAG AA)
+### Lemon Lime (`#FEE94B`)
+- Acento de foco y señal operativa.
+- Uso puntual para evitar saturación visual.
 
-### Blanco (`#FFFFFF`)
-- Máximo 70% de cobertura
-- Obligatorio para espacios negativos
-- Fondos de tarjetas y modales
+### Crema Editorial (`#F5F2EA`) y Blanco (`#FFFFFF`)
+- Crema para fondo general de trabajo.
+- Blanco para superficies, tarjetas y capas de lectura.
 
-### Gris Oscuro (`#374151`)
-- Para textos secundarios y subtítulos
-- Máximo 30% de cobertura
-- Contraste mínimo 4.5:1 con fondo
+### Azul Grisáceo (`#90A4B8`)
+- Texto secundario, estados neutros y soportes de UI.
 
-### Gris Claro (`#E5E7EB`)
-- Exclusivo para divisores y bordes
-- Máximo 10% de cobertura
-- Prohibido como fondo principal
+### Rojo AMTME (`#E0211E`)
+- Estados de error, alertas y bloqueos.
+- No usar como color base del layout.
 
-### Azul Acento (`#3B82F6`)
-- Para elementos interactivos, enlaces hover
-- Máximo 15% de cobertura
-- Contraste mínimo 3:1
-
-### Naranja Acento (`#F97316`)
-- Para avisos, notificaciones, alertas
-- Máximo 10% de cobertura
-- Uso bajo demanda de prioridad visual
+### Negro Interfaz (`#111111`)
+- Refuerzo de contraste en elementos de máxima jerarquía.
 
 ## Formatos Oficiales
 

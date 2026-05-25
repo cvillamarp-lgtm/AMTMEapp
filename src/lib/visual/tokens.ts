@@ -18,14 +18,14 @@ export type BrandTokens = z.infer<typeof BrandTokensSchema>;
 export const TOKEN_KEYS = Object.freeze(['NAVY', 'GOLD', 'AQUA', 'TEAL', 'SAND', 'HL'] as const);
 export type TokenKey = (typeof TOKEN_KEYS)[number];
 
-// Default tokens (exact from sb01.js)
+// Default tokens basados en la paleta oficial AMTME
 export const DEFAULT_TOKENS: BrandTokens = Object.freeze({
-  NAVY: '#083A4F',
-  GOLD: '#A58D66',
-  AQUA: '#C0D5D6',
-  TEAL: '#407E8C',
-  SAND: '#E5E1DD',
-  HL: '#E8FF40',
+  NAVY: '#0C1F36',
+  GOLD: '#FEE94B',
+  AQUA: '#90A4B8',
+  TEAL: '#111111',
+  SAND: '#F5F2EA',
+  HL: '#FEE94B',
 });
 
 // Set of allowed hex colors

@@ -8,7 +8,7 @@ export default function PoliticaOperativaPage() {
 
   return (
     <div className="space-y-5">
-      <Card className="bg-[#001F36] text-white">
+      <Card className="bg-[#0C1F36] text-white">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="text-xs uppercase tracking-[0.24em] text-white/45">
@@ -30,7 +30,7 @@ export default function PoliticaOperativaPage() {
         {state.masterSections.map((section) => (
           <Card key={section.id} className="bg-white">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-lg font-semibold text-[#001F36]">{section.title}</h3>
+              <h3 className="text-lg font-semibold text-[#0C1F36]">{section.title}</h3>
               <Badge tone={section.status === 'Vigente' ? 'good' : 'neutral'}>
                 {section.status}
               </Badge>
@@ -53,7 +53,7 @@ export default function PoliticaOperativaPage() {
           ].map((rule) => (
             <div
               key={rule}
-              className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm leading-6 text-[#001F36]"
+              className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm leading-6 text-[#0C1F36]"
             >
               {rule}
             </div>

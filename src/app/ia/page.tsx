@@ -82,7 +82,7 @@ export default function IAPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">IA</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Conexión Grok y Gemini
             </h2>
           </div>
@@ -146,8 +146,8 @@ export default function IAPage() {
       <div className="space-y-5">
         <Card>
           <div className="text-xs uppercase tracking-[0.22em] text-black/40">Resultado</div>
-          <div className="mt-4 min-h-[360px] rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm leading-6 text-[#001F36]">
-            {response.error ? <p className="text-[#B85C38]">{response.error}</p> : null}
+          <div className="mt-4 min-h-[360px] rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm leading-6 text-[#0C1F36]">
+            {response.error ? <p className="text-[#E0211E]">{response.error}</p> : null}
             {!response.error && !response.result ? (
               <p className="text-black/45">Aquí aparecerá la respuesta de Grok o Gemini.</p>
             ) : null}
@@ -162,27 +162,27 @@ export default function IAPage() {
             Estado de conexión
           </div>
           <div className="mt-4 grid gap-3 text-sm text-black/60">
-            <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
+            <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
               <span>Proveedor primario</span>
-              <span className="font-medium text-[#001F36]">
+              <span className="font-medium text-[#0C1F36]">
                 {getProviderLabel(state.config.aiPrimaryProvider)}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
+            <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
               <span>Proveedor fallback</span>
-              <span className="font-medium text-[#001F36]">
+              <span className="font-medium text-[#0C1F36]">
                 {getProviderLabel(state.config.aiFallbackProvider)}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
+            <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
               <span>Modelo Grok</span>
-              <span className="font-medium text-[#001F36]">
+              <span className="font-medium text-[#0C1F36]">
                 {state.config.aiPreferredModelByProvider.grok}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl bg-[#F5F5F7] px-4 py-3">
+            <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
               <span>Modelo Gemini</span>
-              <span className="font-medium text-[#001F36]">
+              <span className="font-medium text-[#0C1F36]">
                 {state.config.aiPreferredModelByProvider.gemini}
               </span>
             </div>
