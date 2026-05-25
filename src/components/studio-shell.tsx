@@ -22,6 +22,7 @@ const navigation = [
   { href: '/automatizacion', label: 'Automatización' },
   { href: '/verificador', label: 'Verificador' },
   { href: '/ia', label: 'IA' },
+  { href: '/ia/editor', label: 'Editor IA' },
   { href: '/checklists', label: 'Checklists' },
   { href: '/historico', label: 'Histórico' },
   { href: '/politica-operativa', label: 'Política Operativa' },
