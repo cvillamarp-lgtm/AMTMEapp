@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { Badge, Button, Card } from '@/components/ui';
 import { useStudio } from '@/components/studio-provider';
 import { formatDate } from '@/lib/studio-utils';
+import { truncateText } from '@/lib/text-utils';
+
+const MAX_ALERT_LENGTH = 120;
+const MAX_EPISODE_TITLE_LENGTH = 68;
 
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
@@ -128,7 +132,7 @@ export default function DashboardPage() {
                   className="flex items-start gap-3 rounded-2xl border border-black/8 bg-[#F5F2EA] px-4 py-3 text-sm text-[#0C1F36]"
                 >
                   <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#E0211E]" />
-                  <span>{alert}</span>
+                  <span>{truncateText(alert, MAX_ALERT_LENGTH)}</span>
                 </div>
               ))
             ) : (
@@ -183,7 +187,7 @@ export default function DashboardPage() {
                       Episodio {episode.episodeNumber}
                     </div>
                     <div className="mt-1 text-base font-semibold text-[#0C1F36]">
-                      {episode.title}
+                      {truncateText(episode.title, MAX_EPISODE_TITLE_LENGTH)}
                     </div>
                   </div>
                   <Badge tone={episode.status === 'Publicado' ? 'good' : 'neutral'}>
