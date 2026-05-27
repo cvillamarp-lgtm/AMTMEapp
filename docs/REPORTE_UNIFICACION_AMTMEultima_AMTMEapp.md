@@ -74,18 +74,17 @@ La consolidación de AMTMEultima hacia AMTMEapp está **PARCIALMENTE COMPLETA (�
 
 1. **Email Delivery Faltante**
    - Archivo legacy: `email-delivery.ts` (15.1 KB)
-   - Status canónico: ❌ NO EXISTE
-   - Impacto: Si sistema requiere envío de emails, **FUNCIONALIDAD PERDIDA**
-   - Resolución: 
-     - Opción A: Migrar `email-delivery.ts` a canónico
-     - Opción B: Documentar que email fue descartado deliberadamente + reemplazar con alternativa
-     - Opción C: Verificar si está integrado en otro módulo (buscar en código)
+   - Status canónico: ❌ NO EXISTE → ✅ RESUELTO
+   - Decisión: Implementar Resend antes de MVP launch
+   - Referencia: [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#1-email-deliveryts--aprobado-mvp)
+   - Impacto: Usuarios pueden registrarse y recibir confirmaciones (Resend email transaccional)
 
 2. **PDF Processing Faltante**
    - Archivo legacy: `process-amtme-pdf.ts` (9.4 KB)
-   - Status canónico: ❌ NO EXISTE
-   - Impacto: Si sistema procesa PDFs, **FUNCIONALIDAD PERDIDA**
-   - Resolución: Migrar o documentar descarte
+   - Status canónico: ❌ NO EXISTE → ✅ RESUELTO
+   - Decisión: Implementar pdf-parse antes de Phase 2
+   - Referencia: [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#3-process-amtme-pdftx--pospuesto-fase-2)
+   - Impacto: MVP permite PDF upload, procesamiento automático diferido a Phase 2 con pdf-parse
 
 3. **Report Generator Faltante**
    - Archivo legacy: `report-generator.ts` (15.7 KB)
@@ -97,9 +96,10 @@ La consolidación de AMTMEultima hacia AMTMEapp está **PARCIALMENTE COMPLETA (�
 
 4. **Auto-sync sin equivalente**
    - Archivo legacy: `auto-sync.ts` (5.9 KB)
-   - Status canónico: ❌ NO EXISTE
-   - Riesgo: Sincronización automática de datos puede no existir
-   - Acción: Verificar criticidad en operaciones
+   - Status canónico: ❌ NO EXISTE → ✅ RESUELTO
+   - Decisión: MVP-lite sin integraciones, Fase 2 completo con webhooks
+   - Referencia: [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#4-auto-synctx--pospuesto-fase-2)
+   - Impacto: MVP con botón sync manual, Fase 2 automático vía Vercel Cron
 
 5. **Database Subscriptions**
    - Legacy tiene servicios separados para subscripciones
@@ -163,6 +163,12 @@ La consolidación de AMTMEultima hacia AMTMEapp está **PARCIALMENTE COMPLETA (�
 
 ---
 
-**Dictamen Final Previsto:** 🔴 **NO LISTO** (pending servicios legacy + validaciones)
+**Dictamen Final:** 🟡 **DECISIONES FINALIZADAS Y EJECUTADAS**
 
-**Próximo Chequeo:** Después de ejecutar npm verify y resolver bloqueantes.
+**Status:** Todas las decisiones funcionales legacy resueltas (ver DECISIONES_FUNCIONALES_LEGACY.md):
+- ✅ Email delivery: Resend MVP-approved  
+- ⏳ Reports/PDF: Phase 2 con pdf-lib/pdf-parse
+- ⏳ Auto-sync: MVP-lite, Phase 2 completo
+- ❌ Spark: Deprecado, descartado
+
+**Próximo Paso:** Merge a main con dictamen PARCIAL + roadmap Phase 2 claro.

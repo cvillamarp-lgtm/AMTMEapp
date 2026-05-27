@@ -22,27 +22,24 @@ Estos servicios se clasifican en **3 categorías de riesgo**:
 
 ## Servicios Legacy Clasificados
 
-### 1. **email-delivery.ts** — CRÍTICA
+### 1. **email-delivery.ts** — ✅ APROBADO MVP
 
 **Funcionalidad:** Sistema de envío de emails transaccionales
 - Envío de confirmaciones de registro
 - Notificaciones de eventos de usuario
 - Comunicaciones de soporte
 
-**Riesgo:** 🔴 CRÍTICA
-- **Impacto:** Usuarios no reciben confirmaciones de registro ni notificaciones
-- **Usuarios Afectados:** 100% de usuarios en onboarding
-- **Datos Perdidos:** Posibles registros incompletos si confirmación no enviada
-- **Negocios:** Churn en signup, problemas de compliance legal (confirmación de GDPR)
+**Decisión:** Implementar Resend antes de MVP launch
 
-**Alternatives:**
-- ✅ **Resend** (Recomendado) — Email transaccional moderno, integración sencilla con Next.js, templates con React
-- ⚠️ **SendGrid** — Más robusto pero más complicado
-- ⚠️ **AWS SES** — Mayor complejidad operacional
+**Justificación:**
+- ✅ Resend es email transaccional moderno con integración nativa Next.js
+- ✅ Bajo overhead operacional (API client + templates React)
+- ✅ Crítico para signup flow (confirmación obligatoria GDPR)
+- ✅ Costo mínimo ($1-5 MRR para MVP)
 
-**Bloqueante:** SÍ — Implementar Resend antes de MVP
+**Bloqueante:** SÍ — MVP-critical
 
-**Status:** PENDIENTE DECISIÓN
+**Status:** ✅ EJECUTADO (ver [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#1-email-deliveryts--aprobado-mvp))
 
 ---
 
@@ -66,7 +63,7 @@ Estos servicios se clasifican en **3 categorías de riesgo**:
 
 **Bloqueante:** SÍ — Implementar pdf-lib antes de MVP
 
-**Status:** PENDIENTE DECISIÓN
+**Status:** ⏳ POSPUESTO FASE 2 (ver [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#2-report-generatorts--pospuesto-fase-2))
 
 ---
 
@@ -90,7 +87,7 @@ Estos servicios se clasifican en **3 categorías de riesgo**:
 
 **Bloqueante:** SÍ — Implementar pdf-parse antes de MVP
 
-**Status:** PENDIENTE DECISIÓN
+**Status:** ⏳ POSPUESTO FASE 2 (ver [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#3-process-amtme-pdftx--pospuesto-fase-2))
 
 ---
 
@@ -114,7 +111,7 @@ Estos servicios se clasifican en **3 categorías de riesgo**:
 
 **Bloqueante:** NO — Puede postergarse para fase 2
 
-**Status:** PENDIENTE DECISIÓN
+**Status:** ⏳ POSPUESTO FASE 2 (ver [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#4-auto-synctx--pospuesto-fase-2))
 
 ---
 
@@ -140,7 +137,7 @@ Estos servicios se clasifican en **3 categorías de riesgo**:
 
 **Bloqueante:** NO — Seguro descartar
 
-**Status:** PROBABLE DESCARTE (confirmar si Spark deprecado)
+**Status:** ❌ ELIMINADO (ver [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#5-install-spark-kv-fallbackts--descartado))
 
 ---
 
@@ -167,7 +164,7 @@ Estos servicios se clasifican en **3 categorías de riesgo**:
 
 **Bloqueante:** NO — Seguro descartar
 
-**Status:** PROBABLE DESCARTE (confirmar via grep que no hay referencias)
+**Status:** ❌ ELIMINADO (ver [docs/DECISIONES_FUNCIONALES_LEGACY.md](DECISIONES_FUNCIONALES_LEGACY.md#6-spark-hooksts--descartado))
 
 ---
 
