@@ -1,4 +1,11 @@
-import type { ValidationCheck, ValidationStatus, DiffHunk, RiskLevel } from './types';
+import type {
+  ValidationCheck,
+  ValidationStatus,
+  DiffHunk,
+  RiskLevel,
+  ValidationRunMetadata,
+} from './types';
+import { getCiWorkflowEvidence } from './githubIntegration';
 
 // ── Validation result ──────────────────────────────────────────────────────
 
@@ -12,6 +19,7 @@ export interface ValidationResult {
    * deferred checks must NOT be interpreted as passing.
    */
   deferred: boolean;
+  validationRun: ValidationRunMetadata;
 }
 
 // ── CI command map ─────────────────────────────────────────────────────────
@@ -29,11 +37,15 @@ const CI_COMMANDS: Record<string, string> = {
 // deferred — they cannot run from within Next.js at request time.
 // Deferred status ≠ passed. The UI must make this explicit.
 
-export function validatePatch(diff: DiffHunk[], riskLevel: RiskLevel): ValidationResult {
+export async function validatePatch(
+  diff: DiffHunk[],
+  riskLevel: RiskLevel
+): Promise<ValidationResult> {
   const checks: ValidationCheck[] = [];
+  const ciEvidence = await getCiWorkflowEvidence();
 
   for (const name of ['typecheck', 'lint', 'test', 'build'] as const) {
-    checks.push(runCheck(name, diff, riskLevel));
+    checks.push(runCheck(name, diff, riskLevel, ciEvidence.url));
   }
 
   const anyFailed = checks.some((c) => c.status === 'failed');
@@ -45,6 +57,17 @@ export function validatePatch(diff: DiffHunk[], riskLevel: RiskLevel): Validatio
     // Only truly passed when ALL checks executed and none failed
     passed: !anyFailed && !anyDeferred,
     deferred: anyDeferred,
+    validationRun: {
+      source: anyFailed ? 'policy_engine' : ciEvidence.source,
+      status: anyFailed ? 'failed' : anyDeferred ? 'deferred' : 'passed',
+      runUrl: ciEvidence.url,
+      evidence: anyFailed
+        ? 'Validación de política local'
+        : ciEvidence.url
+          ? 'Workflow de CI configurado'
+          : 'CI diferido sin repositorio configurado',
+      executedAt: new Date().toISOString(),
+    },
   };
 }
 
@@ -53,7 +76,8 @@ export function validatePatch(diff: DiffHunk[], riskLevel: RiskLevel): Validatio
 function runCheck(
   name: keyof typeof CI_COMMANDS,
   diff: DiffHunk[],
-  riskLevel: RiskLevel
+  riskLevel: RiskLevel,
+  ciEvidenceUrl?: string
 ): ValidationCheck {
   // Policy failures — can be determined without running CI
   if (riskLevel === 'blocked') {
@@ -62,6 +86,7 @@ function runCheck(
       status: 'failed',
       error: 'Acción bloqueada por política de seguridad.',
       recommendation: 'Revisa la instrucción y elimina acciones destructivas.',
+      executionSource: 'policy_engine',
     };
   }
 
@@ -71,6 +96,7 @@ function runCheck(
       status: 'failed',
       error: 'Riesgo crítico detectado. Se requiere revisión manual antes de continuar.',
       recommendation: 'Solicita revisión de seguridad explícita.',
+      executionSource: 'policy_engine',
     };
   }
 
@@ -86,6 +112,7 @@ function runCheck(
       status: 'failed',
       error: `Patrón destructivo detectado en el diff (validación de ${name}).`,
       recommendation: 'Elimina las líneas con comandos destructivos antes de continuar.',
+      executionSource: 'policy_engine',
     };
   }
 
@@ -94,5 +121,9 @@ function runCheck(
     name,
     status: 'deferred',
     recommendation: `Ejecuta manualmente: ${CI_COMMANDS[name]}`,
+    executionSource: ciEvidenceUrl ? 'github_actions' : 'deferred_ci',
+    command: CI_COMMANDS[name],
+    evidenceUrl: ciEvidenceUrl,
+    evidenceLabel: ciEvidenceUrl ? 'Workflow CI de GitHub Actions' : 'Ejecución manual requerida',
   };
 }

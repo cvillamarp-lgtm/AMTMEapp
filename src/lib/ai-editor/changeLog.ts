@@ -5,6 +5,7 @@ import type {
   AiEditorScope,
   ChangeStatus,
   RiskLevel,
+  ValidationRunMetadata,
 } from './types';
 
 // ── Persistence contract ───────────────────────────────────────────────────
@@ -35,7 +36,16 @@ export function buildHistoryEntry(
   riskLevel: RiskLevel,
   filesChanged: string[],
   plan?: AiChangePlan,
-  branchName?: string
+  branchName?: string,
+  options?: {
+    branchType?: 'real' | 'proposed';
+    commitSha?: string;
+    executionSource?: ChangeHistoryEntry['executionSource'];
+    validationRun?: ValidationRunMetadata;
+    rollbackType?: 'discard' | 'revert';
+    rollbackMetadata?: ChangeHistoryEntry['rollbackMetadata'];
+    persistenceType?: 'session' | 'persistent';
+  }
 ): ChangeHistoryEntry {
   return {
     id,
@@ -50,7 +60,14 @@ export function buildHistoryEntry(
     scope,
     plan,
     branchName,
-    persistenceType: CHANGE_LOG_STORAGE,
+    branchType: options?.branchType,
+    commitSha: options?.commitSha,
+    executionSource: options?.executionSource,
+    validationRun: options?.validationRun,
+    rollbackType: options?.rollbackType,
+    rollbackMetadata: options?.rollbackMetadata,
+    persistenceType: options?.persistenceType ?? CHANGE_LOG_STORAGE,
+    updatedAt: new Date().toISOString(),
   };
 }
 

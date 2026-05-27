@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Field, Select, Textarea } from '@/components/ui';
 import type { AiEditorMode, AiEditorScope, AiChangePlan } from '@/lib/ai-editor/types';
 import { ChangePreview } from './ChangePreview';
@@ -44,24 +44,67 @@ export function NaturalLanguageEditor() {
   });
   const [applying, setApplying] = useState(false);
   const [history, setHistory] = useState<ChangeHistoryEntry[]>([]);
+  const [persistenceInfo, setPersistenceInfo] = useState<{
+    type: 'persistent' | 'session';
+    source: 'supabase' | 'memory';
+    reason?: string;
+  }>({
+    type: 'session',
+    source: 'memory',
+  });
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await fetch('/api/ai-editor/history');
+        const data = (await res.json()) as {
+          entries?: ChangeHistoryEntry[];
+          persistenceType?: 'persistent' | 'session';
+          persistenceSource?: 'supabase' | 'memory';
+          persistenceReason?: string;
+        };
+
+        if (!res.ok) return;
+        if (Array.isArray(data.entries)) {
+          setHistory(data.entries);
+        }
+        setPersistenceInfo({
+          type: data.persistenceType ?? 'session',
+          source: data.persistenceSource ?? 'memory',
+          reason: data.persistenceReason,
+        });
+      } catch {
+        // fallback silencioso a historial local
+      }
+    };
+
+    void loadHistory();
+  }, []);
 
   const analyze = async () => {
     if (!prompt.trim()) return;
 
     setState({ loading: true, error: '', blocked: false, blockedReason: '', plan: null });
+    const requestId = `req-${Date.now()}`;
+    const promptValue = prompt.trim();
 
     try {
       const res = await fetch('/api/ai-editor/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.trim(), mode, scope }),
+        body: JSON.stringify({ requestId, prompt: promptValue, mode, scope }),
       });
 
       const data = (await res.json()) as {
+        requestId?: string;
         plan?: AiChangePlan;
         blocked?: boolean;
         reason?: string;
         error?: string;
+        entry?: ChangeHistoryEntry;
+        persistenceType?: 'persistent' | 'session';
+        persistenceSource?: 'supabase' | 'memory';
+        persistenceReason?: string;
       };
 
       if (!res.ok || data.error) {
@@ -73,7 +116,12 @@ export function NaturalLanguageEditor() {
             blockedReason: data.reason ?? 'Acción bloqueada.',
             plan: null,
           });
-          addHistoryEntry(null, 'blocked');
+          if (data.entry) {
+            const historyEntry = data.entry;
+            setHistory((prev) => [historyEntry, ...prev]);
+          } else {
+            addHistoryEntry(data.requestId ?? requestId, promptValue, null, 'blocked');
+          }
           return;
         }
         setState({
@@ -88,7 +136,19 @@ export function NaturalLanguageEditor() {
 
       if (data.plan) {
         setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: data.plan });
-        addHistoryEntry(data.plan, 'analyzed');
+        if (data.entry) {
+          const historyEntry = data.entry;
+          setHistory((prev) => [historyEntry, ...prev]);
+        } else {
+          addHistoryEntry(data.requestId ?? requestId, promptValue, data.plan, 'analyzed');
+        }
+      }
+      if (data.persistenceType && data.persistenceSource) {
+        setPersistenceInfo({
+          type: data.persistenceType,
+          source: data.persistenceSource,
+          reason: data.persistenceReason,
+        });
       }
     } catch {
       setState({
@@ -102,14 +162,17 @@ export function NaturalLanguageEditor() {
   };
 
   const addHistoryEntry = (
+    id: string,
+    promptValue: string,
     plan: AiChangePlan | null,
     status: ChangeHistoryEntry['status'],
-    branchName?: string
+    branchName?: string,
+    options?: Partial<ChangeHistoryEntry>
   ) => {
     const entry: ChangeHistoryEntry = {
-      id: `req-${Date.now()}`,
+      id,
       createdAt: new Date().toISOString(),
-      prompt: prompt.trim(),
+      prompt: promptValue.trim(),
       status,
       filesChanged: plan?.affectedFiles ?? [],
       riskLevel: plan?.riskLevel ?? 'low',
@@ -118,7 +181,14 @@ export function NaturalLanguageEditor() {
       scope,
       plan: plan ?? undefined,
       branchName,
-      persistenceType: 'session',
+      branchType: options?.branchType,
+      commitSha: options?.commitSha,
+      executionSource: options?.executionSource,
+      validationRun: options?.validationRun,
+      rollbackType: options?.rollbackType,
+      rollbackMetadata: options?.rollbackMetadata,
+      persistenceType: options?.persistenceType ?? 'session',
+      updatedAt: new Date().toISOString(),
     };
     setHistory((prev) => [entry, ...prev]);
   };
@@ -131,7 +201,13 @@ export function NaturalLanguageEditor() {
       const res = await fetch('/api/ai-editor/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId: `req-${Date.now()}`, plan: state.plan, mode }),
+        body: JSON.stringify({
+          requestId: `req-${Date.now()}`,
+          prompt: prompt.trim(),
+          scope,
+          plan: state.plan,
+          mode,
+        }),
       });
 
       const data = (await res.json()) as {
@@ -139,13 +215,38 @@ export function NaturalLanguageEditor() {
         message?: string;
         status?: string;
         branchName?: string;
+        branchType?: 'real' | 'proposed';
+        commitSha?: string;
+        executionSource?: ChangeHistoryEntry['executionSource'];
+        rollbackMetadata?: ChangeHistoryEntry['rollbackMetadata'];
+        entry?: ChangeHistoryEntry;
+        persistenceType?: 'persistent' | 'session';
+        persistenceSource?: 'supabase' | 'memory';
+        persistenceReason?: string;
       };
 
       if (!res.ok) {
         setState((prev) => ({ ...prev, error: data.error ?? 'No se pudo preparar el cambio.' }));
       } else {
-        const entryStatus = (data.status as ChangeHistoryEntry['status']) ?? 'ready_to_apply';
-        addHistoryEntry(state.plan, entryStatus, data.branchName);
+        if (data.entry) {
+          const historyEntry = data.entry;
+          setHistory((prev) => [historyEntry, ...prev]);
+        } else {
+          const entryStatus = (data.status as ChangeHistoryEntry['status']) ?? 'ready_to_apply';
+          addHistoryEntry(`req-${Date.now()}`, prompt, state.plan, entryStatus, data.branchName, {
+            branchType: data.branchType,
+            commitSha: data.commitSha,
+            executionSource: data.executionSource,
+            rollbackMetadata: data.rollbackMetadata,
+          });
+        }
+        if (data.persistenceType && data.persistenceSource) {
+          setPersistenceInfo({
+            type: data.persistenceType,
+            source: data.persistenceSource,
+            reason: data.persistenceReason,
+          });
+        }
         setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
         setPrompt('');
       }
@@ -157,7 +258,7 @@ export function NaturalLanguageEditor() {
   };
 
   const handleDiscard = () => {
-    addHistoryEntry(state.plan, 'discarded');
+    addHistoryEntry(`req-${Date.now()}`, prompt, state.plan, 'discarded');
     setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
   };
 
@@ -166,7 +267,7 @@ export function NaturalLanguageEditor() {
   };
 
   const handleSaveAsTask = () => {
-    addHistoryEntry(state.plan, 'draft');
+    addHistoryEntry(`req-${Date.now()}`, prompt, state.plan, 'draft');
     setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
     setPrompt('');
   };
@@ -178,10 +279,28 @@ export function NaturalLanguageEditor() {
       const res = await fetch('/api/ai-editor/rollback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requestId: entry.id, plan: entry.plan }),
+        body: JSON.stringify({
+          requestId: entry.id,
+          prompt: entry.prompt,
+          mode: entry.mode,
+          scope: entry.scope,
+          plan: entry.plan,
+          branchName: entry.branchName,
+          commitSha: entry.commitSha,
+          rollbackMetadata: entry.rollbackMetadata,
+        }),
       });
 
-      if (res.ok) {
+      const data = (await res.json()) as {
+        entry?: ChangeHistoryEntry;
+        persistenceType?: 'persistent' | 'session';
+        persistenceSource?: 'supabase' | 'memory';
+        persistenceReason?: string;
+      };
+
+      if (res.ok && data.entry) {
+        setHistory((prev) => [data.entry as ChangeHistoryEntry, ...prev]);
+      } else if (res.ok) {
         setHistory((prev) =>
           prev.map((e) =>
             e.id === entry.id
@@ -189,6 +308,14 @@ export function NaturalLanguageEditor() {
               : e
           )
         );
+      }
+
+      if (data.persistenceType && data.persistenceSource) {
+        setPersistenceInfo({
+          type: data.persistenceType,
+          source: data.persistenceSource,
+          reason: data.persistenceReason,
+        });
       }
     } catch {
       // silent — UI will show no change
@@ -286,12 +413,14 @@ export function NaturalLanguageEditor() {
               Historial de cambios
             </div>
             <span className="rounded bg-amtme-slate/10 px-1.5 py-0.5 font-mono text-xs text-amtme-navy">
-              solo sesión
+              {persistenceInfo.type === 'persistent' ? 'persistente' : 'solo sesión'}
             </span>
           </div>
           <p className="mt-1 text-xs text-semantic-muted">
-            Este historial se pierde al recargar la página. Persistencia en base de datos pendiente
-            (fase 3).
+            {persistenceInfo.type === 'persistent'
+              ? 'Historial cargado desde Supabase.'
+              : 'Este historial se pierde al recargar la página. Persistencia en base de datos no disponible en este runtime.'}
+            {persistenceInfo.reason ? ` ${persistenceInfo.reason}` : ''}
           </p>
           <div className="mt-4">
             <ChangeHistory entries={history} onRollback={handleRollback} />

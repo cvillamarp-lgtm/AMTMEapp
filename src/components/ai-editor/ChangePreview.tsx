@@ -42,11 +42,7 @@ export function ChangePreview({
   const canPrepare = !validationFailed;
 
   // Label reflects what the action actually does in Phase 2
-  const applyLabel = applying
-    ? 'Preparando…'
-    : validationDeferred
-      ? 'Preparar rama'
-      : 'Aplicar cambio';
+  const applyLabel = applying ? 'Preparando…' : 'Preparar rama técnica';
 
   return (
     <div className="space-y-5">
@@ -126,7 +122,44 @@ export function ChangePreview({
         <div className="mt-3">
           <ValidationPanel checks={plan.validationChecks} />
         </div>
+        {plan.validationRun ? (
+          <div className="mt-3 rounded-2xl border border-semantic-border bg-semantic-surface-soft px-3 py-2">
+            <p className="text-xs text-semantic-muted">
+              Fuente: <span className="font-mono text-amtme-navy">{plan.validationRun.source}</span>
+              {plan.validationRun.runUrl ? (
+                <>
+                  {' '}
+                  · Evidencia:{' '}
+                  <a
+                    href={plan.validationRun.runUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-amtme-navy underline underline-offset-2"
+                  >
+                    workflow CI
+                  </a>
+                </>
+              ) : null}
+            </p>
+          </div>
+        ) : null}
       </Card>
+
+      {(plan.branchName || plan.commitSha) && (
+        <Card>
+          <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
+            Estado técnico del cambio
+          </div>
+          <div className="mt-2 space-y-1 font-mono text-xs text-amtme-navy">
+            {plan.branchName ? (
+              <p>
+                🌿 {plan.branchName} ({plan.branchType === 'real' ? 'real' : 'propuesta'})
+              </p>
+            ) : null}
+            {plan.commitSha ? <p>🧾 {plan.commitSha}</p> : <p>🧾 sin commit real</p>}
+          </div>
+        </Card>
+      )}
 
       {/* Nota CI cuando validaciones diferidas */}
       {validationDeferred ? (

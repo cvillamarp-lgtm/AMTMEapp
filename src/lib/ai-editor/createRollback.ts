@@ -1,4 +1,5 @@
 import type { AiChangePlan } from './types';
+import { rollbackGitHubChange } from './githubIntegration';
 
 // ── Rollback result ────────────────────────────────────────────────────────
 
@@ -13,6 +14,7 @@ export interface RollbackResult {
    * 'revert'  — a real commit was made and has been reverted (Phase 3+).
    */
   rollbackType: RollbackType;
+  rollbackCommitSha?: string;
 }
 
 // ── Create rollback ────────────────────────────────────────────────────────
@@ -24,7 +26,15 @@ export interface RollbackResult {
 // this function should detect a real commit and perform an actual revert,
 // returning rollbackType: 'revert' with the restored file list.
 
-export function createRollback(plan: AiChangePlan, requestId: string): RollbackResult {
+export async function createRollback(
+  plan: AiChangePlan,
+  requestId: string,
+  options?: {
+    branchName?: string;
+    commitSha?: string;
+    rollbackMetadata?: { strategy?: string; patchFilePath?: string };
+  }
+): Promise<RollbackResult> {
   if (!plan.rollbackAvailable) {
     return {
       success: false,
@@ -34,7 +44,40 @@ export function createRollback(plan: AiChangePlan, requestId: string): RollbackR
     };
   }
 
-  // Phase 2: no real commit was made, so rollback = discard the prepared plan
+  if (options?.commitSha && options.branchName) {
+    const githubRollback = await rollbackGitHubChange({
+      branchName: options.branchName,
+      requestId,
+      rollbackMetadata: options.rollbackMetadata,
+    });
+
+    if (githubRollback.success) {
+      return {
+        success: true,
+        message: githubRollback.message,
+        restoredFiles: githubRollback.restoredFiles,
+        rollbackType: 'revert',
+        rollbackCommitSha: githubRollback.rollbackCommitSha,
+      };
+    }
+
+    return {
+      success: false,
+      message: githubRollback.message,
+      restoredFiles: [],
+      rollbackType: 'discard',
+    };
+  }
+
+  if (options?.commitSha && !options.branchName) {
+    return {
+      success: false,
+      message: 'Rollback real requiere branchName cuando existe commitSha.',
+      restoredFiles: [],
+      rollbackType: 'discard',
+    };
+  }
+
   return {
     success: true,
     message: `Plan descartado para solicitud ${requestId}. No se realizó ningún commit real — el diff propuesto ha sido cancelado.`,

@@ -30,6 +30,15 @@ export const ValidationStatusSchema = z.enum([
 ]);
 export type ValidationStatus = z.infer<typeof ValidationStatusSchema>;
 
+export const ValidationExecutionSourceSchema = z.enum([
+  'policy_engine',
+  'runtime',
+  'github_actions',
+  'deferred_ci',
+  'unavailable',
+]);
+export type ValidationExecutionSource = z.infer<typeof ValidationExecutionSourceSchema>;
+
 export const ChangeStatusSchema = z.enum([
   'draft',
   'analyzed',
@@ -60,8 +69,22 @@ export const ValidationCheckSchema = z.object({
   affectedFile: z.string().optional(),
   approximateLine: z.number().int().positive().optional(),
   recommendation: z.string().optional(),
+  executionSource: ValidationExecutionSourceSchema.optional(),
+  command: z.string().optional(),
+  evidenceUrl: z.string().url().optional(),
+  evidenceLabel: z.string().optional(),
 });
 export type ValidationCheck = z.infer<typeof ValidationCheckSchema>;
+
+export const ValidationRunMetadataSchema = z.object({
+  source: ValidationExecutionSourceSchema,
+  status: ValidationStatusSchema,
+  runId: z.string().optional(),
+  runUrl: z.string().url().optional(),
+  evidence: z.string().optional(),
+  executedAt: z.string().datetime().optional(),
+});
+export type ValidationRunMetadata = z.infer<typeof ValidationRunMetadataSchema>;
 
 // ── Diff Hunk ──────────────────────────────────────────────────────────────
 
@@ -101,7 +124,12 @@ export const AiChangePlanSchema = z.object({
   diff: z.array(DiffHunkSchema),
   validationStatus: ValidationStatusSchema,
   validationChecks: z.array(ValidationCheckSchema),
+  validationRun: ValidationRunMetadataSchema.optional(),
   rollbackAvailable: z.boolean(),
+  executionSource: z.enum(['simulation', 'github_api', 'hybrid']).optional(),
+  branchName: z.string().optional(),
+  branchType: z.enum(['real', 'proposed']).optional(),
+  commitSha: z.string().optional(),
 });
 export type AiChangePlan = z.infer<typeof AiChangePlanSchema>;
 
@@ -120,8 +148,23 @@ export const ChangeHistoryEntrySchema = z.object({
   plan: AiChangePlanSchema.optional(),
   // Phase 2: proposed branch name when status === 'ready_to_apply'
   branchName: z.string().optional(),
-  // Phase 2: 'session' = in-memory only; 'persistent' = saved to DB
+  branchType: z.enum(['real', 'proposed']).optional(),
+  commitSha: z.string().optional(),
+  executionSource: z
+    .enum(['simulation', 'github_api', 'hybrid', 'rollback_github', 'rollback_discard'])
+    .optional(),
+  validationRun: ValidationRunMetadataSchema.optional(),
+  rollbackType: z.enum(['discard', 'revert']).optional(),
+  rollbackMetadata: z
+    .object({
+      strategy: z.string(),
+      patchFilePath: z.string().optional(),
+      rollbackCommitSha: z.string().optional(),
+      details: z.string().optional(),
+    })
+    .optional(),
   persistenceType: z.enum(['session', 'persistent']).optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 export type ChangeHistoryEntry = z.infer<typeof ChangeHistoryEntrySchema>;
 
