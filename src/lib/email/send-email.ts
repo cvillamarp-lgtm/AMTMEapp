@@ -27,7 +27,14 @@ enum EmailErrorCode {
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const URL_REGEX = /^https?:\/\/[a-z0-9]([a-z0-9-]*\.)*[a-z0-9-]*\.[a-z]{2,}(\/[^\s]*)?$/i;
 const ALLOWED_TEMPLATES = ['welcome', 'password-reset', 'audit-alert'] as const;
+
+function isValidUrl(url: string | null | undefined): boolean {
+  if (!url || typeof url !== 'string') return false;
+  if (url.length > 2048) return false;
+  return URL_REGEX.test(url);
+}
 
 export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {
   const timestamp = new Date().toISOString();
@@ -88,18 +95,42 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
     try {
       switch (options.templateId) {
         case 'welcome':
+          if (!isValidUrl(options.variables.loginUrl as string)) {
+            return {
+              success: false,
+              error: 'Invalid loginUrl in variables',
+              code: EmailErrorCode.INVALID_EMAIL,
+              timestamp,
+            };
+          }
           emailComponent = WelcomeEmail({
             userName: String(options.variables.userName || ''),
             loginUrl: String(options.variables.loginUrl || ''),
           });
           break;
         case 'password-reset':
+          if (!isValidUrl(options.variables.resetUrl as string)) {
+            return {
+              success: false,
+              error: 'Invalid resetUrl in variables',
+              code: EmailErrorCode.INVALID_EMAIL,
+              timestamp,
+            };
+          }
           emailComponent = PasswordResetEmail({
             resetUrl: String(options.variables.resetUrl || ''),
             expiresIn: String(options.variables.expiresIn || ''),
           });
           break;
         case 'audit-alert':
+          if (!isValidUrl(options.variables.dashboardUrl as string)) {
+            return {
+              success: false,
+              error: 'Invalid dashboardUrl in variables',
+              code: EmailErrorCode.INVALID_EMAIL,
+              timestamp,
+            };
+          }
           emailComponent = AuditAlertEmail({
             eventType: String(options.variables.eventType || ''),
             summary: String(options.variables.summary || ''),
