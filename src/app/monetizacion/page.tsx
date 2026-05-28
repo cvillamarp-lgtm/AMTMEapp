@@ -21,7 +21,7 @@ export default function MonetizacionPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Monetización</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Leads y sesiones
             </h2>
           </div>
@@ -31,13 +31,13 @@ export default function MonetizacionPage() {
         </div>
         <div className="mt-5 space-y-3">
           {state.monetizationLeads.map((lead) => (
-            <div key={lead.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
+            <div key={lead.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-black/38">
                     {lead.source}
                   </div>
-                  <div className="mt-1 text-base font-semibold text-[#001F36]">{lead.name}</div>
+                  <div className="mt-1 text-base font-semibold text-[#0C1F36]">{lead.name}</div>
                 </div>
                 <Badge
                   tone={

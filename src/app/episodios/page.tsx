@@ -88,7 +88,7 @@ export default function EpisodiosPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Episodios</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Producción editorial
             </h2>
           </div>
@@ -125,14 +125,14 @@ export default function EpisodiosPage() {
             <button
               key={episode.id}
               onClick={() => selectEpisode(episode)}
-              className="w-full rounded-3xl border border-black/8 bg-[#F5F5F7] px-4 py-4 text-left transition hover:bg-white"
+              className="w-full rounded-3xl border border-black/8 bg-[#F5F2EA] px-4 py-4 text-left transition hover:bg-white"
             >
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-black/38">
                     Episodio {episode.episodeNumber || 'nuevo'}
                   </div>
-                  <div className="mt-1 text-base font-semibold text-[#001F36]">
+                  <div className="mt-1 text-base font-semibold text-[#0C1F36]">
                     {episode.title || 'Sin título'}
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export default function EpisodiosPage() {
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Editor</div>
-            <h3 className="mt-1 text-2xl font-semibold text-[#001F36]">
+            <h3 className="mt-1 text-2xl font-semibold text-[#0C1F36]">
               {draft.title || 'Nuevo episodio'}
             </h3>
           </div>

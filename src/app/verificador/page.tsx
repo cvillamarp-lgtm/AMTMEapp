@@ -33,7 +33,7 @@ export default function VerificadorPage() {
 
   return (
     <div className="space-y-5 pb-24">
-      <Card className="bg-[#001F36] text-white">
+      <Card className="bg-[#0C1F36] text-white">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="text-xs uppercase tracking-[0.24em] text-white/45">
@@ -57,30 +57,30 @@ export default function VerificadorPage() {
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="bg-[#F5F5F7]">
+        <Card className="bg-[#F5F2EA]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Checks</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#0C1F36]">
             {summary.passedChecks}/{summary.totalChecks}
           </div>
           <div className="mt-2 text-sm text-black/55">Validaciones aprobadas</div>
         </Card>
-        <Card className="bg-[#F5F5F7]">
+        <Card className="bg-[#F5F2EA]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Incidencias altas</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#B85C38]">
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#E0211E]">
             {highCount}
           </div>
           <div className="mt-2 text-sm text-black/55">Requieren corrección inmediata</div>
         </Card>
-        <Card className="bg-[#F5F5F7]">
+        <Card className="bg-[#F5F2EA]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Incidencias medias</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#003D5C]">
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#0C1F36]">
             {mediumCount}
           </div>
           <div className="mt-2 text-sm text-black/55">Ajustes operativos sugeridos</div>
         </Card>
-        <Card className="bg-[#F5F5F7]">
+        <Card className="bg-[#F5F2EA]">
           <div className="text-xs uppercase tracking-[0.2em] text-black/40">Incidencias bajas</div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#001F36]">
+          <div className="mt-3 text-3xl font-semibold tracking-tight text-[#0C1F36]">
             {lowCount}
           </div>
           <div className="mt-2 text-sm text-black/55">Refinamientos de calidad</div>
@@ -94,21 +94,21 @@ export default function VerificadorPage() {
           </div>
           <div className="mt-4 space-y-3">
             {summary.issues.length === 0 ? (
-              <div className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm text-black/60">
+              <div className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm text-black/60">
                 Sin incidencias críticas. El sistema está listo para operación.
               </div>
             ) : (
               summary.issues.map((issue) => (
-                <div key={issue.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
+                <div key={issue.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="text-base font-semibold text-[#001F36]">{issue.title}</h3>
+                    <h3 className="text-base font-semibold text-[#0C1F36]">{issue.title}</h3>
                     <Badge tone={severityTone(issue.severity)}>
                       {issue.severity.toUpperCase()}
                     </Badge>
                   </div>
                   <div className="mt-2 text-sm text-black/58">Área: {issue.area}</div>
                   <p className="mt-2 text-sm leading-6 text-black/60">{issue.detail}</p>
-                  <p className="mt-2 text-sm leading-6 text-[#001F36]">Acción: {issue.action}</p>
+                  <p className="mt-2 text-sm leading-6 text-[#0C1F36]">Acción: {issue.action}</p>
                 </div>
               ))
             )}
@@ -120,7 +120,7 @@ export default function VerificadorPage() {
           <p className="mt-3 text-sm text-black/55">
             Úsalo para documentar revisión mensual o compartir estado de sistema.
           </p>
-          <pre className="mt-4 max-h-[560px] overflow-auto rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-xs leading-6 text-[#001F36]">
+          <pre className="mt-4 max-h-[560px] overflow-auto rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-xs leading-6 text-[#0C1F36]">
             {report}
           </pre>
           {copyStatus ? <p className="mt-3 text-sm text-black/55">{copyStatus}</p> : null}

@@ -3,6 +3,33 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
+      ai_history: {
+        Row: {
+          created_at: string;
+          id: string;
+          owner_id: string;
+          payload: Json;
+          updated_at: string;
+          workspace_key: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          owner_id: string;
+          payload: Json;
+          updated_at?: string;
+          workspace_key?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          owner_id?: string;
+          payload?: Json;
+          updated_at?: string;
+          workspace_key?: string;
+        };
+        Relationships: [];
+      };
       studio_state: {
         Row: {
           created_at: string;

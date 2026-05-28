@@ -49,7 +49,7 @@ export default function CreadorVisualPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Creador Visual</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Prompts y especificaciones
             </h2>
           </div>
@@ -153,8 +153,8 @@ export default function CreadorVisualPage() {
               onChange={(event) => setDraft({ ...draft, templateVariables: event.target.value })}
             />
           </Field>
-          <div className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4 text-sm text-black/60">
-            <div className="font-medium text-[#001F36]">Checklist QA visual</div>
+          <div className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm text-black/60">
+            <div className="font-medium text-[#0C1F36]">Checklist QA visual</div>
             <ul className="mt-3 space-y-2 leading-6">
               <li>• Paleta oficial respetada</li>
               <li>• Un solo CTA principal</li>

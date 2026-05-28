@@ -20,12 +20,13 @@ type EngineDefinition = {
 };
 
 const palette = {
-  navy: '#001F36',
-  yellow: '#E8FF40',
+  navy: '#0C1F36',
+  lemonLime: '#FEE94B',
   white: '#FFFFFF',
-  cream: '#F5EFE6',
-  petroleum: '#003D5C',
-  terracotta: '#B85C38',
+  cream: '#F5F2EA',
+  slate: '#90A4B8',
+  red: '#E0211E',
+  black: '#111111',
 };
 
 export const AI_ENGINE_CATALOG: EngineDefinition[] = [
@@ -295,7 +296,7 @@ export function buildAiCorePrompt({ engine, goal, prompt, provider, model, state
     `Prioridad: ${definition?.priority ?? 'media'}`,
     `Proveedor: ${provider}`,
     `Modelo: ${model}`,
-    `Paleta oficial: Navy ${palette.navy}, Amarillo ${palette.yellow}, Blanco ${palette.white}, Crema ${palette.cream}, Azul petróleo ${palette.petroleum}, Terracota ${palette.terracotta} solo como acento mínimo.`,
+    `Paleta oficial: Navy ${palette.navy}, Lemon Lime ${palette.lemonLime}, Crema ${palette.cream}, Blanco ${palette.white}, Azul grisáceo ${palette.slate}, Rojo ${palette.red}, Negro ${palette.black}.`,
     `Estructura narrativa activa: ${state.config.aiNarrativeStructure.join(' · ')}`,
     `Tono por defecto: ${state.config.aiTone}`,
     `Reglas de calidad: ${state.config.aiQualityRules.join(' | ')}`,

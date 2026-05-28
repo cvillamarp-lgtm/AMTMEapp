@@ -12,7 +12,7 @@ export default function AutomatizacionPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Automatización</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#001F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Reglas y disparadores
             </h2>
           </div>
@@ -20,9 +20,9 @@ export default function AutomatizacionPage() {
         </div>
         <div className="mt-5 grid gap-4 xl:grid-cols-2">
           {state.automationRules.map((rule) => (
-            <div key={rule.id} className="rounded-3xl border border-black/8 bg-[#F5F5F7] p-4">
+            <div key={rule.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-lg font-semibold text-[#001F36]">{rule.name}</h3>
+                <h3 className="text-lg font-semibold text-[#0C1F36]">{rule.name}</h3>
                 <Badge tone={rule.status === 'Listo' ? 'good' : 'neutral'}>{rule.status}</Badge>
               </div>
               <p className="mt-3 text-sm leading-6 text-black/58">{rule.objective}</p>

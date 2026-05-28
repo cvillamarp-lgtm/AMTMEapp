@@ -38,7 +38,7 @@ export default function ChecklistsPage() {
                   <div className="text-xs uppercase tracking-[0.22em] text-black/40">
                     {checklist.area}
                   </div>
-                  <h2 className="mt-1 text-xl font-semibold text-[#001F36]">{checklist.name}</h2>
+                  <h2 className="mt-1 text-xl font-semibold text-[#0C1F36]">{checklist.name}</h2>
                 </div>
                 <Badge
                   tone={
@@ -61,14 +61,14 @@ export default function ChecklistsPage() {
                   <button
                     key={item.id}
                     onClick={() => toggleItem(checklist.id, item.id)}
-                    className={`w-full rounded-2xl border px-3 py-3 text-left text-sm transition ${item.completed ? 'border-[#001F36] bg-[#001F36] text-white' : 'border-black/8 bg-[#F5F5F7] text-[#001F36] hover:bg-white'}`}
+                    className={`w-full rounded-2xl border px-3 py-3 text-left text-sm transition ${item.completed ? 'border-[#0C1F36] bg-[#0C1F36] text-white' : 'border-black/8 bg-[#F5F2EA] text-[#0C1F36] hover:bg-white'}`}
                   >
                     {item.item}
                   </button>
                 ))}
               </div>
               <div className="mt-4 rounded-2xl border border-black/8 bg-white p-3 text-sm text-black/55">
-                <div className="font-medium text-[#001F36]">Lista para entregar</div>
+                <div className="font-medium text-[#0C1F36]">Lista para entregar</div>
                 <p className="mt-2 leading-6">{checklist.readyCriteria}</p>
                 <p className="mt-2 leading-6">Evitar: {checklist.errorsToAvoid}</p>
               </div>
