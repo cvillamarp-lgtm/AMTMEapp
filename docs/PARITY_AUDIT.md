@@ -2,17 +2,32 @@
 
 **Fecha:** 2026-05-29  
 **Rama PR:** `copilot/merge-amtmeultima-into-amtmeapp`  
-**PR:** #27 — [Merge AMTMEultima into AMTMEapp with controlled integration](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/27)  
+**PR:** #27 — [Auditoría de paridad AMTMEultima → AMTMEapp (estado parcial)](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/27)  
 **Repositorio Canónico:** `cvillamarp-lgtm/AMTMEapp`  
 **Repositorio Fuente:** `AMTMEultima` (local: `~/Downloads/AMTMEultima-main`)
 
 ---
 
+## ⚠️ Advertencia de Alcance
+
+> **`cvillamarp-lgtm/AMTMEultima` devolvió 404.** El repositorio fuente real no fue accesible como repositorio público en GitHub durante esta sesión.
+>
+> **No se puede confirmar fusión completa AMTMEultima → AMTMEapp en esta sesión.**
+>
+> `archivo-3-amtme-os` fue consultado como referencia secundaria del stack Vite+React, pero **no es equivalente a AMTMEultima** y no puede usarse como sustituto concluyente del repositorio fuente.
+
+---
+
 ## Resumen Ejecutivo
 
-La consolidación de `AMTMEultima` en `AMTMEapp` está **COMPLETA** como base canónica. El repositorio `cvillamarp-lgtm/AMTMEultima` **no existe como repositorio público en GitHub** (retorna 404), confirmando que era un proyecto local del usuario. Toda la migración fue realizada en sesiones previas con acceso al ZIP local.
+**Dictamen: 🟡 PARCIAL**
 
-### Dictamen Final: 🟢 LISTO para revisión (PR abierto sin auto-merge)
+El repositorio `cvillamarp-lgtm/AMTMEultima` **no existe como repositorio público en GitHub** (retorna 404). Por tanto, la auditoría de paridad completa contra la fuente real no pudo ejecutarse en esta sesión. La migración documentada aquí se basa en sesiones previas con acceso al ZIP local.
+
+- **AMTMEapp puede considerarse canónico operativo** en virtud de los PRs #24, #25 y #26 ya mergeados.
+- **AMTMEapp no puede declararse canónico por paridad total verificada** contra AMTMEultima, dado que el repositorio fuente no fue accesible.
+
+### Dictamen Final: 🟡 PARCIAL — PR abierto para revisión (sin auto-merge)
 
 **Validaciones actuales (2026-05-29):**
 
@@ -37,7 +52,9 @@ La consolidación de `AMTMEultima` en `AMTMEapp` está **COMPLETA** como base ca
 - Era un proyecto local Vite + React 18 + React Router DOM
 - Fue referenciado en sesiones previas como `~/Downloads/AMTMEultima-main`
 - No está publicado como repositorio GitHub separado
-- El repositorio más similar públicamente disponible es `cvillamarp-lgtm/archivo-3-amtme-os` (mismo stack: Vite + React 18 + TypeScript + Supabase + Radix UI)
+- **La paridad total contra AMTMEultima no pudo verificarse en esta sesión por falta de acceso al repositorio fuente**
+
+> **`archivo-3-amtme-os`** fue consultado como referencia secundaria del mismo stack tecnológico (Vite + React 18 + Supabase), pero **no es equivalente a AMTMEultima** y aparece en este documento solo como referencia no concluyente, no como sustituto del repositorio fuente real.
 
 ### Confirmación de arquitectura legacy AMTMEultima
 
@@ -116,9 +133,11 @@ Según los documentos de auditoría previos (`DECISIONES_CANONICAS_UNIFICACION.m
 
 ---
 
-## Comparación con archivo-3-amtme-os (referencia pública)
+## Comparación con archivo-3-amtme-os (referencia secundaria — no concluyente)
 
-`cvillamarp-lgtm/archivo-3-amtme-os` es el repositorio público más similar al stack de AMTMEultima (Vite + React 18 + Radix UI + Supabase). Se analizó para identificar funcionalidades adicionales potencialmente útiles.
+> **Nota:** `cvillamarp-lgtm/archivo-3-amtme-os` es un repositorio público con stack similar (Vite + React 18 + Radix UI + Supabase), pero **no es AMTMEultima** y no puede usarse como sustituto concluyente del repositorio fuente real. El análisis a continuación es de carácter informativo y no implica paridad verificada contra AMTMEultima.
+
+`cvillamarp-lgtm/archivo-3-amtme-os` se analizó para identificar funcionalidades adicionales potencialmente útiles, sin que esto constituya evidencia de paridad con AMTMEultima.
 
 ### Funcionalidades en archivo-3-amtme-os NO presentes en AMTMEapp
 
@@ -234,13 +253,15 @@ $ npm run verify      ✅  Cadena completa: lint + typecheck + test + build
 
 ## Dictamen Final
 
-🟢 **AMTMEapp está listo como repositorio canónico único, funcional y estable.**
+🟡 **Dictamen: PARCIAL**
 
-- ✅ Migración controlada completada (31+ módulos)
-- ✅ Decisiones de descarte documentadas y justificadas
-- ✅ Validaciones técnicas 100% PASS
-- ✅ Documentación de trazabilidad completa
-- ✅ PR abierto para revisión (sin auto-merge)
+- **No se puede confirmar fusión completa AMTMEultima → AMTMEapp en esta sesión** porque el repositorio fuente real (`cvillamarp-lgtm/AMTMEultima`) no fue accesible (404).
+- **AMTMEapp es canónico operativo** en virtud de los PRs #24, #25 y #26. Las validaciones técnicas pasan en su totalidad.
+- **AMTMEapp no puede declararse canónico por paridad total verificada** hasta que el repositorio fuente real sea accesible y la auditoría pueda completarse.
+- ✅ Validaciones técnicas 100% PASS (lint, type-check, 236 tests, build 31 rutas)
+- ✅ Decisiones de descarte documentadas y justificadas con la información disponible
+- ✅ Documentación de trazabilidad completa para las sesiones de migración previas
+- ⚠️ `archivo-3-amtme-os` solo como referencia secundaria no concluyente
 - ⏳ 3 features pospuestas a Fase 2 con roadmap claro
 
 **Próximos pasos (Fase 2, post-review):**
