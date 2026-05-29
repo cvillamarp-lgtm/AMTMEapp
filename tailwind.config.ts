@@ -7,10 +7,10 @@ const config: Config = {
       colors: {
         amtme: {
           lemon: '#FEE94B',
-          navy: '#0C1F36',
+          navy: '#001F36',
           cream: '#F5F2EA',
           white: '#FFFFFF',
-          slate: '#90A4B8',
+          slate: '#7A8A99',
           red: '#E0211E',
           black: '#111111',
         },
@@ -26,7 +26,7 @@ const config: Config = {
         },
       },
       boxShadow: {
-        panel: '0 16px 60px rgba(12, 31, 54, 0.16)',
+        panel: '0 18px 52px rgba(0, 31, 54, 0.18)',
       },
     },
   },

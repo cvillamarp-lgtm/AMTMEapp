@@ -4,18 +4,18 @@
 
 :root {
   --amtme-lemon-lime: #fee94b;
-  --amtme-navy-profundo: #0c1f36;
+  --amtme-navy-profundo: #001f36;
   --amtme-crema-editorial: #f5f2ea;
   --amtme-blanco: #ffffff;
-  --amtme-azul-grisaceo: #90a4b8;
+  --amtme-azul-grisaceo: #7a8a99;
   --amtme-rojo: #e0211e;
   --amtme-negro: #111111;
   --color-bg: var(--amtme-crema-editorial);
   --color-text: var(--amtme-navy-profundo);
   --color-surface: var(--amtme-blanco);
-  --color-surface-soft: #ece7dd;
-  --color-border: #d8d1c6;
-  --color-muted: #4e6075;
+  --color-surface-soft: #e9e3d9;
+  --color-border: #c8d1da;
+  --color-muted: #556579;
   --color-accent: var(--amtme-lemon-lime);
   --color-danger: var(--amtme-rojo);
 }
