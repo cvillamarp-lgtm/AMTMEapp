@@ -12,7 +12,7 @@ const episodeStatusSchema = z.enum([
   'Medido',
   'Archivado',
 ]);
-const contentStatusSchema = z.enum(['Borrador', 'Listo', 'Publicado', 'Archivado']);
+const contentStatusSchema = z.enum(['Borrador', 'Listo', 'Publicado', 'Medido', 'Archivado']);
 const checklistStatusSchema = z.enum(['Pendiente', 'En proceso', 'Listo']);
 const calendarStatusSchema = z.enum([
   'Pendiente',

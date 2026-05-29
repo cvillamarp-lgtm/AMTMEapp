@@ -23,9 +23,7 @@ export function ModulePage({
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-amtme-navy sm:text-4xl">
               {title}
             </h2>
-            <p className="mt-3 max-w-2xl text-base leading-7 text-semantic-muted">
-              {description}
-            </p>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-semantic-muted">{description}</p>
           </div>
           {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
         </div>

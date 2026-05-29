@@ -9,7 +9,7 @@ export type EpisodeStatus =
   | 'Distribuido'
   | 'Medido'
   | 'Archivado';
-export type ContentStatus = 'Borrador' | 'Listo' | 'Publicado' | 'Archivado';
+export type ContentStatus = 'Borrador' | 'Listo' | 'Publicado' | 'Medido' | 'Archivado';
 export type ChecklistStatus = 'Pendiente' | 'En proceso' | 'Listo';
 export type CalendarStatus =
   | 'Pendiente'

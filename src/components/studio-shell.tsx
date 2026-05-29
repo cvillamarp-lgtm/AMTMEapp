@@ -112,9 +112,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
         <aside className="hidden w-64 shrink-0 border-r border-semantic-border bg-semantic-surface px-6 py-8 md:block">
           <div className="mb-10">
             <div className="text-xs uppercase tracking-[0.26em] text-semantic-muted">AMTME</div>
-            <div className="mt-2 text-2xl font-bold tracking-tight text-amtme-navy">
-              Studio OS
-            </div>
+            <div className="mt-2 text-2xl font-bold tracking-tight text-amtme-navy">Studio OS</div>
             <p className="mt-3 text-sm leading-6 text-semantic-muted">
               Sistema operativo editorial y documental con foco en orden, velocidad y control.
             </p>
