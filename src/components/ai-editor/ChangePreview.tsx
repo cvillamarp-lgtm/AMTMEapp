@@ -1,5 +1,5 @@
 import type { AiChangePlan } from '@/lib/ai-editor/types';
-import { Card, Badge } from '@/components/ui';
+import { Card } from '@/components/ui';
 import { RiskBadge } from './RiskBadge';
 import { DiffViewer } from './DiffViewer';
 import { ValidationPanel } from './ValidationPanel';
@@ -9,7 +9,6 @@ interface ChangePreviewProps {
   onApply: () => void;
   onDiscard: () => void;
   onEditInstruction: () => void;
-  onSaveAsTask: () => void;
   applying: boolean;
 }
 
@@ -27,7 +26,6 @@ export function ChangePreview({
   onApply,
   onDiscard,
   onEditInstruction,
-  onSaveAsTask,
   applying,
 }: ChangePreviewProps) {
   const validationFailed =
@@ -46,55 +44,70 @@ export function ChangePreview({
 
   return (
     <div className="space-y-5">
-      {/* Intención y resumen */}
+      {/* Resumen del análisis de la IA */}
       <Card>
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
-              Intención detectada
+            <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted">
+              Lo que entendió la IA
             </div>
-            <p className="mt-1 font-mono text-sm font-medium text-amtme-navy">{plan.intent}</p>
+            <p className="mt-2 text-lg font-semibold tracking-tight text-amtme-navy">
+              {plan.summary}
+            </p>
           </div>
           <RiskBadge level={plan.riskLevel} />
         </div>
-        <p className="mt-3 text-sm leading-6 text-semantic-text">{plan.summary}</p>
 
-        {plan.requiresApproval ? (
-          <div className="mt-3">
-            <Badge tone="warning">Requiere aprobación manual</Badge>
+        {plan.requiresApproval && (
+          <div className="mt-4 rounded-xl border border-amtme-gold/30 bg-amtme-gold/5 px-4 py-3 text-sm">
+            Este cambio requiere tu aprobación explícita antes de prepararse.
           </div>
-        ) : null}
+        )}
       </Card>
 
-      {/* Archivos afectados */}
+      {/* Impacto del cambio */}
       <Card>
-        <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
-          Archivos afectados
+        <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted mb-2">
+          Impacto del cambio
         </div>
-        {plan.affectedFiles.length === 0 ? (
-          <p className="mt-2 text-sm text-semantic-muted">Ningún archivo identificado.</p>
-        ) : (
-          <ul className="mt-3 space-y-1">
-            {plan.affectedFiles.map((file) => (
-              <li key={file} className="font-mono text-xs text-amtme-navy">
-                · {file}
-              </li>
-            ))}
-          </ul>
-        )}
 
-        {plan.affectedRoutes.length > 0 ? (
-          <div className="mt-4">
-            <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">Rutas</div>
-            <ul className="mt-2 space-y-1">
-              {plan.affectedRoutes.map((route) => (
-                <li key={route} className="font-mono text-xs text-amtme-navy">
-                  → {route}
+        {plan.affectedFiles.length > 0 ? (
+          <div>
+            <div className="text-sm font-medium text-amtme-navy mb-1.5">
+              Archivos que se modificarán
+            </div>
+            <ul className="space-y-1.5">
+              {plan.affectedFiles.map((file) => (
+                <li
+                  key={file}
+                  className="font-mono text-xs bg-semantic-surface-soft px-3 py-1.5 rounded-lg text-amtme-navy"
+                >
+                  {file}
                 </li>
               ))}
             </ul>
           </div>
-        ) : null}
+        ) : (
+          <p className="text-sm text-semantic-muted">No se identificaron archivos específicos.</p>
+        )}
+
+        {plan.affectedRoutes.length > 0 && (
+          <div className="mt-4">
+            <div className="text-sm font-medium text-amtme-navy mb-1.5">
+              Secciones de la app afectadas
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {plan.affectedRoutes.map((route) => (
+                <span
+                  key={route}
+                  className="inline-block rounded-full bg-amtme-navy/5 px-3 py-1 text-xs font-mono text-amtme-navy"
+                >
+                  {route}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Diff */}
@@ -107,42 +120,33 @@ export function ChangePreview({
         </div>
       </Card>
 
-      {/* Validaciones */}
+      {/* Seguridad y Validaciones */}
       <Card>
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
-            Validaciones
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted">
+              Seguridad del cambio
+            </div>
+            <div className="text-sm font-medium text-amtme-navy mt-0.5">
+              {validationStatusLabel[plan.validationStatus] ?? plan.validationStatus}
+            </div>
           </div>
-          <span
-            className={`text-xs ${validationFailed ? 'text-amtme-red' : validationDeferred ? 'text-amtme-navy' : 'text-semantic-muted'}`}
-          >
-            {validationStatusLabel[plan.validationStatus] ?? plan.validationStatus}
-          </span>
-        </div>
-        <div className="mt-3">
           <ValidationPanel checks={plan.validationChecks} />
         </div>
-        {plan.validationRun ? (
-          <div className="mt-3 rounded-2xl border border-semantic-border bg-semantic-surface-soft px-3 py-2">
-            <p className="text-xs text-semantic-muted">
-              Fuente: <span className="font-mono text-amtme-navy">{plan.validationRun.source}</span>
-              {plan.validationRun.runUrl ? (
-                <>
-                  {' '}
-                  · Evidencia:{' '}
-                  <a
-                    href={plan.validationRun.runUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-amtme-navy underline underline-offset-2"
-                  >
-                    workflow CI
-                  </a>
-                </>
-              ) : null}
-            </p>
+
+        {plan.validationRun && (
+          <div className="text-[10px] text-semantic-muted">
+            Validado vía:{' '}
+            <span className="font-mono text-amtme-navy">{plan.validationRun.source}</span>
           </div>
-        ) : null}
+        )}
+
+        {validationDeferred && (
+          <div className="mt-4 rounded-xl bg-amtme-navy/5 border border-amtme-navy/10 px-4 py-3 text-sm text-amtme-navy">
+            Este cambio se marca como "propuesta". Se recomienda ejecutar verificaciones completas
+            antes de mergear.
+          </div>
+        )}
       </Card>
 
       {(plan.branchName || plan.commitSha) && (
@@ -174,38 +178,40 @@ export function ChangePreview({
         </div>
       ) : null}
 
-      {/* Acciones */}
-      <Card>
-        <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">Acciones</div>
-        <div className="mt-4 flex flex-wrap gap-3">
+      {/* Acciones finales */}
+      <div className="pt-2">
+        <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted mb-3">
+          ¿Qué quieres hacer con este plan?
+        </div>
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={onApply}
             disabled={!canPrepare || applying}
-            className="inline-flex items-center justify-center rounded-full bg-amtme-navy px-4 py-2 text-sm font-medium text-amtme-white transition hover:bg-amtme-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-full bg-amtme-navy px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
           >
             {applyLabel}
           </button>
+
           <button
             onClick={onDiscard}
             disabled={applying}
-            className="inline-flex items-center justify-center rounded-full border border-semantic-border bg-semantic-surface px-4 py-2 text-sm font-medium text-amtme-navy transition hover:bg-semantic-surface-soft disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-full border border-semantic-border px-5 py-2.5 text-sm font-medium text-amtme-navy transition hover:bg-semantic-surface-soft disabled:opacity-50"
           >
-            Descartar
+            Descartar este plan
           </button>
+
           <button
             onClick={onEditInstruction}
-            className="inline-flex items-center justify-center rounded-full border border-semantic-border bg-semantic-surface px-4 py-2 text-sm font-medium text-amtme-navy transition hover:bg-semantic-surface-soft"
+            className="inline-flex items-center justify-center rounded-full border border-semantic-border px-5 py-2.5 text-sm font-medium text-amtme-navy transition hover:bg-semantic-surface-soft"
           >
-            Editar instrucción
-          </button>
-          <button
-            onClick={onSaveAsTask}
-            className="inline-flex items-center justify-center rounded-full border border-semantic-border bg-semantic-surface px-4 py-2 text-sm font-medium text-amtme-navy transition hover:bg-semantic-surface-soft"
-          >
-            Guardar como tarea
+            Cambiar la instrucción
           </button>
         </div>
-      </Card>
+
+        <div className="mt-4 text-[10px] text-semantic-muted">
+          Puedes guardar esta propuesta como tarea pendiente si prefieres revisarla más tarde.
+        </div>
+      </div>
     </div>
   );
 }

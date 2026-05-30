@@ -280,11 +280,8 @@ export function NaturalLanguageEditor() {
     setState((prev) => ({ ...prev, plan: null }));
   };
 
-  const handleSaveAsTask = () => {
-    addHistoryEntry(`req-${Date.now()}`, prompt, state.plan, 'draft');
-    setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
-    setPrompt('');
-  };
+  // Guardado como tarea pendiente (temporalmente deshabilitado en esta iteración del editor)
+  // const handleSaveAsTask = () => { ... };
 
   const handleRollback = async (entry: ChangeHistoryEntry) => {
     if (!entry.plan) return;
@@ -470,7 +467,6 @@ export function NaturalLanguageEditor() {
             onApply={handleApply}
             onDiscard={handleDiscard}
             onEditInstruction={handleEditInstruction}
-            onSaveAsTask={handleSaveAsTask}
             applying={applying}
           />
         </>
