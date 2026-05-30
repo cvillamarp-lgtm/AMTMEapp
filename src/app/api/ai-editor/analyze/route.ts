@@ -95,6 +95,9 @@ export async function POST(request: Request) {
     validationRun: validation.validationRun,
     rollbackAvailable: false,
     executionSource: 'simulation' as const,
+    // New LLM-powered fields for richer conversational experience
+    reasoning: (parseResult as { reasoning?: string }).reasoning,
+    confidence: (parseResult as { confidence?: number }).confidence,
   };
 
   const analyzedEntry = buildHistoryEntry(

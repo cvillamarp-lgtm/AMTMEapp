@@ -93,23 +93,32 @@ Execution mode chosen by user: ${mode}
       systemPrompt,
     });
 
-    const json = safeJsonParse(raw);
+    const parsed = safeJsonParse(raw) as Record<string, unknown>;
 
     // Merge with our static file resolver for safety
     const staticResolution = resolveAffectedFiles(prompt, scope);
-    const risk = assessRisk(staticResolution.files, json.riskLevel, prompt);
+    const risk = assessRisk(
+      staticResolution.files,
+      parsed.riskLevel as RiskLevel | undefined,
+      prompt
+    );
 
     return {
-      intent: json.intent || 'general_modification',
-      summary: json.summary || prompt.slice(0, 140),
-      affectedFiles: [...new Set([...(json.affectedFiles || []), ...staticResolution.files])],
-      affectedRoutes: [...new Set([...(json.affectedRoutes || []), ...staticResolution.routes])],
+      intent: (parsed.intent as string) || 'general_modification',
+      summary: (parsed.summary as string) || prompt.slice(0, 140),
+      affectedFiles: [
+        ...new Set([...((parsed.affectedFiles as string[]) || []), ...staticResolution.files]),
+      ],
+      affectedRoutes: [
+        ...new Set([...((parsed.affectedRoutes as string[]) || []), ...staticResolution.routes]),
+      ],
       riskLevel: risk,
-      requiresApproval: mode === 'safe' ? true : (json.requiresApproval ?? risk !== 'low'),
-      confidence: Math.max(30, Math.min(95, json.confidence ?? 60)),
-      reasoning: json.reasoning || 'LLM analysis + static safety resolver.',
+      requiresApproval:
+        mode === 'safe' ? true : ((parsed.requiresApproval as boolean) ?? risk !== 'low'),
+      confidence: Math.max(30, Math.min(95, (parsed.confidence as number) ?? 60)),
+      reasoning: (parsed.reasoning as string) || 'LLM analysis + static safety resolver.',
     };
-  } catch (error) {
+  } catch {
     // Graceful fallback to the original keyword-based parser
     const fallback = parseInstructionFallback(prompt, mode, scope);
     return {
@@ -120,7 +129,7 @@ Execution mode chosen by user: ${mode}
   }
 }
 
-function safeJsonParse(raw: string): any {
+function safeJsonParse(raw: string): unknown {
   const trimmed = raw.trim();
   try {
     return JSON.parse(trimmed);

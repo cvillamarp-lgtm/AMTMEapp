@@ -441,14 +441,39 @@ export function NaturalLanguageEditor() {
 
       {/* Change preview */}
       {state.plan ? (
-        <ChangePreview
-          plan={state.plan}
-          onApply={handleApply}
-          onDiscard={handleDiscard}
-          onEditInstruction={handleEditInstruction}
-          onSaveAsTask={handleSaveAsTask}
-          applying={applying}
-        />
+        <>
+          {/* LLM Reasoning (new in this audit — makes the editor feel truly intelligent) */}
+          {state.plan &&
+            'reasoning' in state.plan &&
+            (state.plan as { reasoning?: string }).reasoning && (
+              <Card className="border-l-4 border-amtme-gold bg-semantic-surface-soft">
+                <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted mb-1">
+                  Razonamiento de la IA
+                </div>
+                <p className="text-sm leading-relaxed text-amtme-navy">
+                  {(state.plan as { reasoning?: string }).reasoning}
+                </p>
+                {'confidence' in state.plan &&
+                  (state.plan as { confidence?: number }).confidence && (
+                    <div className="mt-2 text-[10px] text-semantic-muted">
+                      Confianza del análisis:{' '}
+                      <span className="font-mono text-amtme-navy">
+                        {(state.plan as { confidence?: number }).confidence}%
+                      </span>
+                    </div>
+                  )}
+              </Card>
+            )}
+
+          <ChangePreview
+            plan={state.plan}
+            onApply={handleApply}
+            onDiscard={handleDiscard}
+            onEditInstruction={handleEditInstruction}
+            onSaveAsTask={handleSaveAsTask}
+            applying={applying}
+          />
+        </>
       ) : null}
 
       {/* History */}
