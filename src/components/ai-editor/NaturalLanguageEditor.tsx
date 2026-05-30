@@ -404,7 +404,7 @@ export function NaturalLanguageEditor() {
 
         <div className="mt-5 flex flex-wrap gap-3">
           <Button onClick={analyze} disabled={state.loading || !prompt.trim()}>
-            {state.loading ? 'Analizando…' : 'Analizar cambio'}
+            {state.loading ? 'Pensando…' : 'Analizar con IA'}
           </Button>
           {state.plan || state.blocked ? (
             <Button variant="ghost" onClick={handleDiscard}>
@@ -412,6 +412,18 @@ export function NaturalLanguageEditor() {
             </Button>
           ) : null}
         </div>
+
+        {state.loading && (
+          <div className="mt-4 rounded-2xl border border-semantic-border bg-semantic-surface-soft p-4 text-sm text-semantic-muted">
+            <div className="flex items-center gap-2 font-medium text-amtme-navy">
+              <span className="animate-pulse">●</span> Analizando tu instrucción en lenguaje natural
+            </div>
+            <div className="mt-2 text-xs leading-relaxed">
+              Identificando intención → Mapeando archivos y rutas afectadas → Evaluando nivel de
+              riesgo → Generando preview seguro con validaciones.
+            </div>
+          </div>
+        )}
 
         {state.error ? (
           <p className="mt-3 rounded-2xl bg-amtme-red/8 px-4 py-3 text-sm text-amtme-red">
