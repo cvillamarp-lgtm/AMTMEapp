@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Badge, Button, Card } from '@/components/ui';
+import { EmptyState } from '@/components/EmptyState';
 import { useStudio } from '@/components/studio-provider';
 import { formatDate } from '@/lib/studio-utils';
 import { truncateText } from '@/lib/text-utils';
@@ -148,16 +149,11 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-semantic-border py-10 text-center">
-                <div className="text-4xl">🌱</div>
-                <p className="mt-4 font-medium tracking-tight text-amtme-navy">
-                  El sistema está en equilibrio
-                </p>
-                <p className="mt-1.5 max-w-[260px] text-sm text-amtme-slate">
-                  No hay alertas de calidad activas. Buen trabajo manteniendo la integridad
-                  editorial.
-                </p>
-              </div>
+              <EmptyState
+                icon="🌱"
+                title="El sistema está en equilibrio"
+                description="No hay alertas de calidad activas. Buen trabajo manteniendo la integridad editorial."
+              />
             )}
           </div>
         </Card>
