@@ -195,6 +195,20 @@ export function NaturalLanguageEditor() {
 
   const handleApply = async () => {
     if (!state.plan) return;
+
+    // Strong guardrail for high/critical risk (Lovable-style safety)
+    if (state.plan.riskLevel === 'high' || state.plan.riskLevel === 'critical') {
+      const confirmed = window.confirm(
+        `⚠️ Riesgo ${state.plan.riskLevel.toUpperCase()}.\n\n` +
+          `Este cambio afecta archivos importantes del sistema.\n` +
+          `Se recomienda revisión manual y ejecución de tests antes de aplicar.\n\n` +
+          `¿Deseas continuar de todas formas?`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setApplying(true);
 
     try {
@@ -337,14 +351,34 @@ export function NaturalLanguageEditor() {
         </div>
 
         <div className="mt-5">
-          <Field label="Instrucción">
+          <Field label="Instrucción en lenguaje natural">
             <Textarea
               rows={4}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Ejemplo: mejora la pantalla de configuración, hazla más compacta y cambia la zona horaria a America/Cancun."
+              placeholder="Ej: 'Mejora la pantalla de configuración, hazla más compacta y cambia la zona horaria a America/Cancun' o 'Agrega una sección de testimonios en la home con el estilo editorial de AMTME'"
             />
           </Field>
+
+          {/* Conversational helper — makes the Lovable-like experience clearer */}
+          <div className="mt-3 rounded-xl border border-semantic-border bg-semantic-surface-soft p-3 text-xs text-semantic-muted">
+            <strong>Ejemplos que funcionan bien:</strong>
+            <ul className="mt-1 list-inside list-disc space-y-0.5">
+              <li>Mejora la tipografía y espaciado del dashboard para que se sienta más premium</li>
+              <li>Agrega un estado vacío útil en la página de episodios cuando no hay ninguno</li>
+              <li>
+                Haz que el calendario use colores del branding AMTME y sea más legible en mobile
+              </li>
+              <li>
+                En el editor IA, agrega una explicación clara de qué hace cada modo (seguro /
+                asistido / directo)
+              </li>
+            </ul>
+            <p className="mt-2 text-[10px] opacity-70">
+              El sistema analiza tu intención, identifica archivos afectados, calcula riesgo y
+              genera un plan con preview antes de cualquier cambio.
+            </p>
+          </div>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -370,7 +404,7 @@ export function NaturalLanguageEditor() {
 
         <div className="mt-5 flex flex-wrap gap-3">
           <Button onClick={analyze} disabled={state.loading || !prompt.trim()}>
-            {state.loading ? 'Analizando…' : 'Analizar cambio'}
+            {state.loading ? 'Pensando…' : 'Analizar con IA'}
           </Button>
           {state.plan || state.blocked ? (
             <Button variant="ghost" onClick={handleDiscard}>
@@ -378,6 +412,18 @@ export function NaturalLanguageEditor() {
             </Button>
           ) : null}
         </div>
+
+        {state.loading && (
+          <div className="mt-4 rounded-2xl border border-semantic-border bg-semantic-surface-soft p-4 text-sm text-semantic-muted">
+            <div className="flex items-center gap-2 font-medium text-amtme-navy">
+              <span className="animate-pulse">●</span> Analizando tu instrucción en lenguaje natural
+            </div>
+            <div className="mt-2 text-xs leading-relaxed">
+              Identificando intención → Mapeando archivos y rutas afectadas → Evaluando nivel de
+              riesgo → Generando preview seguro con validaciones.
+            </div>
+          </div>
+        )}
 
         {state.error ? (
           <p className="mt-3 rounded-2xl bg-amtme-red/8 px-4 py-3 text-sm text-amtme-red">
@@ -395,14 +441,39 @@ export function NaturalLanguageEditor() {
 
       {/* Change preview */}
       {state.plan ? (
-        <ChangePreview
-          plan={state.plan}
-          onApply={handleApply}
-          onDiscard={handleDiscard}
-          onEditInstruction={handleEditInstruction}
-          onSaveAsTask={handleSaveAsTask}
-          applying={applying}
-        />
+        <>
+          {/* LLM Reasoning (new in this audit — makes the editor feel truly intelligent) */}
+          {state.plan &&
+            'reasoning' in state.plan &&
+            (state.plan as { reasoning?: string }).reasoning && (
+              <Card className="border-l-4 border-amtme-gold bg-semantic-surface-soft">
+                <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted mb-1">
+                  Razonamiento de la IA
+                </div>
+                <p className="text-sm leading-relaxed text-amtme-navy">
+                  {(state.plan as { reasoning?: string }).reasoning}
+                </p>
+                {'confidence' in state.plan &&
+                  (state.plan as { confidence?: number }).confidence && (
+                    <div className="mt-2 text-[10px] text-semantic-muted">
+                      Confianza del análisis:{' '}
+                      <span className="font-mono text-amtme-navy">
+                        {(state.plan as { confidence?: number }).confidence}%
+                      </span>
+                    </div>
+                  )}
+              </Card>
+            )}
+
+          <ChangePreview
+            plan={state.plan}
+            onApply={handleApply}
+            onDiscard={handleDiscard}
+            onEditInstruction={handleEditInstruction}
+            onSaveAsTask={handleSaveAsTask}
+            applying={applying}
+          />
+        </>
       ) : null}
 
       {/* History */}

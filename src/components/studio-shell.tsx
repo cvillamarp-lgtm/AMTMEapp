@@ -10,23 +10,44 @@ import { isAuthRequired } from '@/lib/supabase/env';
 import { joinClasses } from '@/lib/studio-utils';
 import { runStudioVerification } from '@/lib/studio-verifier';
 
-const navigation = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/documento-maestro', label: 'Documento Maestro' },
-  { href: '/episodios', label: 'Episodios' },
-  { href: '/creador-visual', label: 'Creador Visual' },
-  { href: '/contenido', label: 'Contenido' },
-  { href: '/calendario', label: 'Calendario' },
-  { href: '/metricas', label: 'Métricas' },
-  { href: '/monetizacion', label: 'Monetización' },
-  { href: '/automatizacion', label: 'Automatización' },
-  { href: '/verificador', label: 'Verificador' },
-  { href: '/ia', label: 'IA' },
-  { href: '/ia/editor', label: 'Editor IA' },
-  { href: '/checklists', label: 'Checklists' },
-  { href: '/historico', label: 'Histórico' },
-  { href: '/politica-operativa', label: 'Política Operativa' },
-  { href: '/configuracion', label: 'Configuración' },
+// Grouped navigation for better mental model (Editorial vs Operaciones vs IA & Sistema)
+const navigationGroups = [
+  {
+    label: 'Editorial',
+    items: [
+      { href: '/dashboard', label: 'Dashboard' },
+      { href: '/documento-maestro', label: 'Documento Maestro' },
+      { href: '/episodios', label: 'Episodios' },
+      { href: '/contenido', label: 'Contenido' },
+      { href: '/creador-visual', label: 'Creador Visual' },
+    ],
+  },
+  {
+    label: 'Operaciones',
+    items: [
+      { href: '/calendario', label: 'Calendario' },
+      { href: '/metricas', label: 'Métricas' },
+      { href: '/monetizacion', label: 'Monetización' },
+      { href: '/checklists', label: 'Checklists' },
+    ],
+  },
+  {
+    label: 'IA & Herramientas',
+    items: [
+      { href: '/ia', label: 'IA' },
+      { href: '/ia/editor', label: 'Editor IA' },
+      { href: '/automatizacion', label: 'Automatización' },
+      { href: '/verificador', label: 'Verificador' },
+    ],
+  },
+  {
+    label: 'Sistema',
+    items: [
+      { href: '/historico', label: 'Histórico' },
+      { href: '/politica-operativa', label: 'Política Operativa' },
+      { href: '/configuracion', label: 'Configuración' },
+    ],
+  },
 ];
 
 function navigationIcon(href: string) {
@@ -118,40 +139,51 @@ export function StudioShell({ children }: { children: ReactNode }) {
             </p>
           </div>
 
-          <nav className="space-y-2">
-            {navigation.map((item) => {
-              const active = pathname === item.href;
-              const icon = navigationIcon(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={joinClasses(
-                    'flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-medium transition',
-                    active
-                      ? 'bg-amtme-navy text-amtme-white shadow-[0_10px_24px_rgba(0,31,54,0.28)]'
-                      : 'text-amtme-navy hover:bg-amtme-slate/20'
-                  )}
-                >
-                  <span className="inline-flex items-center gap-3">
-                    <svg
-                      className="size-5 shrink-0"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      {icon}
-                    </svg>
-                    {item.label}
-                  </span>
-                  {active ? <span className="h-2.5 w-2.5 rounded-full bg-amtme-lemon" /> : null}
-                </Link>
-              );
-            })}
+          <nav className="space-y-6">
+            {navigationGroups.map((group) => (
+              <div key={group.label}>
+                <div className="mb-2 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-semantic-muted">
+                  {group.label}
+                </div>
+                <div className="space-y-1">
+                  {group.items.map((item) => {
+                    const active = pathname === item.href;
+                    const icon = navigationIcon(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={joinClasses(
+                          'flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition',
+                          active
+                            ? 'bg-amtme-navy text-amtme-warm-white shadow-[0_8px_20px_rgba(12,31,54,0.24)]'
+                            : 'text-amtme-navy hover:bg-amtme-navy/5'
+                        )}
+                      >
+                        <span className="inline-flex items-center gap-3">
+                          <svg
+                            className="size-4 shrink-0"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                          >
+                            {icon}
+                          </svg>
+                          {item.label}
+                        </span>
+                        {active ? (
+                          <span className="h-1.5 w-1.5 rounded-full bg-amtme-gold" />
+                        ) : null}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           <div className="mt-10 rounded-[24px] border border-semantic-border bg-semantic-surface-soft p-5">
@@ -206,23 +238,27 @@ export function StudioShell({ children }: { children: ReactNode }) {
         </main>
       </div>
 
+      {/* Mobile bottom nav - adapted to new grouped navigation during audit */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-semantic-border bg-semantic-surface px-3 py-2 md:hidden">
         <div className="flex gap-2 overflow-x-auto">
-          {navigation.slice(0, 6).map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={joinClasses(
-                  'whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-medium',
-                  active ? 'bg-amtme-navy text-amtme-white' : 'bg-amtme-slate/18 text-amtme-navy'
-                )}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+          {navigationGroups
+            .flatMap((g) => g.items)
+            .slice(0, 6)
+            .map((item: { href: string; label: string }) => {
+              const active = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={joinClasses(
+                    'whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-medium',
+                    active ? 'bg-amtme-navy text-amtme-white' : 'bg-amtme-slate/18 text-amtme-navy'
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
         </div>
       </nav>
     </div>
