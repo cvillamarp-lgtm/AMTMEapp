@@ -3,21 +3,25 @@
 @tailwind utilities;
 
 :root {
-  --amtme-lemon-lime: #fee94b;
-  --amtme-navy-profundo: #001f36;
-  --amtme-crema-editorial: #f5f2ea;
-  --amtme-blanco: #ffffff;
-  --amtme-azul-grisaceo: #7a8a99;
-  --amtme-rojo: #e0211e;
-  --amtme-negro: #111111;
-  --color-bg: var(--amtme-crema-editorial);
-  --color-text: var(--amtme-navy-profundo);
-  --color-surface: var(--amtme-blanco);
-  --color-surface-soft: #e9e3d9;
-  --color-border: #c8d1da;
-  --color-muted: #556579;
-  --color-accent: var(--amtme-lemon-lime);
-  --color-danger: var(--amtme-rojo);
+  /* AMTME Editorial Premium Palette (official, audited) */
+  --amtme-navy: #0c1f36;
+  --amtme-gold: #fee94b;
+  --amtme-cream: #f5f1e8;
+  --amtme-warm-white: #f8f8f6;
+  --amtme-slate: #6b7b8c;
+  --amtme-red: #e0211e;
+  --amtme-black: #111111;
+
+  /* Semantic tokens - clean editorial system */
+  --color-bg: var(--amtme-cream);
+  --color-surface: var(--amtme-warm-white);
+  --color-surface-soft: #f0ebe2;
+  --color-text: var(--amtme-navy);
+  --color-muted: var(--amtme-slate);
+  --color-border: #d4d9e0;
+  --color-accent: var(--amtme-gold);
+  --color-danger: var(--amtme-red);
+  --color-focus: rgba(12, 31, 54, 0.25);
 }
 
 * {
@@ -33,9 +37,14 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', sans-serif;
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI',
+    system-ui, sans-serif;
+  font-feature-settings:
+    'tnum' 1,
+    'ss01' 1; /* tabular numbers + stylistic alternates for editorial feel */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -44,5 +53,33 @@ a {
 }
 
 ::selection {
-  background: rgba(254, 233, 75, 0.55);
+  background: rgba(254, 233, 75, 0.35);
+  color: var(--amtme-navy);
+}
+
+/* Premium editorial focus states */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Better default spacing and rhythm for editorial content */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+p {
+  line-height: 1.7;
+}
+
+/* Subtle premium card/panel treatment */
+.editorial-surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
 }
