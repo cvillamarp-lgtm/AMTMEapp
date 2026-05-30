@@ -195,6 +195,20 @@ export function NaturalLanguageEditor() {
 
   const handleApply = async () => {
     if (!state.plan) return;
+
+    // Strong guardrail for high/critical risk (Lovable-style safety)
+    if (state.plan.riskLevel === 'high' || state.plan.riskLevel === 'critical') {
+      const confirmed = window.confirm(
+        `⚠️ Riesgo ${state.plan.riskLevel.toUpperCase()}.\n\n` +
+          `Este cambio afecta archivos importantes del sistema.\n` +
+          `Se recomienda revisión manual y ejecución de tests antes de aplicar.\n\n` +
+          `¿Deseas continuar de todas formas?`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setApplying(true);
 
     try {
