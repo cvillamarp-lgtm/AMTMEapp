@@ -43,6 +43,7 @@ export function NaturalLanguageEditor() {
     plan: null,
   });
   const [applying, setApplying] = useState(false);
+  const [confirmingApply, setConfirmingApply] = useState(false);
   const [history, setHistory] = useState<ChangeHistoryEntry[]>([]);
   const [persistenceInfo, setPersistenceInfo] = useState<{
     type: 'persistent' | 'session';
@@ -196,19 +197,14 @@ export function NaturalLanguageEditor() {
   const handleApply = async () => {
     if (!state.plan) return;
 
-    // Strong guardrail for high/critical risk (Lovable-style safety)
-    if (state.plan.riskLevel === 'high' || state.plan.riskLevel === 'critical') {
-      const confirmed = window.confirm(
-        `⚠️ Riesgo ${state.plan.riskLevel.toUpperCase()}.\n\n` +
-          `Este cambio afecta archivos importantes del sistema.\n` +
-          `Se recomienda revisión manual y ejecución de tests antes de aplicar.\n\n` +
-          `¿Deseas continuar de todas formas?`
-      );
-      if (!confirmed) {
-        return;
-      }
-    }
+    // Enter confirmation step (much stronger Lovable-style safety + clarity)
+    setConfirmingApply(true);
+  };
 
+  const confirmAndApply = async () => {
+    if (!state.plan) return;
+
+    setConfirmingApply(false);
     setApplying(true);
 
     try {
@@ -269,6 +265,10 @@ export function NaturalLanguageEditor() {
     } finally {
       setApplying(false);
     }
+  };
+
+  const cancelConfirmation = () => {
+    setConfirmingApply(false);
   };
 
   const handleDiscard = () => {
@@ -462,13 +462,50 @@ export function NaturalLanguageEditor() {
               </Card>
             )}
 
-          <ChangePreview
-            plan={state.plan}
-            onApply={handleApply}
-            onDiscard={handleDiscard}
-            onEditInstruction={handleEditInstruction}
-            applying={applying}
-          />
+          {/* Strong Confirmation before Apply (Lovable-style safety + clarity) */}
+          {confirmingApply && state.plan && (
+            <Card className="border-2 border-amtme-gold">
+              <div className="font-semibold text-amtme-navy">Confirmar preparación del cambio</div>
+
+              <div className="mt-3 text-sm">
+                {(state.plan as { reasoning?: string }).reasoning ? (
+                  <div>
+                    <div className="text-xs text-semantic-muted mb-1">Razonamiento de la IA:</div>
+                    <p className="italic text-amtme-navy">
+                      “{(state.plan as { reasoning?: string }).reasoning}”
+                    </p>
+                  </div>
+                ) : (
+                  <p>{state.plan.summary}</p>
+                )}
+              </div>
+
+              <div className="mt-4 text-xs text-amtme-slate">
+                Esto generará una rama técnica/propuesta con los cambios propuestos.
+                {state.plan.riskLevel !== 'low' &&
+                  ` El nivel de riesgo es ${state.plan.riskLevel}.`}
+              </div>
+
+              <div className="mt-5 flex gap-3">
+                <Button onClick={confirmAndApply} disabled={applying}>
+                  {applying ? 'Preparando rama...' : 'Confirmar y preparar'}
+                </Button>
+                <Button variant="ghost" onClick={cancelConfirmation} disabled={applying}>
+                  Cancelar
+                </Button>
+              </div>
+            </Card>
+          )}
+
+          {!confirmingApply && (
+            <ChangePreview
+              plan={state.plan}
+              onApply={handleApply}
+              onDiscard={handleDiscard}
+              onEditInstruction={handleEditInstruction}
+              applying={applying}
+            />
+          )}
         </>
       ) : null}
 
