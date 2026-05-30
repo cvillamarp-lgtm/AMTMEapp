@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { parseInstruction } from '@/lib/ai-editor/parseInstruction';
+import { parseInstructionWithLLM } from '@/lib/ai-editor/intentAnalyzer';
 import { generatePatch } from '@/lib/ai-editor/generatePatch';
 import { validatePatch } from '@/lib/ai-editor/validatePatch';
 import { AiEditorModeSchema, AiEditorScopeSchema } from '@/lib/ai-editor/types';
@@ -28,7 +29,26 @@ export async function POST(request: Request) {
   const { prompt, mode, scope } = parsed.data;
   const requestId = parsed.data.requestId ?? `req-${crypto.randomUUID()}`;
 
-  const parseResult = parseInstruction(prompt, mode, scope);
+  // Prefer real LLM reasoning for much better natural language understanding (Lovable-style)
+  let parseResult;
+  try {
+    const llmResult = await parseInstructionWithLLM(prompt, mode, scope);
+    parseResult = {
+      intent: llmResult.intent,
+      summary: llmResult.summary,
+      plan: {
+        intent: llmResult.intent,
+        summary: llmResult.summary,
+        affectedFiles: llmResult.affectedFiles,
+        affectedRoutes: llmResult.affectedRoutes,
+        riskLevel: llmResult.riskLevel,
+        requiresApproval: llmResult.requiresApproval,
+      },
+    };
+  } catch {
+    // Safe fallback to the original keyword system
+    parseResult = parseInstruction(prompt, mode, scope);
+  }
 
   if (parseResult.blocked) {
     const blockedEntry = buildHistoryEntry(
