@@ -11,10 +11,10 @@ const MAX_EPISODE_TITLE_LENGTH = 68;
 
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <Card className="bg-semantic-surface-soft">
-      <div className="text-xs uppercase tracking-[0.22em] text-black/60">{label}</div>
-      <div className="mt-3 text-3xl font-bold tracking-tight text-amtme-navy">{value}</div>
-      <div className="mt-2 text-sm text-black/60">{detail}</div>
+    <Card className="border border-semantic-border bg-semantic-surface">
+      <div className="text-[10px] uppercase tracking-[0.2em] text-amtme-slate">{label}</div>
+      <div className="mt-2 text-3xl font-semibold tracking-tighter text-amtme-navy">{value}</div>
+      <div className="mt-1.5 text-xs leading-tight text-amtme-slate/80">{detail}</div>
     </Card>
   );
 }
@@ -46,25 +46,35 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 pb-24">
       <section className="grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
-        <Card className="overflow-hidden bg-amtme-navy text-white shadow-[0_20px_60px_rgba(0,31,54,0.3)]">
-          <div className="flex h-full flex-col justify-between gap-8">
-            <div className="max-w-2xl">
-              <Badge tone="accent">Centro de control operativo</Badge>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">
+        <Card className="overflow-hidden border-0 bg-amtme-navy text-white shadow-[0_24px_70px_rgba(12,31,54,0.35)]">
+          <div className="flex h-full flex-col justify-between gap-10 p-8">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-medium tracking-[0.15em] text-amtme-gold">
+                CENTRO DE CONTROL
+              </div>
+              <h1 className="mt-5 text-4xl font-semibold tracking-tighter sm:text-5xl">
+                Bienvenido a<br />
                 AMTME Studio OS
-              </h2>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/78 sm:text-base">
-                Fuente central para gestionar episodios, contenido, métricas, monetización, política
-                y verificación del sistema.
+              </h1>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-white/75">
+                La fuente de verdad editorial y operativa. Todo lo que importa para producir,
+                distribuir y medir AMTME en un solo lugar.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Button href="/episodios">Crear episodio</Button>
-              <Button href="/creador-visual" variant="secondary">
-                Crear imagen
+
+            <div className="flex flex-wrap gap-3">
+              <Button
+                href="/episodios"
+                className="bg-white text-amtme-navy hover:bg-amtme-gold hover:text-amtme-navy"
+              >
+                Nuevo episodio
               </Button>
-              <Button href="/contenido" variant="secondary">
-                Crear copy
+              <Button
+                href="/ia/editor"
+                variant="secondary"
+                className="border-white/30 text-white hover:bg-white/10"
+              >
+                Usar el Editor IA
               </Button>
             </div>
           </div>
@@ -124,19 +134,30 @@ export default function DashboardPage() {
               Abrir checklists
             </Button>
           </div>
-          <div className="mt-5 space-y-3">
-            {qualityAlerts.length ? (
-              qualityAlerts.map((alert) => (
-                <div
-                  key={alert}
-                  className="flex items-start gap-3 rounded-2xl border border-black/10 bg-semantic-surface-soft px-4 py-3 text-sm text-amtme-navy"
-                >
-                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#E0211E]" />
-                  <span>{truncateText(alert, MAX_ALERT_LENGTH)}</span>
-                </div>
-              ))
+          <div className="mt-6">
+            {qualityAlerts.length > 0 ? (
+              <div className="space-y-3">
+                {qualityAlerts.map((alert) => (
+                  <div
+                    key={alert}
+                    className="flex items-start gap-3 rounded-2xl border border-black/10 bg-semantic-surface-soft px-4 py-3 text-sm text-amtme-navy"
+                  >
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-amtme-red" />
+                    <span className="leading-snug">{truncateText(alert, MAX_ALERT_LENGTH)}</span>
+                  </div>
+                ))}
+              </div>
             ) : (
-              <p className="text-sm text-black/50">No hay alertas activas.</p>
+              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-semantic-border py-10 text-center">
+                <div className="text-4xl">🌱</div>
+                <p className="mt-4 font-medium tracking-tight text-amtme-navy">
+                  El sistema está en equilibrio
+                </p>
+                <p className="mt-1.5 max-w-[260px] text-sm text-amtme-slate">
+                  No hay alertas de calidad activas. Buen trabajo manteniendo la integridad
+                  editorial.
+                </p>
+              </div>
             )}
           </div>
         </Card>
