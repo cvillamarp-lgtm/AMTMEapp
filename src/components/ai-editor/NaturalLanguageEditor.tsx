@@ -44,6 +44,11 @@ export function NaturalLanguageEditor() {
   });
   const [applying, setApplying] = useState(false);
   const [confirmingApply, setConfirmingApply] = useState(false);
+  const [applySuccess, setApplySuccess] = useState<{
+    branchName?: string;
+    message?: string;
+    status?: string;
+  } | null>(null);
   const [history, setHistory] = useState<ChangeHistoryEntry[]>([]);
   const [persistenceInfo, setPersistenceInfo] = useState<{
     type: 'persistent' | 'session';
@@ -257,8 +262,19 @@ export function NaturalLanguageEditor() {
             reason: data.persistenceReason,
           });
         }
-        setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
-        setPrompt('');
+
+        // Show nice success feedback with next steps (Lovable-style closure)
+        setApplySuccess({
+          branchName: data.branchName,
+          message: data.message,
+          status: data.status,
+        });
+
+        // Clear plan after short delay so success banner is visible
+        setTimeout(() => {
+          setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
+          setPrompt('');
+        }, 1200);
       }
     } catch {
       setState((prev) => ({ ...prev, error: 'Error al preparar el cambio.' }));
@@ -269,6 +285,10 @@ export function NaturalLanguageEditor() {
 
   const cancelConfirmation = () => {
     setConfirmingApply(false);
+  };
+
+  const dismissSuccess = () => {
+    setApplySuccess(null);
   };
 
   const handleDiscard = () => {
@@ -508,6 +528,36 @@ export function NaturalLanguageEditor() {
           )}
         </>
       ) : null}
+
+      {/* Success feedback after Apply (strong closure for Lovable experience) */}
+      {applySuccess && (
+        <Card className="border-2 border-amtme-gold bg-amtme-gold/5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="font-semibold text-amtme-navy">¡Cambio preparado con éxito!</div>
+              <p className="mt-1 text-sm text-amtme-navy/90">
+                {applySuccess.message ||
+                  'Se ha generado la rama técnica con los cambios propuestos.'}
+              </p>
+              {applySuccess.branchName && (
+                <p className="mt-2 font-mono text-xs text-amtme-navy">
+                  Rama: {applySuccess.branchName}
+                </p>
+              )}
+              <p className="mt-3 text-xs text-semantic-muted">
+                Revisa el historial abajo o ve al PR/branch para inspeccionar los cambios antes de
+                mergear.
+              </p>
+            </div>
+            <button
+              onClick={dismissSuccess}
+              className="text-xs text-amtme-slate hover:text-amtme-navy"
+            >
+              Cerrar
+            </button>
+          </div>
+        </Card>
+      )}
 
       {/* History */}
       {history.length > 0 ? (
