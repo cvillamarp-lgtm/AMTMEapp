@@ -351,14 +351,34 @@ export function NaturalLanguageEditor() {
         </div>
 
         <div className="mt-5">
-          <Field label="Instrucción">
+          <Field label="Instrucción en lenguaje natural">
             <Textarea
               rows={4}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Ejemplo: mejora la pantalla de configuración, hazla más compacta y cambia la zona horaria a America/Cancun."
+              placeholder="Ej: 'Mejora la pantalla de configuración, hazla más compacta y cambia la zona horaria a America/Cancun' o 'Agrega una sección de testimonios en la home con el estilo editorial de AMTME'"
             />
           </Field>
+
+          {/* Conversational helper — makes the Lovable-like experience clearer */}
+          <div className="mt-3 rounded-xl border border-semantic-border bg-semantic-surface-soft p-3 text-xs text-semantic-muted">
+            <strong>Ejemplos que funcionan bien:</strong>
+            <ul className="mt-1 list-inside list-disc space-y-0.5">
+              <li>Mejora la tipografía y espaciado del dashboard para que se sienta más premium</li>
+              <li>Agrega un estado vacío útil en la página de episodios cuando no hay ninguno</li>
+              <li>
+                Haz que el calendario use colores del branding AMTME y sea más legible en mobile
+              </li>
+              <li>
+                En el editor IA, agrega una explicación clara de qué hace cada modo (seguro /
+                asistido / directo)
+              </li>
+            </ul>
+            <p className="mt-2 text-[10px] opacity-70">
+              El sistema analiza tu intención, identifica archivos afectados, calcula riesgo y
+              genera un plan con preview antes de cualquier cambio.
+            </p>
+          </div>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
