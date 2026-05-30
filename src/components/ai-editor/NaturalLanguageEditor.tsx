@@ -44,6 +44,7 @@ export function NaturalLanguageEditor() {
   });
   const [applying, setApplying] = useState(false);
   const [confirmingApply, setConfirmingApply] = useState(false);
+  const [confirmationChecked, setConfirmationChecked] = useState(false);
   const [applySuccess, setApplySuccess] = useState<{
     branchName?: string;
     message?: string;
@@ -60,9 +61,15 @@ export function NaturalLanguageEditor() {
   });
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const loadHistory = async () => {
       try {
-        const res = await fetch('/api/ai-editor/history');
+        const res = await fetch('/api/ai-editor/history', {
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+
         const data = (await res.json()) as {
           entries?: ChangeHistoryEntry[];
           persistenceType?: 'persistent' | 'session';
@@ -70,7 +77,6 @@ export function NaturalLanguageEditor() {
           persistenceReason?: string;
         };
 
-        if (!res.ok) return;
         if (Array.isArray(data.entries)) {
           setHistory(data.entries);
         }
@@ -79,12 +85,18 @@ export function NaturalLanguageEditor() {
           source: data.persistenceSource ?? 'memory',
           reason: data.persistenceReason,
         });
-      } catch {
-        // fallback silencioso a historial local
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          // fallback silencioso a historial local
+        }
       }
     };
 
     void loadHistory();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const analyze = async () => {
@@ -202,6 +214,7 @@ export function NaturalLanguageEditor() {
   const handleApply = async () => {
     if (!state.plan) return;
 
+    setConfirmationChecked(false);
     // Enter confirmation step (much stronger Lovable-style safety + clarity)
     setConfirmingApply(true);
   };
@@ -210,6 +223,7 @@ export function NaturalLanguageEditor() {
     if (!state.plan) return;
 
     setConfirmingApply(false);
+    setConfirmationChecked(false);
     setApplying(true);
 
     try {
@@ -285,6 +299,7 @@ export function NaturalLanguageEditor() {
 
   const cancelConfirmation = () => {
     setConfirmingApply(false);
+    setConfirmationChecked(false);
   };
 
   const dismissSuccess = () => {
@@ -506,9 +521,28 @@ export function NaturalLanguageEditor() {
                   ` El nivel de riesgo es ${state.plan.riskLevel}.`}
               </div>
 
+              {/* Explicit confirmation checkbox for safety (required for non-low risk) */}
+              {state.plan.riskLevel !== 'low' && (
+                <label className="mt-4 flex items-start gap-2 text-sm text-amtme-navy">
+                  <input
+                    type="checkbox"
+                    checked={confirmationChecked}
+                    onChange={(e) => setConfirmationChecked(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <span>
+                    He revisado el plan completo y el razonamiento de la IA. Entiendo los riesgos
+                    identificados.
+                  </span>
+                </label>
+              )}
+
               <div className="mt-5 flex gap-3">
-                <Button onClick={confirmAndApply} disabled={applying}>
-                  {applying ? 'Preparando rama...' : 'Confirmar y preparar'}
+                <Button
+                  onClick={confirmAndApply}
+                  disabled={applying || (state.plan.riskLevel !== 'low' && !confirmationChecked)}
+                >
+                  {applying ? 'Preparando rama...' : 'Confirmar y preparar rama'}
                 </Button>
                 <Button variant="ghost" onClick={cancelConfirmation} disabled={applying}>
                   Cancelar
