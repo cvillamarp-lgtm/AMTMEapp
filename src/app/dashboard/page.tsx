@@ -38,6 +38,7 @@ export default function DashboardPage() {
     async function load() {
       try {
         const supabase = getSupabaseBrowserClient();
+        if (!supabase) return;
         const [ep, ct, ld] = await Promise.all([
           supabase.from('episodes').select('*').order('created_at', { ascending: false }),
           supabase.from('content_pieces').select('id,status'),
