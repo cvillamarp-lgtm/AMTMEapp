@@ -7,6 +7,7 @@ import type {
 } from 'react';
 import { joinClasses } from '@/lib/studio-utils';
 
+// ─── Button ─ Contraste WCAG AA garantizado en todas las variantes ─────────────
 export function Button({
   children,
   className,
@@ -18,30 +19,36 @@ export function Button({
 }: {
   children: ReactNode;
   className?: string;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   href?: string;
   type?: 'button' | 'submit' | 'reset';
   onClick?: () => void;
   disabled?: boolean;
 }) {
-  const base =
-    'inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-amtme-navy/25 disabled:cursor-not-allowed disabled:opacity-50';
-  const variants = {
-    primary: 'bg-amtme-navy text-amtme-white hover:bg-amtme-black',
-    secondary:
-      'border border-amtme-slate bg-amtme-slate text-amtme-white hover:border-amtme-navy hover:bg-amtme-navy',
-    ghost: 'bg-transparent text-amtme-navy hover:bg-amtme-navy/10',
+  const base = [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap select-none cursor-pointer',
+    'rounded-xl px-4 py-2 text-[13px] font-semibold leading-none tracking-[-0.01em]',
+    'transition-all duration-150 ease-out',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0C1F36]/30',
+    'disabled:pointer-events-none disabled:opacity-40',
+  ].join(' ');
+
+  const variants: Record<string, string> = {
+    primary:
+      'bg-[#0C1F36] text-white hover:bg-[#09182a] active:scale-[0.97] shadow-[0_1px_3px_rgba(12,31,54,0.18)]',
+    secondary: 'bg-black/[0.06] text-[#0C1F36] hover:bg-black/[0.10] active:scale-[0.97]',
+    ghost: 'bg-transparent text-[#0C1F36] hover:bg-black/[0.05] active:scale-[0.97]',
+    danger: 'bg-[#E0211E] text-white hover:bg-[#c01c1a] active:scale-[0.97]',
   };
 
   const classes = joinClasses(base, variants[variant], className);
 
-  if (href) {
+  if (href)
     return (
       <Link href={href} className={classes}>
         {children}
       </Link>
     );
-  }
 
   return (
     <button type={type} className={classes} onClick={onClick} disabled={disabled}>
@@ -50,11 +57,13 @@ export function Button({
   );
 }
 
+// ─── Card ────────────────────────────────────────────────────────────────────────
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <section
       className={joinClasses(
-        'rounded-[24px] border border-semantic-border bg-semantic-surface p-6 shadow-[0_12px_30px_rgba(0,31,54,0.08)]',
+        'rounded-[20px] border border-black/[0.07] bg-white p-6',
+        'shadow-[0_2px_8px_rgba(12,31,54,0.06),0_0_1px_rgba(12,31,54,0.06)]',
         className
       )}
     >
@@ -63,6 +72,7 @@ export function Card({ children, className }: { children: ReactNode; className?:
   );
 }
 
+// ─── Badge ───────────────────────────────────────────────────────────────────────
 export function Badge({
   children,
   tone = 'neutral',
@@ -70,18 +80,18 @@ export function Badge({
   children: ReactNode;
   tone?: 'neutral' | 'good' | 'warning' | 'danger' | 'accent';
 }) {
-  const tones = {
-    neutral: 'bg-amtme-slate/22 text-amtme-navy',
-    good: 'bg-amtme-lemon/30 text-amtme-black',
-    warning: 'bg-amtme-lemon text-amtme-black',
-    danger: 'bg-amtme-red/12 text-amtme-red',
-    accent: 'bg-amtme-lemon text-amtme-navy',
+  const tones: Record<string, string> = {
+    neutral: 'bg-black/[0.06] text-[#0C1F36]',
+    good: 'bg-emerald-50 text-emerald-700',
+    warning: 'bg-[#FEE94B] text-[#0C1F36]',
+    danger: 'bg-red-50 text-[#C0201E]',
+    accent: 'bg-[#FEE94B] text-[#0C1F36]',
   };
 
   return (
     <span
       className={joinClasses(
-        'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium',
+        'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-[-0.005em]',
         tones[tone]
       )}
     >
@@ -90,6 +100,7 @@ export function Badge({
   );
 }
 
+// ─── Field ───────────────────────────────────────────────────────────────────────
 export function Field({
   label,
   children,
@@ -100,46 +111,46 @@ export function Field({
   hint?: string;
 }) {
   return (
-    <label className="flex flex-col gap-2 text-sm text-semantic-text">
-      <span className="font-medium">{label}</span>
+    <label className="flex flex-col gap-1.5">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#0C1F36]/50">
+        {label}
+      </span>
       {children}
-      {hint ? <span className="text-xs text-semantic-muted">{hint}</span> : null}
+      {hint ? <span className="text-[11px] text-[#6B7B8C]">{hint}</span> : null}
     </label>
   );
 }
 
+// ─── Inputs ──────────────────────────────────────────────────────────────────────
+const inputBase = [
+  'w-full rounded-xl border border-black/[0.10] bg-black/[0.025]',
+  'px-3.5 py-2.5 text-[14px] text-[#0C1F36]',
+  'placeholder:text-[#6B7B8C]/60',
+  'outline-none transition-all duration-150',
+  'focus:border-[#0C1F36]/25 focus:bg-white focus:shadow-[0_0_0_3px_rgba(12,31,54,0.08)]',
+  'disabled:opacity-50',
+].join(' ');
+
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className={joinClasses(
-        'w-full rounded-2xl border border-semantic-border bg-semantic-surface px-4 py-3 text-sm text-semantic-text outline-none placeholder:text-semantic-muted/70 focus:border-amtme-navy/35 focus:ring-2 focus:ring-amtme-navy/15',
-        props.className
-      )}
-    />
-  );
+  return <input {...props} className={joinClasses(inputBase, props.className)} />;
 }
 
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className={joinClasses(
-        'w-full rounded-2xl border border-semantic-border bg-semantic-surface px-4 py-3 text-sm text-semantic-text outline-none placeholder:text-semantic-muted/70 focus:border-amtme-navy/35 focus:ring-2 focus:ring-amtme-navy/15',
-        props.className
-      )}
+      className={joinClasses(inputBase, 'resize-y min-h-[80px]', props.className)}
     />
   );
 }
 
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select
-      {...props}
-      className={joinClasses(
-        'w-full rounded-2xl border border-semantic-border bg-semantic-surface px-4 py-3 text-sm text-semantic-text outline-none focus:border-amtme-navy/35 focus:ring-2 focus:ring-amtme-navy/15',
-        props.className
-      )}
-    />
+    <select {...props} className={joinClasses(inputBase, 'cursor-pointer', props.className)} />
   );
+}
+
+// ─── Divider ─────────────────────────────────────────────────────────────────────
+export function Divider({ className }: { className?: string }) {
+  return <div className={joinClasses('h-px bg-black/[0.07] my-4', className)} />;
 }
