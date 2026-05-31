@@ -17,6 +17,8 @@ const navigationGroups = [
       { href: '/dashboard', label: 'Dashboard' },
       { href: '/documento-maestro', label: 'Documento Maestro' },
       { href: '/episodios', label: 'Episodios' },
+      { href: '/guiones', label: 'Guiones' },
+      { href: '/revision-episodios', label: 'Revisión Episodios' },
       { href: '/contenido', label: 'Contenido' },
       { href: '/creador-visual', label: 'Creador Visual' },
     ],
@@ -35,6 +37,8 @@ const navigationGroups = [
     items: [
       { href: '/ia', label: 'IA' },
       { href: '/ia/editor', label: 'Editor IA' },
+      { href: '/notas', label: 'Notas' },
+      { href: '/instagram', label: 'Instagram' },
       { href: '/automatizacion', label: 'Automatización' },
       { href: '/verificador', label: 'Verificador' },
     ],
