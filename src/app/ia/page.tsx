@@ -1,27 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
+import { Badge } from '@/components/ui';
 import { useStudio } from '@/components/studio-provider';
-import { getProviderLabel } from '@/lib/ai-providers';
-import type { AIProvider, AIWorkMode } from '@/lib/studio-types';
-
-type AIResponseState = {
-  loading: boolean;
-  error: string;
-  result: string;
-};
-
-const defaultPromptByMode: Record<AIWorkMode, string> = {
-  Episodio: 'Genera un guion breve para un episodio de AMTME con hooks, estructura y CTA.',
-  Copy: 'Escribe copy listo para publicar para Instagram con tono sobrio y editorial.',
-  Visual: 'Define un prompt visual tipo Apple para una pieza de AMTME.',
-  Métricas: 'Resume el dato clave y la acción siguiente de una métrica operativa.',
-  Monetización: 'Redacta el siguiente paso comercial para convertir un lead interesado.',
-};
+import { NaturalLanguageEditor } from '@/components/ia-editor/NaturalLanguageEditor';
 
 export default function IAPage() {
   const { state } = useStudio();
+<<<<<<< HEAD
   const [provider, setProvider] = useState<AIProvider>(state.config.aiPrimaryProvider);
   const [mode, setMode] = useState<AIWorkMode>('Copy');
   const [model, setModel] = useState(state.config.aiPreferredModelByProvider[provider]);
@@ -75,21 +60,28 @@ export default function IAPage() {
       });
     }
   };
+=======
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
-      <Card>
-        <div className="flex items-center justify-between gap-3">
+    <div className="space-y-8">
+      <div>
+        <div className="flex items-center justify-between">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">IA</div>
+<<<<<<< HEAD
             <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Conexión Grok y Gemini
             </h2>
+=======
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">Editor Conversacional</h2>
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
           </div>
           <Badge tone={state.config.aiEnabled ? 'good' : 'warning'}>
             {state.config.aiEnabled ? 'IA activa' : 'IA pausada'}
           </Badge>
         </div>
+<<<<<<< HEAD
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <Field label="Proveedor">
@@ -188,7 +180,21 @@ export default function IAPage() {
             </div>
           </div>
         </Card>
+=======
+        <p className="mt-3 max-w-prose text-sm text-black/55">
+          Escribe en lenguaje natural. El modelo te mostrará su razonamiento en cada paso. 
+          Todas las aplicaciones son simulaciones seguras (no modifican el repositorio real).
+        </p>
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
       </div>
+
+      <NaturalLanguageEditor />
+
+      {/* Legacy quick generator kept for power users - can be removed later */}
+      <details className="mt-12 text-xs text-black/40">
+        <summary className="cursor-pointer">Modo clásico (generador por prompts)</summary>
+        <div className="mt-4 text-[13px] text-black/50">El modo clásico sigue disponible temporalmente en la ruta /ia/clasico (por implementar). El nuevo editor conversacional con razonamiento visible es la experiencia principal.</div>
+      </details>
     </div>
   );
 }

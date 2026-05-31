@@ -6,6 +6,7 @@ const config: Config = {
     extend: {
       colors: {
         amtme: {
+<<<<<<< HEAD
           // Official AMTME Editorial Premium palette (audited & aligned)
           navy: '#0C1F36', // Navy profundo
           gold: '#FEE94B', // Amarillo editorial
@@ -28,6 +29,18 @@ const config: Config = {
           border: 'var(--color-border)',
           accent: 'var(--color-accent)',
           danger: 'var(--color-danger)',
+=======
+          navy: '#0C1F36', // Deep editorial navy (primary)
+          navyLegacy: '#001F36', // Previous value retained for compatibility
+          gold: '#FEE94B', // Editorial yellow/gold accent
+          yellow: '#E8FF40', // Legacy bright accent (kept for existing surfaces)
+          white: '#F8F8F6', // Warm editorial white
+          cream: '#F5F1E8', // Warm cream
+          creamLegacy: '#F5EFE6',
+          petro: '#003D5C',
+          terracotta: '#B85C38',
+          red: '#E0211E', // High-risk / danger accent
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
         },
       },
       boxShadow: {

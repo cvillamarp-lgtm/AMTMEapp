@@ -62,6 +62,7 @@ export default function DashboardPage() {
                 distribuir y medir AMTME en un solo lugar.
               </p>
             </div>
+<<<<<<< HEAD
 
             <div className="flex flex-wrap gap-3">
               <Button
@@ -77,6 +78,12 @@ export default function DashboardPage() {
               >
                 Usar el Editor IA
               </Button>
+=======
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Button href="/episodios" className="bg-[#E8FF40] text-[#001F36] hover:bg-[#fee94b] border-0">Crear episodio</Button>
+              <Button href="/creador-visual" variant="secondary" className="bg-white/15 text-white border border-white/20 hover:bg-white/25">Crear imagen</Button>
+              <Button href="/contenido" variant="secondary" className="bg-white/15 text-white border border-white/20 hover:bg-white/25">Crear copy</Button>
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
             </div>
           </div>
         </Card>
@@ -193,11 +200,15 @@ export default function DashboardPage() {
           </div>
           <div className="mt-5 space-y-3">
             {state.episodes.slice(0, 3).map((episode) => (
+<<<<<<< HEAD
               <Link
                 key={episode.id}
                 href="/episodios"
                 className="block rounded-2xl border border-black/10 bg-semantic-surface-soft px-4 py-4 transition hover:bg-white"
               >
+=======
+              <Link key={episode.id} href="/episodios" className="block rounded-2xl border border-black/8 bg-[#F5F5F7] px-4 py-4 transition hover:bg-white hover:border-[#001F36]/20 hover:shadow-[0_4px_16px_rgba(0,31,54,0.06)]">
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
                     <div className="text-xs uppercase tracking-[0.2em] text-black/38">

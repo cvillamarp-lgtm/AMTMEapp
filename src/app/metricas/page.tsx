@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
+import { EmptyState } from '@/components/ui/empty-state';
+import { RiskLevelBadge } from '@/components/ia-editor/RiskLevelBadge';
+import { ReasoningDisclosure } from '@/components/ia-editor/ReasoningDisclosure';
 import { useStudio } from '@/components/studio-provider';
 import type { MetricMonthly } from '@/lib/studio-types';
 
@@ -32,6 +35,26 @@ export default function MetricasPage() {
       metricsMonthly: [draft, ...current.metricsMonthly],
     }));
   };
+
+  if (state.metricsMonthly.length === 0) {
+    return (
+      <div className="py-12">
+        <EmptyState
+          title="Sin métricas todavía"
+          description="Registra tu primer ciclo o usa el Editor IA conversacional para generar insights con razonamiento visible del modelo."
+          action={<Button onClick={() => setDraft(emptyMetric())}>Añadir primer ciclo</Button>}
+        />
+        {/* DS propagation proof: IA components reused in Métricas module */}
+        <div className="mt-8 max-w-md mx-auto">
+          <div className="text-xs uppercase tracking-widest text-black/40 mb-2">Ejemplo DS IA (reutilizado)</div>
+          <RiskLevelBadge risk="bajo" />
+          <div className="mt-2">
+            <ReasoningDisclosure reasoning="Ejemplo de traza visible: el modelo sugiere añadir un empty state editorial premium aquí. Cambio de presentación de bajo riesgo." confidence={0.88} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_0.88fr]">

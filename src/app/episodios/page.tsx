@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useStudio } from '@/components/studio-provider';
 import {
   buildNarrativeStructure,
@@ -49,6 +50,8 @@ export default function EpisodiosPage() {
       }),
     [query, status, state.episodes]
   );
+
+  const showEmpty = filtered.length === 0;
   const [draft, setDraft] = useState<Episode>(state.episodes[0] ?? emptyEpisode());
 
   const selectEpisode = (episode: Episode) => {
@@ -58,6 +61,19 @@ export default function EpisodiosPage() {
   const newEpisode = () => {
     setDraft(emptyEpisode());
   };
+
+  // Editorial EmptyState example (Fase 4 DS propagation)
+  if (showEmpty && state.episodes.length === 0) {
+    return (
+      <div className="py-12">
+        <EmptyState
+          title="Aún no hay episodios"
+          description="Crea el primer episodio o usa el Editor IA conversacional para generar ideas con razonamiento visible."
+          action={<Button onClick={newEpisode}>Crear primer episodio</Button>}
+        />
+      </div>
+    );
+  }
 
   const saveEpisode = () => {
     setState((current) => {
@@ -122,11 +138,15 @@ export default function EpisodiosPage() {
         </div>
         <div className="mt-4 space-y-3">
           {filtered.map((episode) => (
+<<<<<<< HEAD
             <button
               key={episode.id}
               onClick={() => selectEpisode(episode)}
               className="w-full rounded-3xl border border-black/8 bg-[#F5F2EA] px-4 py-4 text-left transition hover:bg-white"
             >
+=======
+            <button key={episode.id} onClick={() => selectEpisode(episode)} className={`w-full rounded-3xl border px-4 py-4 text-left transition hover:bg-white hover:border-[#001F36]/20 hover:shadow-[0_4px_16px_rgba(0,31,54,0.08)] cursor-pointer ${draft.id === episode.id ? 'border-[#001F36]/30 bg-white shadow-[0_4px_16px_rgba(0,31,54,0.08)]' : 'border-black/8 bg-[#F5F5F7]'}`}>
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-black/38">

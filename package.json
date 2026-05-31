@@ -7,6 +7,7 @@
     "build": "npm run type-check && next build",
     "start": "next start",
     "lint": "eslint .",
+<<<<<<< HEAD
     "typecheck": "tsc --noEmit",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
@@ -22,6 +23,11 @@
     "tabWidth": 2,
     "trailingComma": "es5",
     "printWidth": 100
+=======
+    "test": "tsx --test src/lib/ia-editor/types.test.ts",
+    "test:watch": "tsx --watch src/lib/ia-editor/types.test.ts",
+    "test:coverage": "echo 'Coverage via tsx not yet; run full Vitest after dep cleanup' && npm test"
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -41,6 +47,7 @@
     "@sentry/tracing": "^7.120.4",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.8",
+<<<<<<< HEAD
     "@tanstack/react-query": "^5.90.20",
     "bullmq": "^5.77.3",
     "clsx": "^2.1.0",
@@ -60,6 +67,12 @@
     "resend": "^6.12.4",
     "stripe": "^22.1.1",
     "zod": "3.24.4"
+=======
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "zod": "^3.25.76"
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
@@ -69,16 +82,29 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.4.20",
+<<<<<<< HEAD
     "eslint": "9.39.4",
     "eslint-config-next": "16.2.6",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+=======
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "jsdom": "^24.1.3",
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
     "postcss": "8.4.49",
     "prettier": "^3.8.3",
     "tailwindcss": "3.4.17",
+<<<<<<< HEAD
     "typescript": "5.7.3",
     "typescript-eslint": "^8.59.3",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4"
+=======
+    "tsx": "^4.22.3",
+    "typescript": "latest",
+    "typescript-eslint": "^8.59.3",
+    "vitest": "^1.6.0"
+>>>>>>> ece5a9a (fix: botones visibles hero card, estado activo episodios, monetizacion con acciones de venta, copiar output IA)
   }
 }
