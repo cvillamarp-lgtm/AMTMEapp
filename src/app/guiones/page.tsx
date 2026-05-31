@@ -1,301 +1,123 @@
-'use client';
-
-import { useState, useMemo } from 'react';
-import { Card, Badge, Button, Input, Textarea, Select, Field } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
-import { joinClasses } from '@/lib/studio-utils';
-
-const SECTIONS = [
-  { key: 'opening', label: 'Apertura' },
-  { key: 'threshold', label: 'Umbral' },
-  { key: 'wound', label: 'Herida' },
-  { key: 'symbol', label: 'Símbolo' },
-  { key: 'truth', label: 'Verdad' },
-  { key: 'bridge', label: 'Puente' },
-  { key: 'action', label: 'Acción' },
-  { key: 'closing', label: 'Cierre' },
-] as const;
-
-type SectionKey = (typeof SECTIONS)[number]['key'];
-
-type Script = {
-  id: string;
-  title: string;
-  episodeId: string;
-  status: 'borrador' | 'revision' | 'listo-grabar' | 'grabado' | 'archivado';
-  cta: string;
-  voiceNotes: string;
-  sections: Record<SectionKey, string>;
-  createdAt: number;
-  updatedAt: number;
-};
-
-const STATUSES: Record<Script['status'], { label: string; tone: 'neutral' | 'warning' | 'good' | 'accent' | 'danger' }> = {
-  borrador: { label: 'Borrador', tone: 'neutral' },
-  revision: { label: 'En revisión', tone: 'warning' },
-  'listo-grabar': { label: 'Listo para grabar', tone: 'good' },
-  grabado: { label: 'Grabado', tone: 'accent' },
-  archivado: { label: 'Archivado', tone: 'neutral' },
-};
-
-const emptySections = (): Record<SectionKey, string> =>
-  Object.fromEntries(SECTIONS.map((s) => [s.key, ''])) as Record<SectionKey, string>;
-
-function useScripts() {
-  const [scripts, setScripts] = useState<Script[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try { return JSON.parse(localStorage.getItem('amtme-scripts') || '[]'); } catch { return []; }
-  });
-
-  const save = (next: Script[]) => {
-    setScripts(next);
-    localStorage.setItem('amtme-scripts', JSON.stringify(next));
-  };
-
-  const create = (data: Omit<Script, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const s: Script = { ...data, id: Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() };
-    save([s, ...scripts]);
-    return s;
-  };
-
-  const update = (id: string, patch: Partial<Script>) =>
-    save(scripts.map((s) => (s.id === id ? { ...s, ...patch, updatedAt: Date.now() } : s)));
-
-  const remove = (id: string) => save(scripts.filter((s) => s.id !== id));
-
-  return { scripts, create, update, remove };
-}
-
-const emptyForm = (): Omit<Script, 'id' | 'createdAt' | 'updatedAt'> => ({
-  title: '',
-  episodeId: '',
-  status: 'borrador',
-  cta: '',
-  voiceNotes: '',
-  sections: emptySections(),
-});
+'use client'
+import { useState, useEffect } from 'react'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/shadcn/card'
+import { Button } from '@/components/shadcn/button'
+import { Input } from '@/components/shadcn/input'
+import { Label } from '@/components/shadcn/label'
+import { Textarea } from '@/components/shadcn/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
+import { Plus, Pencil, Trash2, FileText } from 'lucide-react'
+import { toast } from 'sonner'
+import { getScripts, createScript, updateScript, deleteScript } from '@/lib/database'
+import type { Script, ScriptStatus } from '@/types/database'
 
 export default function GuionesPage() {
-  const { state } = useStudio();
-  const { scripts, create, update, remove } = useScripts();
-  const [filter, setFilter] = useState<string>('all');
-  const [open, setOpen] = useState(false);
-  const [viewing, setViewing] = useState<Script | null>(null);
-  const [editing, setEditing] = useState<Script | null>(null);
-  const [form, setForm] = useState(emptyForm());
-  const [tab, setTab] = useState<'sections' | 'notes'>('sections');
+  const [scripts, setScripts] = useState<Script[]>([])
+  const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [viewing, setViewing] = useState<Script | null>(null)
+  const [editing, setEditing] = useState<Script | null>(null)
+  const [form, setForm] = useState({ episode_id: '', title: '', opening: '', threshold: '', wound: '', symbol: '', truth: '', bridge: '', action: '', closing: '', cta: '', voice_notes: '', status: 'borrador' as ScriptStatus })
 
-  const filtered = useMemo(
-    () => scripts.filter((s) => filter === 'all' || s.status === filter),
-    [scripts, filter]
-  );
+  useEffect(() => { load() }, [])
+  async function load() {
+    try { const d = await getScripts(); setScripts(d) } catch { toast.error('Error al cargar') } finally { setLoading(false) }
+  }
+  function resetForm() { setForm({ episode_id: '', title: '', opening: '', threshold: '', wound: '', symbol: '', truth: '', bridge: '', action: '', closing: '', cta: '', voice_notes: '', status: 'borrador' }); setEditing(null) }
+  function handleEdit(s: Script) { setEditing(s); setForm({ episode_id: s.episode_id, title: s.title, opening: s.opening||'', threshold: s.threshold||'', wound: s.wound||'', symbol: s.symbol||'', truth: s.truth||'', bridge: s.bridge||'', action: s.action||'', closing: s.closing||'', cta: s.cta||'', voice_notes: s.voice_notes||'', status: s.status }); setDialogOpen(true) }
 
-  const completeness = (s: Script) => {
-    const filled = SECTIONS.filter((sec) => s.sections[sec.key]?.trim()).length;
-    return Math.round((filled / SECTIONS.length) * 100);
-  };
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.title || !form.episode_id) { toast.error('Completa título e ID de episodio'); return }
+    const data = { ...form, opening: form.opening||null, threshold: form.threshold||null, wound: form.wound||null, symbol: form.symbol||null, truth: form.truth||null, bridge: form.bridge||null, action: form.action||null, closing: form.closing||null, cta: form.cta||null, voice_notes: form.voice_notes||null }
+    try {
+      if (editing) { await updateScript(editing.id, data); toast.success('Guion actualizado') }
+      else { await createScript(data); toast.success('Guion creado') }
+      setDialogOpen(false); resetForm(); await load()
+    } catch { toast.error('Error al guardar') }
+  }
 
-  const openCreate = () => { setEditing(null); setForm(emptyForm()); setOpen(true); };
-  const openEdit = (s: Script) => {
-    setEditing(s);
-    setForm({ title: s.title, episodeId: s.episodeId, status: s.status, cta: s.cta, voiceNotes: s.voiceNotes, sections: { ...s.sections } });
-    setOpen(true);
-  };
+  async function handleDelete(id: string) {
+    if (!confirm('Eliminar?')) return
+    try { await deleteScript(id); setScripts(prev => prev.filter(s => s.id !== id)); toast.success('Eliminado') } catch { toast.error('Error') }
+  }
 
-  const handleSubmit = () => {
-    if (!form.title.trim()) return;
-    if (editing) { update(editing.id, form); }
-    else { create(form); }
-    setOpen(false);
-  };
-
-  const fmt = (ts: number) => new Intl.DateTimeFormat('es-MX', { day: 'numeric', month: 'short' }).format(new Date(ts));
+  const statusColor: Record<string, string> = { borrador: 'bg-gray-100 text-gray-700', revision: 'bg-yellow-100 text-yellow-800', 'listo-grabar': 'bg-[#e8ff40] text-[#0c1f36]', grabado: 'bg-green-100 text-green-800' }
+  const blocks = [{ key: 'opening', label: 'Apertura' }, { key: 'threshold', label: 'Umbral' }, { key: 'wound', label: 'Herida' }, { key: 'symbol', label: 'Símbolo' }, { key: 'truth', label: 'Verdad' }, { key: 'bridge', label: 'Puente' }, { key: 'action', label: 'Acción' }, { key: 'closing', label: 'Cierre' }]
 
   return (
-    <div className="space-y-5 pb-24">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0C1F36]/40">Editorial</div>
-          <h1 className="mt-1 text-[28px] font-bold tracking-[-0.03em] text-[#0C1F36]">Guiones</h1>
-          <p className="mt-1 text-[13px] text-[#6B7B8C]">Convierte estructuras narrativas en guiones listos para grabar.</p>
-        </div>
-        <Button onClick={openCreate}>+ Crear guión</Button>
-      </div>
-
-      {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { label: 'Total', value: scripts.length },
-          { label: 'Listos para grabar', value: scripts.filter((s) => s.status === 'listo-grabar').length },
-          { label: 'En revisión', value: scripts.filter((s) => s.status === 'revision').length },
-          { label: 'Grabados', value: scripts.filter((s) => s.status === 'grabado').length },
-        ].map(({ label, value }) => (
-          <div key={label} className="rounded-[20px] border border-black/[0.07] bg-white p-4 shadow-[0_2px_8px_rgba(12,31,54,0.05)]">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#0C1F36]/40">{label}</div>
-            <div className="mt-1 text-[28px] font-bold tracking-[-0.04em] text-[#0C1F36]">{value}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Filtro */}
-      <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="w-48">
-        <option value="all">Todos los estados</option>
-        {Object.entries(STATUSES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-      </Select>
-
-      {/* Lista */}
-      {filtered.length === 0 ? (
-        <Card>
-          <div className="flex flex-col items-center py-10 text-center">
-            <div className="text-4xl">📄</div>
-            <p className="mt-3 text-[15px] font-semibold text-[#0C1F36]">Sin guiones</p>
-            <Button className="mt-4" onClick={openCreate}>Crear guión</Button>
-          </div>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map((s) => {
-            const ep = state.episodes.find((e) => e.id === s.episodeId);
-            const pct = completeness(s);
-            return (
-              <Card key={s.id}>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[15px] font-bold text-[#0C1F36]">{s.title}</span>
-                      <Badge tone={STATUSES[s.status].tone}>{STATUSES[s.status].label}</Badge>
-                    </div>
-                    {ep && (
-                      <div className="mt-0.5 text-[12px] text-[#6B7B8C]">
-                        EP {ep.episodeNumber} — {ep.title}
-                      </div>
-                    )}
-                    <div className="mt-2 flex items-center gap-3 text-[12px] text-[#6B7B8C]">
-                      <span>Completitud: {pct}%</span>
-                      <span>·</span>
-                      <span>Actualizado {fmt(s.updatedAt)}</span>
-                    </div>
-                    {/* Barra */}
-                    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-black/[0.07]">
-                      <div className={joinClasses('h-full rounded-full', pct === 100 ? 'bg-emerald-500' : pct >= 60 ? 'bg-[#FEE94B]' : 'bg-[#E0211E]')} style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <Button variant="ghost" onClick={() => setViewing(s)}>Ver</Button>
-                    <Button variant="secondary" onClick={() => openEdit(s)}>Editar</Button>
-                    <Button variant="danger" onClick={() => remove(s.id)}>✕</Button>
-                  </div>
-                </div>
-                {s.cta && (
-                  <div className="mt-3 rounded-xl bg-[#FEE94B]/20 px-3 py-2 text-[12px] font-medium text-[#0C1F36]">
-                    → {s.cta}
-                  </div>
-                )}
-              </Card>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Modal crear/editar */}
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[24px] bg-white p-6 shadow-2xl">
-            <h2 className="text-[20px] font-bold text-[#0C1F36]">{editing ? 'Editar guión' : 'Nuevo guión'}</h2>
-
-            <div className="mt-4 space-y-3 overflow-y-auto max-h-[65vh]">
-              <Field label="Título">
-                <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Guión EP 35..." />
-              </Field>
-              <Field label="Episodio">
-                <Select value={form.episodeId} onChange={(e) => setForm((f) => ({ ...f, episodeId: e.target.value }))}>
-                  <option value="">Selecciona un episodio</option>
-                  {state.episodes.map((ep) => <option key={ep.id} value={ep.id}>{ep.episodeNumber} — {ep.title}</option>)}
+    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
+      <div className="flex items-center justify-between mb-6">
+        <div><h1 className="text-2xl md:text-3xl font-semibold">Guiones</h1><p className="text-sm text-muted-foreground mt-1">Estructura narrativa AZTIYARTE</p></div>
+        <Dialog open={dialogOpen} onOpenChange={v => { setDialogOpen(v); if (!v) resetForm() }}>
+          <DialogTrigger asChild><Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"><Plus className="mr-2 h-4 w-4" />Crear guion</Button></DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle>{editing ? 'Editar guion' : 'Crear guion'}</DialogTitle></DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Título</Label><Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="El momento que lo cambia todo" /></div>
+                <div><Label>ID Episodio</Label><Input value={form.episode_id} onChange={e => setForm({...form, episode_id: e.target.value})} placeholder="EP35" /></div>
+              </div>
+              <div><Label>Estado</Label>
+                <Select value={form.status} onValueChange={v => setForm({...form, status: v as ScriptStatus})}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{['borrador','revision','listo-grabar','grabado','archivado'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Estado">
-                  <Select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as Script['status'] }))}>
-                    {Object.entries(STATUSES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-                  </Select>
-                </Field>
-                <Field label="CTA">
-                  <Input value={form.cta} onChange={(e) => setForm((f) => ({ ...f, cta: e.target.value }))} placeholder="CTA del episodio" />
-                </Field>
               </div>
-
-              {/* Tabs */}
-              <div className="flex gap-2 border-b border-black/[0.07] pb-2">
-                {(['sections', 'notes'] as const).map((t) => (
-                  <button key={t} onClick={() => setTab(t)} className={joinClasses('rounded-lg px-3 py-1.5 text-[12px] font-semibold transition-all', tab === t ? 'bg-[#0C1F36] text-white' : 'text-[#6B7B8C] hover:bg-black/[0.05]')}>
-                    {t === 'sections' ? 'Secciones' : 'Notas de voz'}
-                  </button>
-                ))}
-              </div>
-
-              {tab === 'sections' ? (
-                <div className="space-y-3">
-                  {SECTIONS.map((sec) => (
-                    <Field key={sec.key} label={sec.label}>
-                      <Textarea
-                        value={form.sections[sec.key]}
-                        onChange={(e) => setForm((f) => ({ ...f, sections: { ...f.sections, [sec.key]: e.target.value } }))}
-                        placeholder={`Texto de ${sec.label.toLowerCase()}...`}
-                        className="!min-h-[80px]"
-                      />
-                    </Field>
-                  ))}
-                </div>
-              ) : (
-                <Field label="Notas de voz / grabación">
-                  <Textarea value={form.voiceNotes} onChange={(e) => setForm((f) => ({ ...f, voiceNotes: e.target.value }))} placeholder="Pausas, énfasis, tono..." className="!min-h-[120px]" />
-                </Field>
-              )}
-            </div>
-
-            <div className="mt-5 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button onClick={handleSubmit}>{editing ? 'Actualizar' : 'Crear'}</Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal ver guión */}
+              {blocks.map(b => (
+                <div key={b.key}><Label>{b.label}</Label><Textarea value={(form as any)[b.key]} onChange={e => setForm({...form, [b.key]: e.target.value})} rows={3} /></div>
+              ))}
+              <div><Label>CTA</Label><Input value={form.cta} onChange={e => setForm({...form, cta: e.target.value})} /></div>
+              <div><Label>Notas de voz</Label><Textarea value={form.voice_notes} onChange={e => setForm({...form, voice_notes: e.target.value})} rows={2} /></div>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button type="submit">{editing ? 'Guardar' : 'Crear'}</Button></DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
       {viewing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-[24px] bg-white p-6 shadow-2xl">
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-[20px] font-bold text-[#0C1F36]">{viewing.title}</h2>
-                <div className="mt-1"><Badge tone={STATUSES[viewing.status].tone}>{STATUSES[viewing.status].label}</Badge></div>
-              </div>
-              <Button variant="ghost" onClick={() => setViewing(null)}>✕</Button>
-            </div>
-            <div className="mt-4 max-h-[65vh] overflow-y-auto space-y-4">
-              {SECTIONS.map((sec) => viewing.sections[sec.key] && (
-                <div key={sec.key}>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0C1F36]/40">{sec.label}</div>
-                  <div className="mt-1 rounded-xl bg-[#F5F1E8] px-4 py-3 text-[13px] leading-relaxed text-[#0C1F36] whitespace-pre-wrap">{viewing.sections[sec.key]}</div>
+        <Dialog open={!!viewing} onOpenChange={() => setViewing(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle>{viewing.title}</DialogTitle></DialogHeader>
+            <div className="space-y-4 text-sm">
+              {blocks.map(b => (viewing as any)[b.key] && (
+                <div key={b.key} className="border-l-2 border-[#e8ff40] pl-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">{b.label}</p>
+                  <p className="whitespace-pre-wrap">{(viewing as any)[b.key]}</p>
                 </div>
               ))}
-              {viewing.cta && (
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0C1F36]/40">CTA</div>
-                  <div className="mt-1 rounded-xl bg-[#FEE94B]/30 px-4 py-3 text-[13px] text-[#0C1F36]">{viewing.cta}</div>
-                </div>
-              )}
-              {viewing.voiceNotes && (
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0C1F36]/40">Notas de voz</div>
-                  <div className="mt-1 rounded-xl bg-black/[0.03] px-4 py-3 text-[12px] text-[#6B7B8C] whitespace-pre-wrap">{viewing.voiceNotes}</div>
-                </div>
-              )}
+              {viewing.cta && <div className="border-l-2 border-[#0c1f36] pl-4"><p className="text-xs font-semibold text-muted-foreground uppercase mb-1">CTA</p><p>{viewing.cta}</p></div>}
             </div>
-          </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      {loading ? <div className="text-center py-12 text-muted-foreground">Cargando...</div> : scripts.length === 0 ? (
+        <div className="text-center py-16"><FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" /><p className="text-muted-foreground">Sin guiones</p><Button className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]" onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Crear primero</Button></div>
+      ) : (
+        <div className="grid gap-4">
+          {scripts.map(s => (
+            <Card key={s.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <CardTitle className="text-lg">{s.title}</CardTitle>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[s.status] || 'bg-gray-100 text-gray-700'}`}>{s.status}</span>
+                    </div>
+                    <CardDescription>EP: {s.episode_id} · v{s.version}</CardDescription>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="ghost" onClick={() => setViewing(s)}><FileText className="h-4 w-4" /></Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleEdit(s)}><Pencil className="h-4 w-4" /></Button>
+                    <Button size="sm" variant="ghost" onClick={() => handleDelete(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                </div>
+              </CardHeader>
+              {s.opening && <CardContent><p className="text-sm text-muted-foreground line-clamp-2">{s.opening}</p></CardContent>}
+            </Card>
+          ))}
         </div>
       )}
     </div>
-  );
+  )
 }
