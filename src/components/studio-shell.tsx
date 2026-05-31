@@ -75,11 +75,11 @@ export function StudioShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background font-sans">
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-primary z-30">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-[#0c1f36] z-30">
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-5 border-b border-primary-foreground/10">
-            <h1 className="text-base font-semibold text-primary-foreground tracking-tight">
+          <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
+            <h1 className="text-base font-semibold text-white tracking-tight">
               AMTME Studio OS
             </h1>
           </div>
@@ -96,8 +96,8 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
                     isActive
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-primary-foreground/70 hover:bg-primary-foreground/8 hover:text-primary-foreground'
+                      ? 'bg-[#e8ff40] text-[#0c1f36]'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
                   )}
                 >
                   <Icon size={20} weight="regular" />
@@ -108,15 +108,15 @@ export function StudioShell({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Footer */}
-          <div className="px-4 py-3 border-t border-primary-foreground/10 flex items-center justify-between">
-            <p className="text-xs text-primary-foreground/30">
+          <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between">
+            <p className="text-xs text-white/30">
               <kbd className="font-sans">⌘K</kbd> para buscar
             </p>
             {authRequired && (
               <button
                 onClick={signOut}
                 disabled={signingOut}
-                className="text-xs text-primary-foreground/40 hover:text-primary-foreground/70 transition-colors"
+                className="text-xs text-white/40 hover:text-white/70 transition-colors"
               >
                 {signingOut ? 'Saliendo…' : 'Salir'}
               </button>
@@ -133,7 +133,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </main>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-primary border-t border-primary-foreground/10 z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0c1f36] border-t border-white/10 z-50">
         <div className="grid grid-cols-5 gap-1 p-2">
           {mobileItems.map((item) => {
             const Icon = item.icon;
@@ -145,8 +145,8 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 className={cn(
                   'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
                   isActive
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-primary-foreground/70'
+                    ? 'bg-[#e8ff40] text-[#0c1f36]'
+                    : 'text-white/70'
                 )}
               >
                 <Icon size={20} weight="regular" />
