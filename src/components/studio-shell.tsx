@@ -10,7 +10,6 @@ import { isAuthRequired } from '@/lib/supabase/env';
 import { joinClasses } from '@/lib/studio-utils';
 import { runStudioVerification } from '@/lib/studio-verifier';
 
-// Grouped navigation for better mental model (Editorial vs Operaciones vs IA & Sistema)
 const navigationGroups = [
   {
     label: 'Editorial',
@@ -50,62 +49,123 @@ const navigationGroups = [
   },
 ];
 
-function navigationIcon(href: string) {
-  if (href === '/dashboard') {
-    return (
+function NavIcon({ href }: { href: string }) {
+  const paths: Record<string, ReactNode> = {
+    '/dashboard': (
       <>
         <path d="M4 4h7v7H4z" />
         <path d="M13 4h7v5h-7z" />
         <path d="M13 11h7v9h-7z" />
         <path d="M4 13h7v7H4z" />
       </>
-    );
-  }
-
-  if (href === '/documento-maestro' || href === '/checklists' || href === '/politica-operativa') {
-    return (
+    ),
+    '/documento-maestro': (
       <>
         <path d="M6 3h9l3 3v15H6z" />
         <path d="M15 3v4h4" />
         <path d="M9 12h6" />
       </>
-    );
-  }
-
-  if (href === '/episodios' || href === '/contenido' || href === '/ia' || href === '/ia/editor') {
-    return (
+    ),
+    '/checklists': (
+      <>
+        <path d="M6 3h9l3 3v15H6z" />
+        <path d="M15 3v4h4" />
+        <path d="M9 12h6" />
+      </>
+    ),
+    '/politica-operativa': (
+      <>
+        <path d="M6 3h9l3 3v15H6z" />
+        <path d="M15 3v4h4" />
+        <path d="M9 12h6" />
+      </>
+    ),
+    '/episodios': (
       <>
         <path d="M4 7h16v10H4z" />
         <path d="m10 10 5 2-5 2z" />
       </>
-    );
-  }
-
-  if (href === '/metricas' || href === '/monetizacion' || href === '/historico') {
-    return (
+    ),
+    '/contenido': (
+      <>
+        <path d="M4 7h16v10H4z" />
+        <path d="m10 10 5 2-5 2z" />
+      </>
+    ),
+    '/ia': (
+      <>
+        <path d="M4 7h16v10H4z" />
+        <path d="m10 10 5 2-5 2z" />
+      </>
+    ),
+    '/ia/editor': (
+      <>
+        <path d="M4 7h16v10H4z" />
+        <path d="m10 10 5 2-5 2z" />
+      </>
+    ),
+    '/metricas': (
       <>
         <path d="M5 19h14" />
         <path d="M7 16v-4" />
         <path d="M12 16V8" />
         <path d="M17 16v-6" />
       </>
-    );
-  }
-
-  if (href === '/calendario' || href === '/automatizacion' || href === '/verificador') {
-    return (
+    ),
+    '/monetizacion': (
+      <>
+        <path d="M5 19h14" />
+        <path d="M7 16v-4" />
+        <path d="M12 16V8" />
+        <path d="M17 16v-6" />
+      </>
+    ),
+    '/historico': (
+      <>
+        <path d="M5 19h14" />
+        <path d="M7 16v-4" />
+        <path d="M12 16V8" />
+        <path d="M17 16v-6" />
+      </>
+    ),
+    '/calendario': (
       <>
         <rect x="4" y="5" width="16" height="15" rx="2" />
         <path d="M8 3v4M16 3v4M4 10h16" />
       </>
-    );
-  }
-
-  return (
+    ),
+    '/automatizacion': (
+      <>
+        <rect x="4" y="5" width="16" height="15" rx="2" />
+        <path d="M8 3v4M16 3v4M4 10h16" />
+      </>
+    ),
+    '/verificador': (
+      <>
+        <rect x="4" y="5" width="16" height="15" rx="2" />
+        <path d="M8 3v4M16 3v4M4 10h16" />
+      </>
+    ),
+  };
+  const icon = paths[href] ?? (
     <>
       <circle cx="12" cy="12" r="4.5" />
       <path d="M12 5v2M12 17v2M5 12h2M17 12h2" />
     </>
+  );
+  return (
+    <svg
+      className="size-4 shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {icon}
+    </svg>
   );
 }
 
@@ -118,7 +178,6 @@ export function StudioShell({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     setSigningOut(true);
-
     try {
       const client = getSupabaseAuthBrowserClient();
       await client?.auth.signOut();
@@ -128,56 +187,41 @@ export function StudioShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-semantic-bg text-semantic-text">
+    <div className="min-h-screen bg-[#F5F1E8] text-[#0C1F36]">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
-        <aside className="hidden w-64 shrink-0 border-r border-semantic-border bg-semantic-surface px-6 py-8 md:block">
-          <div className="mb-10">
-            <div className="text-xs uppercase tracking-[0.26em] text-semantic-muted">AMTME</div>
-            <div className="mt-2 text-2xl font-bold tracking-tight text-amtme-navy">Studio OS</div>
-            <p className="mt-3 text-sm leading-6 text-semantic-muted">
-              Sistema operativo editorial y documental con foco en orden, velocidad y control.
-            </p>
+        {/* ── Sidebar ──────────────────────────────────────────────────────── */}
+        <aside className="hidden w-60 shrink-0 border-r border-black/[0.07] bg-[#FAFAF8] px-4 py-7 md:flex md:flex-col">
+          {/* Logo */}
+          <div className="mb-8 px-2">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#6B7B8C]">
+              AMTME
+            </div>
+            <div className="mt-1.5 text-xl font-bold tracking-tight text-[#0C1F36]">Studio OS</div>
           </div>
 
-          <nav className="space-y-6">
+          {/* Nav */}
+          <nav className="flex-1 space-y-5 overflow-y-auto">
             {navigationGroups.map((group) => (
               <div key={group.label}>
-                <div className="mb-2 px-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-semantic-muted">
+                <div className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6B7B8C]/70">
                   {group.label}
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const active = pathname === item.href;
-                    const icon = navigationIcon(item.href);
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
                         className={joinClasses(
-                          'flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition',
+                          'flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-150',
                           active
-                            ? 'bg-amtme-navy text-amtme-warm-white shadow-[0_8px_20px_rgba(12,31,54,0.24)]'
-                            : 'text-amtme-navy hover:bg-amtme-navy/5'
+                            ? 'bg-[#0C1F36] text-white shadow-[0_4px_12px_rgba(12,31,54,0.20)]'
+                            : 'text-[#0C1F36] hover:bg-black/[0.05]'
                         )}
                       >
-                        <span className="inline-flex items-center gap-3">
-                          <svg
-                            className="size-4 shrink-0"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            {icon}
-                          </svg>
-                          {item.label}
-                        </span>
-                        {active ? (
-                          <span className="h-1.5 w-1.5 rounded-full bg-amtme-gold" />
-                        ) : null}
+                        <NavIcon href={item.href} />
+                        <span>{item.label}</span>
                       </Link>
                     );
                   })}
@@ -186,26 +230,32 @@ export function StudioShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
 
-          <div className="mt-10 rounded-[24px] border border-semantic-border bg-semantic-surface-soft p-5">
-            <div className="text-xs uppercase tracking-[0.2em] text-semantic-muted">
-              Estado del sistema
+          {/* Estado del sistema */}
+          <div className="mt-6 rounded-2xl border border-black/[0.07] bg-white p-4">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6B7B8C]">
+              Sistema
             </div>
-            <div className="mt-2 text-base font-semibold text-amtme-black">Operativo</div>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-1.5 text-sm font-semibold text-[#0C1F36]">Operativo</div>
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
               <Badge tone="accent">Política activa</Badge>
-              <Badge tone="good">Estructura oficial</Badge>
+              <Badge tone="neutral">Estructura oficial</Badge>
             </div>
           </div>
         </aside>
 
-        <main className="flex min-h-screen min-w-0 flex-1 flex-col px-4 pb-8 pt-4 sm:px-6 lg:px-8">
-          <header className="sticky top-0 z-20 mb-6 rounded-[28px] border border-semantic-border bg-semantic-surface px-5 py-4 sm:px-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* ── Main ─────────────────────────────────────────────────────────── */}
+        <main className="flex min-h-screen min-w-0 flex-1 flex-col px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <header
+            className="sticky top-0 z-20 mb-6 rounded-[20px] border border-black/[0.07] bg-white/90 px-5 py-3.5 backdrop-blur-md sm:px-6
+            shadow-[0_2px_8px_rgba(12,31,54,0.06)]"
+          >
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <div className="text-xs uppercase tracking-[0.24em] text-semantic-muted">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#6B7B8C]">
                   AMTME Studio OS
                 </div>
-                <h1 className="mt-1 text-xl font-bold tracking-tight text-amtme-navy sm:text-2xl">
+                <h1 className="mt-0.5 text-lg font-bold tracking-tight text-[#0C1F36]">
                   {state.config.projectName}
                 </h1>
               </div>
@@ -225,34 +275,32 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 </Badge>
                 {authRequired ? (
                   <Button variant="secondary" onClick={signOut} disabled={signingOut}>
-                    {signingOut ? 'Saliendo...' : 'Cerrar sesión'}
+                    {signingOut ? 'Saliendo…' : 'Cerrar sesión'}
                   </Button>
                 ) : null}
               </div>
             </div>
           </header>
 
-          <div className="flex min-h-0 flex-1 gap-5">
-            <div className="min-w-0 flex-1">{children}</div>
-          </div>
+          <div className="min-w-0 flex-1">{children}</div>
         </main>
       </div>
 
-      {/* Mobile bottom nav - adapted to new grouped navigation during audit */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-semantic-border bg-semantic-surface px-3 py-2 md:hidden">
-        <div className="flex gap-2 overflow-x-auto">
+      {/* ── Mobile bottom nav ──────────────────────────────────────────────── */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-black/[0.07] bg-white/95 px-3 py-2 backdrop-blur-md md:hidden">
+        <div className="flex gap-1.5 overflow-x-auto">
           {navigationGroups
             .flatMap((g) => g.items)
             .slice(0, 6)
-            .map((item: { href: string; label: string }) => {
+            .map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={joinClasses(
-                    'whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-medium',
-                    active ? 'bg-amtme-navy text-amtme-white' : 'bg-amtme-slate/18 text-amtme-navy'
+                    'whitespace-nowrap rounded-xl px-3.5 py-2 text-[13px] font-semibold transition-all duration-150',
+                    active ? 'bg-[#0C1F36] text-white' : 'text-[#0C1F36] hover:bg-black/[0.05]'
                   )}
                 >
                   {item.label}
