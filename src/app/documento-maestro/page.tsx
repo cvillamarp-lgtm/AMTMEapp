@@ -1,182 +1,297 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
-import type { MasterSection } from '@/lib/studio-types';
-import { formatDate } from '@/lib/studio-utils';
+import { getMasterSections, createMasterSection, updateMasterSection, deleteMasterSection } from '@/lib/database';
+import type { MasterSection } from '@/types/database';
+
+const STATUS_OPTIONS: MasterSection['status'][] = ['vigente', 'pendiente', 'historico', 'requiere-decision'];
+const PRIORITY_OPTIONS: MasterSection['priority'][] = ['alta', 'media', 'baja'];
+
+const STATUS_TONE: Record<MasterSection['status'], 'good' | 'warning' | 'neutral'> = {
+  vigente: 'good',
+  'requiere-decision': 'warning',
+  pendiente: 'neutral',
+  historico: 'neutral',
+};
+
+const EMPTY: Omit<MasterSection, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'version'> = {
+  title: '',
+  content: '',
+  status: 'pendiente',
+  priority: 'media',
+  responsible: null,
+  notes: null,
+  last_reviewed_at: null,
+};
 
 export default function DocumentoMaestroPage() {
-  const { state, setState } = useStudio();
+  const [sections, setSections] = useState<MasterSection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<MasterSection | null>(null);
+  const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState('');
-  const filtered = useMemo(
-    () =>
-      state.masterSections.filter((section) =>
-        `${section.title} ${section.content}`.toLowerCase().includes(query.toLowerCase())
-      ),
-    [query, state.masterSections]
-  );
-  const [selectedId, setSelectedId] = useState(state.masterSections[0]?.id ?? '');
-  const selected =
-    state.masterSections.find((section) => section.id === selectedId) ?? state.masterSections[0];
-  const [draft, setDraft] = useState<MasterSection | undefined>(selected);
+  const [newOpen, setNewOpen] = useState(false);
+  const [newForm, setNewForm] = useState({ ...EMPTY });
 
-  const syncSelected = (sectionId: string) => {
-    const section = state.masterSections.find((item) => item.id === sectionId);
-    if (section) {
-      setSelectedId(sectionId);
-      setDraft(section);
+  useEffect(() => {
+    getMasterSections().then(data => {
+      setSections(data);
+      if (data.length > 0) {
+        setSelectedId(data[0].id);
+        setDraft(data[0]);
+      }
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const filtered = useMemo(() =>
+    sections.filter(s =>
+      `${s.title} ${s.content}`.toLowerCase().includes(query.toLowerCase())
+    ), [sections, query]);
+
+  function selectSection(s: MasterSection) {
+    setSelectedId(s.id);
+    setDraft({ ...s });
+  }
+
+  async function saveSection() {
+    if (!draft) return;
+    setSaving(true);
+    try {
+      const updated = await updateMasterSection(draft.id, {
+        title: draft.title,
+        content: draft.content,
+        status: draft.status,
+        priority: draft.priority,
+        responsible: draft.responsible,
+        notes: draft.notes,
+        last_reviewed_at: draft.last_reviewed_at,
+      });
+      setSections(prev => prev.map(s => s.id === updated.id ? updated : s));
+      setDraft(updated);
+    } finally {
+      setSaving(false);
     }
-  };
+  }
 
-  const saveSection = () => {
+  async function markReviewed() {
     if (!draft) return;
-    setState((current) => ({
-      ...current,
-      masterSections: current.masterSections.map((section) =>
-        section.id === draft.id ? { ...draft } : section
-      ),
-    }));
-  };
+    const today = new Date().toISOString().split('T')[0];
+    setSaving(true);
+    try {
+      const updated = await updateMasterSection(draft.id, {
+        status: 'vigente',
+        last_reviewed_at: today,
+      });
+      setSections(prev => prev.map(s => s.id === updated.id ? updated : s));
+      setDraft(updated);
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const markReviewed = () => {
-    if (!draft) return;
-    const updated = {
-      ...draft,
-      status: 'Vigente' as const,
-      lastReviewedAt: new Date().toISOString().slice(0, 10),
-    };
-    setDraft(updated);
-    setState((current) => ({
-      ...current,
-      masterSections: current.masterSections.map((section) =>
-        section.id === updated.id ? updated : section
-      ),
-    }));
-  };
+  async function createNew() {
+    if (!newForm.title.trim()) return;
+    setSaving(true);
+    try {
+      const created = await createMasterSection({ ...newForm, version: 1 } as any);
+      setSections(prev => [created, ...prev]);
+      setSelectedId(created.id);
+      setDraft(created);
+      setNewOpen(false);
+      setNewForm({ ...EMPTY });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function removeSection(id: string) {
+    await deleteMasterSection(id);
+    setSections(prev => {
+      const next = prev.filter(s => s.id !== id);
+      if (selectedId === id && next.length > 0) {
+        setSelectedId(next[0].id);
+        setDraft(next[0]);
+      } else if (next.length === 0) {
+        setSelectedId(null);
+        setDraft(null);
+      }
+      return next;
+    });
+  }
+
+  const setNew = (k: keyof typeof newForm) => (v: string) =>
+    setNewForm(f => ({ ...f, [k]: v }));
 
   return (
     <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+      {/* Panel izquierdo — lista */}
       <Card>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-black/40">
-              Documento Maestro
-            </div>
+            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Documento Maestro</div>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Fuente central de conocimiento
             </h2>
           </div>
-          <Badge tone="accent">{state.masterSections.length} secciones</Badge>
-        </div>
-        <div className="mt-5 space-y-4">
-          <Field label="Buscar sección">
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Resumen ejecutivo, métricas, política..."
-            />
-          </Field>
-          <div className="max-h-[620px] space-y-3 overflow-auto pr-1">
-            {filtered.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => syncSelected(section.id)}
-                className={`w-full rounded-3xl border px-4 py-4 text-left transition ${selected?.id === section.id ? 'border-[#0C1F36] bg-[#0C1F36] text-white shadow-[0_12px_30px_rgba(0,31,54,0.18)]' : 'border-black/8 bg-[#F5F2EA] text-[#0C1F36] hover:bg-white'}`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <div className="text-sm font-semibold">{section.title}</div>
-                    <div
-                      className={`mt-1 text-xs uppercase tracking-[0.18em] ${selected?.id === section.id ? 'text-white/60' : 'text-black/38'}`}
-                    >
-                      {section.status}
-                    </div>
-                  </div>
-                  <span
-                    className={`text-xs ${selected?.id === section.id ? 'text-white/65' : 'text-black/45'}`}
-                  >
-                    {formatDate(section.lastReviewedAt)}
-                  </span>
-                </div>
-                <p
-                  className={`mt-3 line-clamp-3 text-sm leading-6 ${selected?.id === section.id ? 'text-white/82' : 'text-black/60'}`}
-                >
-                  {section.content}
-                </p>
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <Badge tone="accent">{sections.length} secciones</Badge>
+            <Button onClick={() => setNewOpen(true)}>+ Nueva</Button>
           </div>
+        </div>
+
+        <div className="mt-4 space-y-4">
+          <input
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="Buscar sección..."
+            className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm placeholder:text-black/30 focus:outline-none focus:ring-2 focus:ring-[#0C1F36]/20"
+          />
+
+          {loading ? (
+            <p className="text-sm text-black/40">Cargando secciones...</p>
+          ) : filtered.length === 0 ? (
+            <p className="text-center text-sm text-black/40 py-8">
+              {query ? 'Sin resultados.' : 'No hay secciones. Crea la primera.'}
+            </p>
+          ) : (
+            <div className="max-h-[580px] space-y-2 overflow-auto pr-1">
+              {filtered.map(section => (
+                <button
+                  key={section.id}
+                  onClick={() => selectSection(section)}
+                  className={`w-full rounded-3xl border px-4 py-4 text-left transition ${selectedId === section.id ? 'border-[#0C1F36] bg-[#0C1F36] text-white shadow-[0_12px_30px_rgba(0,31,54,0.18)]' : 'border-black/8 bg-[#F5F2EA] text-[#0C1F36] hover:bg-white'}`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="text-sm font-semibold">{section.title}</div>
+                      <div className={`mt-0.5 text-xs uppercase tracking-[0.18em] ${selectedId === section.id ? 'text-white/60' : 'text-black/38'}`}>
+                        {section.status} · {section.priority}
+                      </div>
+                    </div>
+                    {section.last_reviewed_at && (
+                      <span className={`shrink-0 text-xs ${selectedId === section.id ? 'text-white/60' : 'text-black/40'}`}>
+                        {section.last_reviewed_at}
+                      </span>
+                    )}
+                  </div>
+                  <p className={`mt-2 line-clamp-2 text-sm leading-5 ${selectedId === section.id ? 'text-white/80' : 'text-black/60'}`}>
+                    {section.content}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </Card>
 
+      {/* Panel derecho — editor */}
       <Card>
         {draft ? (
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-xs uppercase tracking-[0.22em] text-black/40">
-                  Sección activa
-                </div>
-                <h3 className="mt-1 text-2xl font-semibold text-[#0C1F36]">{draft.title}</h3>
+                <div className="text-xs uppercase tracking-[0.22em] text-black/40">Sección activa</div>
+                <h3 className="mt-1 text-xl font-semibold text-[#0C1F36]">{draft.title}</h3>
               </div>
-              <Badge
-                tone={
-                  draft.status === 'Vigente'
-                    ? 'good'
-                    : draft.status === 'Requiere decisión'
-                      ? 'warning'
-                      : 'neutral'
-                }
-              >
-                {draft.status}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge tone={STATUS_TONE[draft.status]}>{draft.status}</Badge>
+                <button onClick={() => removeSection(draft.id)} className="text-xs text-red-400 hover:text-red-600">Eliminar</button>
+              </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Título">
+                <Input value={draft.title} onChange={e => setDraft(d => d ? { ...d, title: e.target.value } : d)} />
+              </Field>
               <Field label="Estado">
-                <Select
-                  value={draft.status}
-                  onChange={(event) =>
-                    setDraft({ ...draft, status: event.target.value as MasterSection['status'] })
-                  }
-                >
-                  <option>Vigente</option>
-                  <option>Pendiente</option>
-                  <option>Histórico</option>
-                  <option>Requiere decisión</option>
+                <Select value={draft.status} onChange={e => setDraft(d => d ? { ...d, status: e.target.value as MasterSection['status'] } : d)}>
+                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
                 </Select>
               </Field>
+              <Field label="Prioridad">
+                <Select value={draft.priority} onChange={e => setDraft(d => d ? { ...d, priority: e.target.value as MasterSection['priority'] } : d)}>
+                  {PRIORITY_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                </Select>
+              </Field>
+              <Field label="Responsable">
+                <Input value={draft.responsible ?? ''} onChange={e => setDraft(d => d ? { ...d, responsible: e.target.value } : d)} placeholder="¿Quién gestiona esto?" />
+              </Field>
               <Field label="Última revisión">
-                <Input
-                  value={draft.lastReviewedAt}
-                  onChange={(event) => setDraft({ ...draft, lastReviewedAt: event.target.value })}
-                />
+                <Input type="date" value={draft.last_reviewed_at ?? ''} onChange={e => setDraft(d => d ? { ...d, last_reviewed_at: e.target.value } : d)} />
               </Field>
             </div>
 
             <Field label="Contenido">
               <Textarea
-                rows={18}
+                rows={14}
                 value={draft.content}
-                onChange={(event) => setDraft({ ...draft, content: event.target.value })}
+                onChange={e => setDraft(d => d ? { ...d, content: e.target.value } : d)}
+                placeholder="Contenido de esta sección del documento maestro..."
+              />
+            </Field>
+
+            <Field label="Notas internas">
+              <Textarea
+                rows={3}
+                value={draft.notes ?? ''}
+                onChange={e => setDraft(d => d ? { ...d, notes: e.target.value } : d)}
+                placeholder="Notas internas, contexto, próximas decisiones..."
               />
             </Field>
 
             <div className="flex flex-wrap gap-2">
-              <Button onClick={saveSection}>Guardar bloque</Button>
-              <Button variant="secondary" onClick={markReviewed}>
-                Marcar como revisada
+              <Button onClick={saveSection} disabled={saving}>
+                {saving ? 'Guardando...' : 'Guardar sección'}
               </Button>
-              <Button variant="secondary" onClick={() => setDraft(selected)}>
-                Revertir cambios
+              <Button variant="secondary" onClick={markReviewed} disabled={saving}>
+                Marcar revisada hoy
+              </Button>
+              <Button variant="secondary" onClick={() => {
+                const orig = sections.find(s => s.id === draft.id);
+                if (orig) setDraft(orig);
+              }}>
+                Revertir
               </Button>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-black/50">Selecciona una sección para editarla.</p>
+          <div className="flex h-full items-center justify-center text-sm text-black/40 py-20">
+            Selecciona una sección para editarla.
+          </div>
         )}
       </Card>
+
+      {/* Modal nueva sección */}
+      {newOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold text-[#0C1F36]">Nueva sección</h3>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Field label="Título *"><Input value={newForm.title} onChange={e => setNew('title')(e.target.value)} placeholder="Nombre de la sección" /></Field>
+              <Field label="Estado">
+                <Select value={newForm.status} onChange={e => setNew('status')(e.target.value)}>
+                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                </Select>
+              </Field>
+              <Field label="Prioridad">
+                <Select value={newForm.priority} onChange={e => setNew('priority')(e.target.value)}>
+                  {PRIORITY_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                </Select>
+              </Field>
+              <Field label="Responsable"><Input value={newForm.responsible ?? ''} onChange={e => setNew('responsible')(e.target.value)} placeholder="Responsable de esta sección" /></Field>
+              <Field label="Contenido"><Textarea value={newForm.content} onChange={e => setNew('content')(e.target.value)} rows={5} placeholder="Contenido inicial..." /></Field>
+            </div>
+            <div className="mt-5 flex justify-end gap-3">
+              <button onClick={() => setNewOpen(false)} className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors">Cancelar</button>
+              <button onClick={createNew} disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50">
+                {saving ? 'Creando...' : 'Crear sección'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ import type {
   Script,
   VisualAsset,
   AutomationRule,
+  ArchiveItem,
+  MasterSection,
 } from '@/types/database'
 
 function getClient() {
@@ -257,4 +259,68 @@ export async function getVisualAssets(): Promise<VisualAsset[]> {
   const { data, error } = await sb.from('visual_assets').select('*').order('created_at', { ascending: false })
   if (error) throw error
   return data || []
+}
+
+// ARCHIVE ITEMS
+export async function getArchiveItems(): Promise<ArchiveItem[]> {
+  const sb = getClient()
+  if (!sb) return []
+  const { data, error } = await sb.from('archive_items').select('*').order('archived_at', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function createArchiveItem(item: Omit<ArchiveItem, 'id' | 'created_at' | 'updated_at' | 'user_id'>): Promise<ArchiveItem> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { data, error } = await sb.from('archive_items').insert([item] as any).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function updateArchiveItem(id: string, updates: Partial<ArchiveItem>): Promise<ArchiveItem> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { data, error } = await sb.from('archive_items').update({ ...updates, updated_at: new Date().toISOString() } as any).eq('id', id).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteArchiveItem(id: string): Promise<void> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { error } = await sb.from('archive_items').delete().eq('id', id)
+  if (error) throw error
+}
+
+// MASTER SECTIONS
+export async function getMasterSections(): Promise<MasterSection[]> {
+  const sb = getClient()
+  if (!sb) return []
+  const { data, error } = await sb.from('master_sections').select('*').order('priority', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function createMasterSection(section: Omit<MasterSection, 'id' | 'created_at' | 'updated_at' | 'user_id'>): Promise<MasterSection> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { data, error } = await sb.from('master_sections').insert([section] as any).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function updateMasterSection(id: string, updates: Partial<MasterSection>): Promise<MasterSection> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { data, error } = await sb.from('master_sections').update({ ...updates, updated_at: new Date().toISOString() } as any).eq('id', id).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteMasterSection(id: string): Promise<void> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { error } = await sb.from('master_sections').delete().eq('id', id)
+  if (error) throw error
 }
