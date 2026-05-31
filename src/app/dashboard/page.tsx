@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 type Episode = {
   id: string;
@@ -37,7 +37,7 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const supabase = createClient();
+        const supabase = getSupabaseBrowserClient();
         const [ep, ct, ld] = await Promise.all([
           supabase.from('episodes').select('*').order('created_at', { ascending: false }),
           supabase.from('content_pieces').select('id,status'),
