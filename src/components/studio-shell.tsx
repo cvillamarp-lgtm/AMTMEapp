@@ -2,183 +2,65 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import {
+  House,
+  FileText,
+  Microphone,
+  Article,
+  Image,
+  Palette,
+  Calendar,
+  ChartLine,
+  CurrencyDollar,
+  CheckSquare,
+  Lightning,
+  Archive,
+  NotePencil,
+  Robot,
+  InstagramLogo,
+  Gear,
+  ListChecks,
+  MagnifyingGlass,
+} from '@phosphor-icons/react';
+import { cn } from '@/lib/utils';
 import { useStudio } from '@/components/studio-provider';
-import { Badge, Button } from '@/components/ui';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
-import { joinClasses } from '@/lib/studio-utils';
-import { runStudioVerification } from '@/lib/studio-verifier';
 
-const navigationGroups = [
-  {
-    label: 'Editorial',
-    items: [
-      { href: '/dashboard', label: 'Dashboard' },
-      { href: '/documento-maestro', label: 'Documento Maestro' },
-      { href: '/episodios', label: 'Episodios' },
-      { href: '/guiones', label: 'Guiones' },
-      { href: '/revision-episodios', label: 'Revisión Episodios' },
-      { href: '/contenido', label: 'Contenido' },
-      { href: '/creador-visual', label: 'Creador Visual' },
-    ],
-  },
-  {
-    label: 'Operaciones',
-    items: [
-      { href: '/calendario', label: 'Calendario' },
-      { href: '/metricas', label: 'Métricas' },
-      { href: '/monetizacion', label: 'Monetización' },
-      { href: '/checklists', label: 'Checklists' },
-    ],
-  },
-  {
-    label: 'IA & Herramientas',
-    items: [
-      { href: '/ia', label: 'IA' },
-      { href: '/ia/editor', label: 'Editor IA' },
-      { href: '/notas', label: 'Notas' },
-      { href: '/instagram', label: 'Instagram' },
-      { href: '/automatizacion', label: 'Automatización' },
-      { href: '/verificador', label: 'Verificador' },
-    ],
-  },
-  {
-    label: 'Sistema',
-    items: [
-      { href: '/historico', label: 'Histórico' },
-      { href: '/politica-operativa', label: 'Política Operativa' },
-      { href: '/configuracion', label: 'Configuración' },
-    ],
-  },
+const navItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: House },
+  { href: '/documento-maestro', label: 'Documento maestro', icon: FileText },
+  { href: '/episodios', label: 'Episodios', icon: Microphone },
+  { href: '/revision-episodios', label: 'Revisión episodios', icon: ListChecks },
+  { href: '/guiones', label: 'Guiones', icon: Article },
+  { href: '/contenido', label: 'Contenido', icon: Image },
+  { href: '/creador-visual', label: 'Creador visual', icon: Palette },
+  { href: '/calendario', label: 'Calendario', icon: Calendar },
+  { href: '/metricas', label: 'Métricas', icon: ChartLine },
+  { href: '/monetizacion', label: 'Monetización', icon: CurrencyDollar },
+  { href: '/checklists', label: 'Checklists', icon: CheckSquare },
+  { href: '/notas', label: 'Notas', icon: NotePencil },
+  { href: '/automatizacion', label: 'Automatización', icon: Lightning },
+  { href: '/historico', label: 'Histórico', icon: Archive },
+  { href: '/ia', label: 'IA', icon: Robot },
+  { href: '/instagram', label: 'Instagram', icon: InstagramLogo },
+  { href: '/configuracion', label: 'Configuración', icon: Gear },
 ];
 
-function NavIcon({ href }: { href: string }) {
-  const paths: Record<string, ReactNode> = {
-    '/dashboard': (
-      <>
-        <path d="M4 4h7v7H4z" />
-        <path d="M13 4h7v5h-7z" />
-        <path d="M13 11h7v9h-7z" />
-        <path d="M4 13h7v7H4z" />
-      </>
-    ),
-    '/documento-maestro': (
-      <>
-        <path d="M6 3h9l3 3v15H6z" />
-        <path d="M15 3v4h4" />
-        <path d="M9 12h6" />
-      </>
-    ),
-    '/checklists': (
-      <>
-        <path d="M6 3h9l3 3v15H6z" />
-        <path d="M15 3v4h4" />
-        <path d="M9 12h6" />
-      </>
-    ),
-    '/politica-operativa': (
-      <>
-        <path d="M6 3h9l3 3v15H6z" />
-        <path d="M15 3v4h4" />
-        <path d="M9 12h6" />
-      </>
-    ),
-    '/episodios': (
-      <>
-        <path d="M4 7h16v10H4z" />
-        <path d="m10 10 5 2-5 2z" />
-      </>
-    ),
-    '/contenido': (
-      <>
-        <path d="M4 7h16v10H4z" />
-        <path d="m10 10 5 2-5 2z" />
-      </>
-    ),
-    '/ia': (
-      <>
-        <path d="M4 7h16v10H4z" />
-        <path d="m10 10 5 2-5 2z" />
-      </>
-    ),
-    '/ia/editor': (
-      <>
-        <path d="M4 7h16v10H4z" />
-        <path d="m10 10 5 2-5 2z" />
-      </>
-    ),
-    '/metricas': (
-      <>
-        <path d="M5 19h14" />
-        <path d="M7 16v-4" />
-        <path d="M12 16V8" />
-        <path d="M17 16v-6" />
-      </>
-    ),
-    '/monetizacion': (
-      <>
-        <path d="M5 19h14" />
-        <path d="M7 16v-4" />
-        <path d="M12 16V8" />
-        <path d="M17 16v-6" />
-      </>
-    ),
-    '/historico': (
-      <>
-        <path d="M5 19h14" />
-        <path d="M7 16v-4" />
-        <path d="M12 16V8" />
-        <path d="M17 16v-6" />
-      </>
-    ),
-    '/calendario': (
-      <>
-        <rect x="4" y="5" width="16" height="15" rx="2" />
-        <path d="M8 3v4M16 3v4M4 10h16" />
-      </>
-    ),
-    '/automatizacion': (
-      <>
-        <rect x="4" y="5" width="16" height="15" rx="2" />
-        <path d="M8 3v4M16 3v4M4 10h16" />
-      </>
-    ),
-    '/verificador': (
-      <>
-        <rect x="4" y="5" width="16" height="15" rx="2" />
-        <path d="M8 3v4M16 3v4M4 10h16" />
-      </>
-    ),
-  };
-  const icon = paths[href] ?? (
-    <>
-      <circle cx="12" cy="12" r="4.5" />
-      <path d="M12 5v2M12 17v2M5 12h2M17 12h2" />
-    </>
-  );
-  return (
-    <svg
-      className="size-4 shrink-0"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {icon}
-    </svg>
-  );
-}
+const mobileItems = [
+  navItems[0], // Dashboard
+  navItems[2], // Episodios
+  navItems[5], // Contenido
+  navItems[8], // Métricas
+  navItems[14], // IA
+];
 
 export function StudioShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { state } = useStudio();
-  const authRequired = useMemo(() => isAuthRequired(), []);
+  const authRequired = isAuthRequired();
   const [signingOut, setSigningOut] = useState(false);
-  const verification = runStudioVerification(state);
 
   const signOut = async () => {
     setSigningOut(true);
@@ -191,126 +73,87 @@ export function StudioShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F1E8] text-[#0C1F36]">
-      <div className="mx-auto flex min-h-screen max-w-[1600px]">
-        {/* ── Sidebar ──────────────────────────────────────────────────────── */}
-        <aside className="hidden w-60 shrink-0 border-r border-black/[0.07] bg-[#FAFAF8] px-4 py-7 md:flex md:flex-col">
+    <div className="flex min-h-screen bg-background font-sans">
+      {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-primary z-30">
+        <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
-          <div className="mb-8 px-2">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#6B7B8C]">
-              AMTME
-            </div>
-            <div className="mt-1.5 text-xl font-bold tracking-tight text-[#0C1F36]">Studio OS</div>
+          <div className="flex items-center justify-between h-16 px-5 border-b border-primary-foreground/10">
+            <h1 className="text-base font-semibold text-primary-foreground tracking-tight">
+              AMTME Studio OS
+            </h1>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 space-y-5 overflow-y-auto">
-            {navigationGroups.map((group) => (
-              <div key={group.label}>
-                <div className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6B7B8C]/70">
-                  {group.label}
-                </div>
-                <div className="space-y-0.5">
-                  {group.items.map((item) => {
-                    const active = pathname === item.href;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={joinClasses(
-                          'flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-150',
-                          active
-                            ? 'bg-[#0C1F36] text-white shadow-[0_4px_12px_rgba(12,31,54,0.20)]'
-                            : 'text-[#0C1F36] hover:bg-black/[0.05]'
-                        )}
-                      >
-                        <NavIcon href={item.href} />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
-
-          {/* Estado del sistema */}
-          <div className="mt-6 rounded-2xl border border-black/[0.07] bg-white p-4">
-            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#6B7B8C]">
-              Sistema
-            </div>
-            <div className="mt-1.5 text-sm font-semibold text-[#0C1F36]">Operativo</div>
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
-              <Badge tone="accent">Política activa</Badge>
-              <Badge tone="neutral">Estructura oficial</Badge>
-            </div>
-          </div>
-        </aside>
-
-        {/* ── Main ─────────────────────────────────────────────────────────── */}
-        <main className="flex min-h-screen min-w-0 flex-1 flex-col px-4 pb-10 pt-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <header
-            className="sticky top-0 z-20 mb-6 rounded-[20px] border border-black/[0.07] bg-white/90 px-5 py-3.5 backdrop-blur-md sm:px-6
-            shadow-[0_2px_8px_rgba(12,31,54,0.06)]"
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#6B7B8C]">
-                  AMTME Studio OS
-                </div>
-                <h1 className="mt-0.5 text-lg font-bold tracking-tight text-[#0C1F36]">
-                  {state.config.projectName}
-                </h1>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="accent">Paleta bloqueada</Badge>
-                <Badge tone="neutral">Fuente de verdad central</Badge>
-                <Badge
-                  tone={
-                    verification.score >= 85
-                      ? 'good'
-                      : verification.score >= 70
-                        ? 'warning'
-                        : 'danger'
-                  }
-                >
-                  {verification.passedChecks}/{verification.totalChecks} checks OK
-                </Badge>
-                {authRequired ? (
-                  <Button variant="secondary" onClick={signOut} disabled={signingOut}>
-                    {signingOut ? 'Saliendo…' : 'Cerrar sesión'}
-                  </Button>
-                ) : null}
-              </div>
-            </div>
-          </header>
-
-          <div className="min-w-0 flex-1">{children}</div>
-        </main>
-      </div>
-
-      {/* ── Mobile bottom nav ──────────────────────────────────────────────── */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-black/[0.07] bg-white/95 px-3 py-2 backdrop-blur-md md:hidden">
-        <div className="flex gap-1.5 overflow-x-auto">
-          {navigationGroups
-            .flatMap((g) => g.items)
-            .slice(0, 6)
-            .map((item) => {
-              const active = pathname === item.href;
+          <nav className="flex-1 px-3 py-4 space-y-0.5">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={joinClasses(
-                    'whitespace-nowrap rounded-xl px-3.5 py-2 text-[13px] font-semibold transition-all duration-150',
-                    active ? 'bg-[#0C1F36] text-white' : 'text-[#0C1F36] hover:bg-black/[0.05]'
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
+                    isActive
+                      ? 'bg-accent text-accent-foreground'
+                      : 'text-primary-foreground/70 hover:bg-primary-foreground/8 hover:text-primary-foreground'
                   )}
                 >
+                  <Icon size={20} weight="regular" />
                   {item.label}
                 </Link>
               );
             })}
+          </nav>
+
+          {/* Footer */}
+          <div className="px-4 py-3 border-t border-primary-foreground/10 flex items-center justify-between">
+            <p className="text-xs text-primary-foreground/30">
+              <kbd className="font-sans">⌘K</kbd> para buscar
+            </p>
+            {authRequired && (
+              <button
+                onClick={signOut}
+                disabled={signingOut}
+                className="text-xs text-primary-foreground/40 hover:text-primary-foreground/70 transition-colors"
+              >
+                {signingOut ? 'Saliendo…' : 'Salir'}
+              </button>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Main content ────────────────────────────────────────────────── */}
+      <main className="flex-1 md:pl-64 min-h-screen">
+        <div className="h-full p-6 pb-24 md:pb-6">
+          {children}
+        </div>
+      </main>
+
+      {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-primary border-t border-primary-foreground/10 z-50">
+        <div className="grid grid-cols-5 gap-1 p-2">
+          {mobileItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
+                  isActive
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-primary-foreground/70'
+                )}
+              >
+                <Icon size={20} weight="regular" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </div>

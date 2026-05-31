@@ -1,37 +1,63 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: ['class'],
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
       colors: {
-        amtme: {
-          // Official AMTME Editorial Premium palette (audited & aligned)
-          navy: '#0C1F36', // Navy profundo
-          gold: '#FEE94B', // Amarillo editorial
-          cream: '#F5F1E8', // Crema editorial
-          warmWhite: '#F8F8F6', // Blanco cálido
-          slate: '#6B7B8C', // Gris frío suave para UI secundaria
-          red: '#E0211E', // Rojo acento
-          black: '#111111',
-          // Legacy aliases (kept for compatibility during audit)
-          lemon: '#FEE94B',
-          'navy-profundo': '#0C1F36',
-          'crema-editorial': '#F5F1E8',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
         },
-        semantic: {
-          bg: 'var(--color-bg)',
-          surface: 'var(--color-surface)',
-          'surface-soft': 'var(--color-surface-soft)',
-          text: 'var(--color-text)',
-          muted: 'var(--color-muted)',
-          border: 'var(--color-border)',
-          accent: 'var(--color-accent)',
-          danger: 'var(--color-danger)',
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        // AMTME tokens directos
+        amtme: {
+          navy: '#0c1f36',
+          lemon: '#e8ff40',
+          cream: '#f5f1e8',
+          slate: '#6b7b8c',
+          red: '#e0211e',
+          white: '#ffffff',
         },
       },
-      boxShadow: {
-        panel: '0 18px 52px rgba(0, 31, 54, 0.18)',
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+        xl: 'calc(var(--radius) * 1.5)',
+        '2xl': 'calc(var(--radius) * 2.5)',
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
       },
     },
   },
