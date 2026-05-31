@@ -27,7 +27,7 @@ export type MonetizationStatus =
   | 'Pagado'
   | 'Perdido'
   | 'Seguimiento';
-export type AIProvider = 'grok' | 'gemini';
+export type AIProvider = 'grok' | 'gemini' | 'claude';
 export type InterfaceDensity = 'compacta' | 'estandar';
 export type IntegrationStatus = 'No configurada' | 'Preparada' | 'Conectada';
 export type AIWorkMode = 'Episodio' | 'Copy' | 'Visual' | 'Métricas' | 'Monetización';

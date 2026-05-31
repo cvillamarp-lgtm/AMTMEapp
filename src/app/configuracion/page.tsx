@@ -49,6 +49,7 @@ export default function ConfiguracionPage() {
   );
   const [grokModel, setGrokModel] = useState(config.aiPreferredModelByProvider.grok);
   const [geminiModel, setGeminiModel] = useState(config.aiPreferredModelByProvider.gemini);
+  const [claudeModel, setClaudeModel] = useState(config.aiPreferredModelByProvider.claude ?? 'claude-sonnet-4-20250514');
   const [visibleGrokModels, setVisibleGrokModels] = useState(
     (config.aiVisibleModelsByProvider?.grok ?? [config.aiPreferredModelByProvider.grok]).join('\n')
   );
@@ -90,10 +91,12 @@ export default function ConfiguracionPage() {
         aiPreferredModelByProvider: {
           grok: grokModel,
           gemini: geminiModel,
+          claude: claudeModel,
         },
         aiVisibleModelsByProvider: {
           grok: asLines(visibleGrokModels),
           gemini: asLines(visibleGeminiModels),
+          claude: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20251001'],
         },
         aiSystemPrompt,
         aiQualityRules: asLines(aiQualityRules),
@@ -231,6 +234,7 @@ export default function ConfiguracionPage() {
               >
                 <option value="grok">Grok</option>
                 <option value="gemini">Gemini</option>
+                <option value="claude">Claude</option>
               </Select>
             </Field>
             <Field label="Proveedor IA fallback">
@@ -240,6 +244,7 @@ export default function ConfiguracionPage() {
               >
                 <option value="grok">Grok</option>
                 <option value="gemini">Gemini</option>
+                <option value="claude">Claude</option>
               </Select>
             </Field>
             <Field label="Modelo preferido Grok">

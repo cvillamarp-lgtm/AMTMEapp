@@ -1,5 +1,11 @@
 import type { AIProvider } from '@/lib/studio-types';
 
+type ProviderEnv = {
+  apiKey: string | undefined;
+  apiUrl: string;
+  model: string;
+};
+
 type GenerateAIInput = {
   provider: AIProvider;
   prompt: string;
@@ -7,12 +13,20 @@ type GenerateAIInput = {
   model?: string;
 };
 
-function getProviderEnv(provider: AIProvider) {
+function getProviderEnv(provider: AIProvider): ProviderEnv {
   if (provider === 'grok') {
     return {
       apiKey: process.env.XAI_API_KEY,
       apiUrl: 'https://api.x.ai/v1/chat/completions',
       model: process.env.XAI_MODEL ?? 'grok-2-latest',
+    };
+  }
+
+  if (provider === 'claude') {
+    return {
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      apiUrl: 'https://api.anthropic.com/v1/messages',
+      model: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514',
     };
   }
 
@@ -33,9 +47,9 @@ async function readJsonResponse(response: Response) {
         : typeof payload.error === 'object' && payload.error !== null && 'message' in payload.error
           ? String(
               (payload.error as { message?: unknown }).message ??
-                `La API respondió con estado ${response.status}`
+                `La API respondio con estado ${response.status}`
             )
-          : `La API respondió con estado ${response.status}`;
+          : `La API respondio con estado ${response.status}`;
 
     throw new Error(message);
   }
@@ -52,7 +66,36 @@ export async function generateWithProvider({
   const env = getProviderEnv(provider);
 
   if (!env.apiKey) {
-    throw new Error(`Falta configurar ${provider === 'grok' ? 'XAI_API_KEY' : 'GEMINI_API_KEY'}.`);
+    const keyName = provider === 'grok' ? 'XAI_API_KEY' : provider === 'claude' ? 'ANTHROPIC_API_KEY' : 'GEMINI_API_KEY';
+    throw new Error(`Falta configurar ${keyName} en las variables de entorno.`);
+  }
+
+  if (provider === 'claude') {
+    const response = await fetch(env.apiUrl, {
+      method: 'POST',
+      headers: {
+        'x-api-key': env.apiKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model ?? env.model,
+        max_tokens: 2048,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    const payload = (await readJsonResponse(response)) as {
+      content?: Array<{ type?: string; text?: string }>;
+    };
+    const content = payload.content?.find((b) => b.type === 'text')?.text?.trim();
+
+    if (!content) {
+      throw new Error('Claude no devolvio contenido utilizable.');
+    }
+
+    return content;
   }
 
   if (provider === 'grok') {
@@ -78,7 +121,7 @@ export async function generateWithProvider({
     const content = payload.choices?.[0]?.message?.content?.trim();
 
     if (!content) {
-      throw new Error('Grok no devolvió contenido utilizable.');
+      throw new Error('Grok no devolvio contenido utilizable.');
     }
 
     return content;
@@ -112,12 +155,14 @@ export async function generateWithProvider({
     .trim();
 
   if (!content) {
-    throw new Error('Gemini no devolvió contenido utilizable.');
+    throw new Error('Gemini no devolvio contenido utilizable.');
   }
 
   return content;
 }
 
 export function getProviderLabel(provider: AIProvider) {
-  return provider === 'grok' ? 'Grok' : 'Gemini';
+  if (provider === 'grok') return 'Grok';
+  if (provider === 'claude') return 'Claude';
+  return 'Gemini';
 }

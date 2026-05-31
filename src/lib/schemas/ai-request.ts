@@ -5,7 +5,7 @@ export const MAX_AI_PROMPT_LENGTH = 5000;
 const trimString = (value: unknown) => (typeof value === 'string' ? value.trim() : value);
 
 export const aiGenerateRequestSchema = z.object({
-  provider: z.enum(['grok', 'gemini']).default('grok'),
+  provider: z.enum(['grok', 'gemini', 'claude']).default('grok'),
   mode: z.enum(['Episodio', 'Copy', 'Visual', 'Métricas', 'Monetización']).optional(),
   prompt: z.preprocess(
     trimString,

@@ -379,10 +379,12 @@ export const initialStudioState: StudioState = {
     aiPreferredModelByProvider: {
       grok: 'grok-2-latest',
       gemini: 'gemini-1.5-pro',
+      claude: 'claude-sonnet-4-20250514',
     },
     aiVisibleModelsByProvider: {
       grok: ['grok-2-latest', 'grok-beta'],
       gemini: ['gemini-1.5-pro', 'gemini-1.5-flash'],
+      claude: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20251001'],
     },
     aiSystemPrompt:
       'Eres el asistente operativo de AMTME Studio OS. Respondes en español neutral, con tono editorial, preciso y orientado a ejecución.',

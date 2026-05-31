@@ -99,6 +99,7 @@ export default function IAPage() {
             >
               <option value="grok">Grok</option>
               <option value="gemini">Gemini</option>
+              <option value="claude">Claude</option>
             </Select>
           </Field>
           <Field label="Modelo">

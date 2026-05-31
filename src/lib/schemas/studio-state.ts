@@ -32,7 +32,7 @@ const monetizationStatusSchema = z.enum([
   'Perdido',
   'Seguimiento',
 ]);
-const aiProviderSchema = z.enum(['grok', 'gemini']);
+const aiProviderSchema = z.enum(['grok', 'gemini', 'claude']);
 const interfaceDensitySchema = z.enum(['compacta', 'estandar']);
 const integrationStatusSchema = z.enum(['No configurada', 'Preparada', 'Conectada']);
 const aiEngineSchema = z.enum([
@@ -287,12 +287,14 @@ const appConfigSchema = z
       .object({
         grok: z.string(),
         gemini: z.string(),
+        claude: z.string(),
       })
       .passthrough(),
     aiVisibleModelsByProvider: z
       .object({
         grok: z.array(z.string()),
         gemini: z.array(z.string()),
+        claude: z.array(z.string()),
       })
       .passthrough(),
     aiSystemPrompt: z.string(),
