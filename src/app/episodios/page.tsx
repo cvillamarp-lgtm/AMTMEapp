@@ -1,321 +1,202 @@
-'use client';
-
-import { useMemo, useState } from 'react';
-import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
-import {
-  buildNarrativeStructure,
-  generateAppleDescription,
-  generateEpisodeScript,
-  generateHooks,
-  generateSpotifyDescription,
-} from '@/lib/studio-generators';
-import type { Episode } from '@/lib/studio-types';
-import { formatDate } from '@/lib/studio-utils';
-
-const emptyEpisode = (): Episode => ({
-  id: `ep-${Date.now()}`,
-  episodeNumber: '',
-  title: '',
-  theme: '',
-  pillar: '',
-  emotionalWound: '',
-  centralSymbol: '',
-  objective: '',
-  status: 'Idea',
-  narrativeStructure: buildNarrativeStructure(),
-  script: '',
-  spotifyDescription: '',
-  appleDescription: '',
-  cta: '',
-  hooks: [],
-  publishDate: '',
-  notes: '',
-  nextAction: 'Definir estructura y CTA.',
-});
+'use client'
+import { useState, useEffect, useMemo } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useOptimisticList } from '@/hooks/use-optimistic-list'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/shadcn/card'
+import { Button } from '@/components/shadcn/button'
+import { Badge } from '@/components/shadcn/badge'
+import { Input } from '@/components/shadcn/input'
+import { Label } from '@/components/shadcn/label'
+import { Textarea } from '@/components/shadcn/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
+import { Alert, AlertDescription } from '@/components/shadcn/alert'
+import { Plus, Pencil, Trash2, Search, Sparkles, AlertTriangle, Mic } from 'lucide-react'
+import { toast } from 'sonner'
+import { getEpisodes, createEpisode, updateEpisode, deleteEpisode } from '@/lib/database'
+import type { Episode, EpisodeStatus, NarrativeStructure } from '@/types/database'
 
 export default function EpisodiosPage() {
-  const { state, setState } = useStudio();
-  const [status, setStatus] = useState<'Todos' | Episode['status']>('Todos');
-  const [query, setQuery] = useState('');
-  const filtered = useMemo(
-    () =>
-      state.episodes.filter((episode) => {
-        const matchesQuery = `${episode.title} ${episode.theme} ${episode.pillar}`
-          .toLowerCase()
-          .includes(query.toLowerCase());
-        const matchesStatus = status === 'Todos' ? true : episode.status === status;
-        return matchesQuery && matchesStatus;
-      }),
-    [query, status, state.episodes]
-  );
-  const [draft, setDraft] = useState<Episode>(state.episodes[0] ?? emptyEpisode());
+  const { items: episodes, setItems: setEpisodes, optimisticUpdate, optimisticCreate, optimisticRemove } = useOptimisticList<Episode>([])
+  const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<EpisodeStatus | 'all'>('all')
+  const [formData, setFormData] = useState({
+    episode_number: '',
+    title: '',
+    theme: '',
+    pillar: '',
+    emotional_wound: '',
+    central_symbol: '',
+    objective: '',
+    status: 'idea' as EpisodeStatus,
+    cta: '',
+    notes: '',
+    narrative_structure: null as NarrativeStructure | null,
+    spotify_description: '',
+    apple_description: '',
+    publish_date: null as string | null,
+  })
 
-  const selectEpisode = (episode: Episode) => {
-    setDraft(episode);
-  };
+  const filteredEpisodes = useMemo(() => episodes.filter(ep => {
+    const matchSearch = searchQuery === '' ||
+      ep.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ep.theme.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ep.episode_number.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchStatus = statusFilter === 'all' || ep.status === statusFilter
+    return matchSearch && matchStatus
+  }), [episodes, searchQuery, statusFilter])
 
-  const newEpisode = () => {
-    setDraft(emptyEpisode());
-  };
+  useEffect(() => { loadEpisodes() }, [])
 
-  const saveEpisode = () => {
-    setState((current) => {
-      const exists = current.episodes.some((episode) => episode.id === draft.id);
-      const episodes = exists
-        ? current.episodes.map((episode) => (episode.id === draft.id ? { ...draft } : episode))
-        : [draft, ...current.episodes];
-      return { ...current, episodes };
-    });
-  };
+  async function loadEpisodes() {
+    try {
+      const data = await getEpisodes()
+      setEpisodes(data)
+    } catch { toast.error('Error al cargar episodios') }
+    finally { setLoading(false) }
+  }
 
-  const generateStructure = () =>
-    setDraft({ ...draft, narrativeStructure: buildNarrativeStructure() });
-  const generateScript = () => setDraft({ ...draft, script: generateEpisodeScript(draft) });
-  const generateSpotify = () =>
-    setDraft({ ...draft, spotifyDescription: generateSpotifyDescription(draft) });
-  const generateApple = () =>
-    setDraft({ ...draft, appleDescription: generateAppleDescription(draft) });
-  const generateHooksPack = () =>
-    setDraft({
-      ...draft,
-      hooks: generateHooks(draft.title || `Episodio ${draft.episodeNumber || 'nuevo'}`),
-    });
+  function resetForm() {
+    setFormData({ episode_number: '', title: '', theme: '', pillar: '', emotional_wound: '', central_symbol: '', objective: '', status: 'idea', cta: '', notes: '', narrative_structure: null, spotify_description: '', apple_description: '', publish_date: null })
+    setEditingEpisode(null)
+  }
+
+  function handleEdit(ep: Episode) {
+    setEditingEpisode(ep)
+    setFormData({ episode_number: ep.episode_number, title: ep.title, theme: ep.theme, pillar: ep.pillar || '', emotional_wound: ep.emotional_wound, central_symbol: ep.central_symbol, objective: ep.objective || '', status: ep.status, cta: ep.cta || '', notes: ep.notes || '', narrative_structure: ep.narrative_structure, spotify_description: ep.spotify_description || '', apple_description: ep.apple_description || '', publish_date: ep.publish_date || null })
+    setDialogOpen(true)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!formData.episode_number || !formData.title || !formData.theme || !formData.emotional_wound || !formData.central_symbol) {
+      toast.error('Completa los campos obligatorios')
+      return
+    }
+    const episodeData = { ...formData, script: null, hooks: null, next_action: null, spotify_description: formData.spotify_description || null, apple_description: formData.apple_description || null, publish_date: formData.publish_date || null, pillar: formData.pillar || null, objective: formData.objective || null, cta: formData.cta || null, notes: formData.notes || null }
+    setDialogOpen(false)
+    resetForm()
+    if (editingEpisode) {
+      await optimisticUpdate(editingEpisode.id, episodeData, () => updateEpisode(editingEpisode.id, episodeData))
+      toast.success('Episodio actualizado')
+    } else {
+      const temp: Episode = { id: crypto.randomUUID(), user_id: 'temp', created_at: new Date().toISOString(), updated_at: new Date().toISOString(), ...episodeData }
+      await optimisticCreate(temp, () => createEpisode(episodeData))
+      toast.success('Episodio creado')
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('¿Eliminar este episodio?')) return
+    await optimisticRemove(id, () => deleteEpisode(id))
+    toast.success('Episodio eliminado')
+  }
+
+  const statusColors: Record<string, string> = { publicado: 'bg-[#e8ff40] text-[#0c1f36]', grabacion: 'bg-blue-100 text-blue-800', edicion: 'bg-purple-100 text-purple-800', guion: 'bg-yellow-100 text-yellow-800', idea: 'bg-gray-100 text-gray-700' }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-      <Card>
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Episodios</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
-              Producción editorial
-            </h2>
-          </div>
-          <Button onClick={newEpisode}>Crear episodio</Button>
+    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-semibold text-foreground">Episodios</h1>
+          <p className="text-sm text-muted-foreground mt-1">Ciclo completo de producción</p>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <Field label="Buscar">
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Título, tema o pilar"
-            />
-          </Field>
-          <Field label="Filtrar por estado">
-            <Select
-              value={status}
-              onChange={(event) => setStatus(event.target.value as typeof status)}
-            >
-              <option>Todos</option>
-              <option>Idea</option>
-              <option>En investigación</option>
-              <option>Guion</option>
-              <option>Grabación</option>
-              <option>Edición</option>
-              <option>Publicado</option>
-              <option>Distribuido</option>
-              <option>Medido</option>
-              <option>Archivado</option>
-            </Select>
-          </Field>
-        </div>
-        <div className="mt-4 space-y-3">
-          {filtered.map((episode) => (
-            <button
-              key={episode.id}
-              onClick={() => selectEpisode(episode)}
-              className="w-full rounded-3xl border border-black/8 bg-[#F5F2EA] px-4 py-4 text-left transition hover:bg-white"
-            >
-              <div className="flex items-center justify-between gap-2">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold">
+              <Plus className="mr-2 h-4 w-4" /> Crear episodio
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle>{editingEpisode ? 'Editar episodio' : 'Crear episodio'}</DialogTitle></DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Número *</Label><Input value={formData.episode_number} onChange={e => setFormData({...formData, episode_number: e.target.value})} placeholder="35" /></div>
                 <div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-black/38">
-                    Episodio {episode.episodeNumber || 'nuevo'}
-                  </div>
-                  <div className="mt-1 text-base font-semibold text-[#0C1F36]">
-                    {episode.title || 'Sin título'}
-                  </div>
+                  <Label>Estado</Label>
+                  <Select value={formData.status} onValueChange={(v: EpisodeStatus) => setFormData({...formData, status: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {['idea','investigacion','guion','grabacion','edicion','publicado','distribuido','medido'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Badge
-                  tone={
-                    episode.status === 'Publicado'
-                      ? 'good'
-                      : episode.status === 'Idea'
-                        ? 'neutral'
-                        : 'accent'
-                  }
-                >
-                  {episode.status}
-                </Badge>
               </div>
-              <div className="mt-3 grid gap-2 text-sm text-black/55 sm:grid-cols-2">
-                <span>CTA: {episode.cta || 'Pendiente'}</span>
-                <span>Publicación: {episode.publishDate || 'Sin fecha'}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </Card>
+              <div><Label>Título *</Label><Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="Cuando ya no puedes seguir fingiendo" /></div>
+              <div><Label>Tema *</Label><Input value={formData.theme} onChange={e => setFormData({...formData, theme: e.target.value})} placeholder="agotamiento emocional y verdad personal" /></div>
+              <div><Label>Herida emocional *</Label><Input value={formData.emotional_wound} onChange={e => setFormData({...formData, emotional_wound: e.target.value})} /></div>
+              <div><Label>Símbolo central *</Label><Input value={formData.central_symbol} onChange={e => setFormData({...formData, central_symbol: e.target.value})} /></div>
+              <div><Label>CTA</Label><Textarea value={formData.cta} onChange={e => setFormData({...formData, cta: e.target.value})} rows={2} /></div>
+              <div><Label>Notas</Label><Textarea value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} rows={3} /></div>
+              <div><Label>Fecha de publicación</Label><Input type="date" value={formData.publish_date || ''} onChange={e => setFormData({...formData, publish_date: e.target.value || null})} /></div>
+              <DialogFooter>
+                <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                <Button type="submit">{editingEpisode ? 'Guardar cambios' : 'Crear episodio'}</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-      <Card>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Editor</div>
-            <h3 className="mt-1 text-2xl font-semibold text-[#0C1F36]">
-              {draft.title || 'Nuevo episodio'}
-            </h3>
-          </div>
-          <Badge tone={draft.status === 'Publicado' ? 'good' : 'neutral'}>{draft.status}</Badge>
+      <div className="mb-6 grid md:grid-cols-[1fr_auto] gap-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input type="search" placeholder="Buscar por título, tema, número..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10" />
         </div>
+        <Select value={statusFilter} onValueChange={v => setStatusFilter(v as EpisodeStatus | 'all')}>
+          <SelectTrigger className="w-[200px]"><SelectValue placeholder="Filtrar estado" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los estados</SelectItem>
+            {['idea','investigacion','guion','grabacion','edicion','publicado','distribuido','medido'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <Field label="Número">
-            <Input
-              value={draft.episodeNumber}
-              onChange={(event) => setDraft({ ...draft, episodeNumber: event.target.value })}
-            />
-          </Field>
-          <Field label="Estado">
-            <Select
-              value={draft.status}
-              onChange={(event) =>
-                setDraft({ ...draft, status: event.target.value as Episode['status'] })
-              }
-            >
-              <option>Idea</option>
-              <option>En investigación</option>
-              <option>Guion</option>
-              <option>Grabación</option>
-              <option>Edición</option>
-              <option>Publicado</option>
-              <option>Distribuido</option>
-              <option>Medido</option>
-              <option>Archivado</option>
-            </Select>
-          </Field>
+      {loading ? (
+        <div className="text-center py-12 text-muted-foreground">Cargando episodios...</div>
+      ) : filteredEpisodes.length === 0 ? (
+        <div className="text-center py-16">
+          <Mic className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Sin episodios todavía</p>
+          <Button className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]" onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Crear primer episodio</Button>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Título">
-            <Input
-              value={draft.title}
-              onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-            />
-          </Field>
-          <Field label="Tema">
-            <Input
-              value={draft.theme}
-              onChange={(event) => setDraft({ ...draft, theme: event.target.value })}
-            />
-          </Field>
-          <Field label="Pilar">
-            <Input
-              value={draft.pillar}
-              onChange={(event) => setDraft({ ...draft, pillar: event.target.value })}
-            />
-          </Field>
-          <Field label="Objetivo">
-            <Input
-              value={draft.objective}
-              onChange={(event) => setDraft({ ...draft, objective: event.target.value })}
-            />
-          </Field>
+      ) : (
+        <div className="grid gap-4">
+          <AnimatePresence mode="popLayout">
+            {filteredEpisodes.map(ep => (
+              <motion.div key={ep.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.15 }}>
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <CardTitle className="text-lg">#{ep.episode_number}: {ep.title}</CardTitle>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[ep.status] || 'bg-gray-100 text-gray-700'}`}>{ep.status}</span>
+                        </div>
+                        <CardDescription>{ep.theme}</CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="ghost" onClick={() => handleEdit(ep)}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => handleDelete(ep.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div><span className="text-muted-foreground">Herida: </span>{ep.emotional_wound}</div>
+                      <div><span className="text-muted-foreground">Símbolo: </span>{ep.central_symbol}</div>
+                      {ep.cta && <div className="col-span-2"><span className="text-muted-foreground">CTA: </span>{ep.cta}</div>}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Herida emocional">
-            <Input
-              value={draft.emotionalWound}
-              onChange={(event) => setDraft({ ...draft, emotionalWound: event.target.value })}
-            />
-          </Field>
-          <Field label="Símbolo central">
-            <Input
-              value={draft.centralSymbol}
-              onChange={(event) => setDraft({ ...draft, centralSymbol: event.target.value })}
-            />
-          </Field>
-        </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="CTA">
-            <Input
-              value={draft.cta}
-              onChange={(event) => setDraft({ ...draft, cta: event.target.value })}
-            />
-          </Field>
-          <Field label="Fecha de publicación">
-            <Input
-              value={draft.publishDate}
-              onChange={(event) => setDraft({ ...draft, publishDate: event.target.value })}
-            />
-          </Field>
-        </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <Button onClick={generateStructure}>Generar estructura</Button>
-          <Button variant="secondary" onClick={generateScript}>
-            Generar guion
-          </Button>
-          <Button variant="secondary" onClick={generateSpotify}>
-            Generar descripción Spotify
-          </Button>
-          <Button variant="secondary" onClick={generateApple}>
-            Generar descripción Apple
-          </Button>
-          <Button variant="secondary" onClick={generateHooksPack}>
-            Generar hooks
-          </Button>
-          <Button variant="secondary" onClick={saveEpisode}>
-            Guardar episodio
-          </Button>
-        </div>
-
-        <div className="mt-5 space-y-4">
-          <Field label="Estructura narrativa">
-            <Textarea rows={3} readOnly value={draft.narrativeStructure.join(' · ')} />
-          </Field>
-          <Field label="Guion">
-            <Textarea
-              rows={6}
-              value={draft.script}
-              onChange={(event) => setDraft({ ...draft, script: event.target.value })}
-            />
-          </Field>
-          <Field label="Descripción Spotify">
-            <Textarea
-              rows={4}
-              value={draft.spotifyDescription}
-              onChange={(event) => setDraft({ ...draft, spotifyDescription: event.target.value })}
-            />
-          </Field>
-          <Field label="Descripción Apple Podcasts">
-            <Textarea
-              rows={4}
-              value={draft.appleDescription}
-              onChange={(event) => setDraft({ ...draft, appleDescription: event.target.value })}
-            />
-          </Field>
-          <Field label="Hooks">
-            <Textarea
-              rows={4}
-              value={draft.hooks.join('\n')}
-              onChange={(event) =>
-                setDraft({ ...draft, hooks: event.target.value.split('\n').filter(Boolean) })
-              }
-            />
-          </Field>
-          <Field label="Notas">
-            <Textarea
-              rows={3}
-              value={draft.notes}
-              onChange={(event) => setDraft({ ...draft, notes: event.target.value })}
-            />
-          </Field>
-        </div>
-
-        <div className="mt-5 text-sm text-black/55">
-          Última revisión: {formatDate(draft.publishDate || new Date().toISOString().slice(0, 10))}.
-          Próxima acción: {draft.nextAction}
-        </div>
-      </Card>
+      )}
     </div>
-  );
+  )
 }

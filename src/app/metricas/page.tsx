@@ -1,208 +1,115 @@
-'use client';
-
-import { useState } from 'react';
-import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
-import type { MetricMonthly } from '@/lib/studio-types';
-
-const emptyMetric = (): MetricMonthly => ({
-  id: `metric-month-${Date.now()}`,
-  month: new Date().toISOString().slice(0, 7),
-  platform: 'Spotify',
-  reach: 0,
-  plays: 0,
-  downloads: 0,
-  engagement: 0,
-  profileVisits: 0,
-  linkClicks: 0,
-  dms: 0,
-  conversions: 0,
-  revenue: 0,
-  insight: '',
-  action: '',
-});
+'use client'
+import { useState, useEffect } from 'react'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/shadcn/card'
+import { Button } from '@/components/shadcn/button'
+import { Input } from '@/components/shadcn/input'
+import { Label } from '@/components/shadcn/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
+import { Plus, Download } from 'lucide-react'
+import { toast } from 'sonner'
+import { getMetricsMonthly, createMetricMonthly } from '@/lib/database'
+import type { MetricMonthly } from '@/types/database'
 
 export default function MetricasPage() {
-  const { state, setState } = useStudio();
-  const [draft, setDraft] = useState<MetricMonthly>(state.metricsMonthly[0] ?? emptyMetric());
+  const [metrics, setMetrics] = useState<MetricMonthly[]>([])
+  const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [form, setForm] = useState({ month: new Date().toISOString().slice(0,7), platform: '', reach: 0, plays: 0, downloads: 0, engagement: 0, profile_visits: 0, link_clicks: 0, dms: 0, conversions: 0, revenue: 0, insight: '', action: '' })
 
-  const saveMetric = () => {
-    setState((current) => ({
-      ...current,
-      metricsMonthly: [draft, ...current.metricsMonthly],
-    }));
-  };
+  useEffect(() => { load() }, [])
+  async function load() {
+    try { const d = await getMetricsMonthly(); setMetrics(d) } catch { toast.error('Error al cargar métricas') } finally { setLoading(false) }
+  }
+  function resetForm() { setForm({ month: new Date().toISOString().slice(0,7), platform: '', reach: 0, plays: 0, downloads: 0, engagement: 0, profile_visits: 0, link_clicks: 0, dms: 0, conversions: 0, revenue: 0, insight: '', action: '' }) }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.platform || !form.month) { toast.error('Completa los campos obligatorios'); return }
+    try {
+      await createMetricMonthly(form)
+      toast.success('Métrica registrada')
+      setDialogOpen(false); resetForm(); await load()
+    } catch { toast.error('Error al guardar') }
+  }
+
+  function calcKPIs(m: MetricMonthly) {
+    return {
+      engagementRate: m.reach > 0 ? ((m.engagement / m.reach) * 100).toFixed(2) : '0',
+      conversionRate: m.dms > 0 ? ((m.conversions / m.dms) * 100).toFixed(2) : '0',
+      playsToDM: m.plays > 0 ? ((m.dms / m.plays) * 100).toFixed(2) : '0',
+    }
+  }
+
+  function exportCSV() {
+    if (!metrics.length) { toast.error('Sin métricas para exportar'); return }
+    const headers = 'mes,plataforma,reproducciones,alcance,dms,conversiones,ingresos\n'
+    const rows = metrics.map(m => `${m.month},${m.platform},${m.plays},${m.reach},${m.dms},${m.conversions},${m.revenue}`).join('\n')
+    const blob = new Blob([headers + rows], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a'); a.href = url; a.download = 'amtme-metricas.csv'; a.click()
+    toast.success('CSV exportado')
+  }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[1fr_0.88fr]">
-      <Card>
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Métricas</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
-              Lectura operativa del sistema
-            </h2>
-          </div>
-          <Badge tone="accent">{state.metricsMonthly.length} ciclos</Badge>
-        </div>
-
-        <div className="mt-5 space-y-4">
-          {state.metricsMonthly.map((metric) => (
-            <div key={metric.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-black/38">
-                    {metric.month} · {metric.platform}
-                  </div>
-                  <div className="mt-1 text-base font-semibold text-[#0C1F36]">
-                    {metric.insight}
-                  </div>
+    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
+      <div className="flex items-center justify-between mb-6">
+        <div><h1 className="text-2xl md:text-3xl font-semibold">Métricas</h1><p className="text-sm text-muted-foreground mt-1">Registro y análisis mensual</p></div>
+        <div className="flex gap-2">
+          {metrics.length > 0 && <Button variant="secondary" onClick={exportCSV}><Download className="mr-2 h-4 w-4" />CSV</Button>}
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild><Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"><Plus className="mr-2 h-4 w-4" />Registrar métrica</Button></DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader><DialogTitle>Registrar métrica mensual</DialogTitle></DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>Mes *</Label><Input type="month" value={form.month} onChange={e => setForm({...form, month: e.target.value})} /></div>
+                  <div><Label>Plataforma *</Label><Input value={form.platform} onChange={e => setForm({...form, platform: e.target.value})} placeholder="Spotify" /></div>
                 </div>
-                <Badge tone={metric.conversions > 10 ? 'good' : 'neutral'}>
-                  {metric.conversions} conversiones
-                </Badge>
-              </div>
-              <div className="mt-4 grid gap-2 text-sm text-black/60 sm:grid-cols-3 lg:grid-cols-4">
-                <span>Reach {metric.reach}</span>
-                <span>Plays {metric.plays}</span>
-                <span>Downloads {metric.downloads}</span>
-                <span>Engagement {metric.engagement}%</span>
-                <span>Visitas {metric.profileVisits}</span>
-                <span>Clicks {metric.linkClicks}</span>
-                <span>DMs {metric.dms}</span>
-                <span>Revenue ${metric.revenue}</span>
-              </div>
-              <p className="mt-3 text-sm text-black/55">Acción: {metric.action}</p>
-            </div>
-          ))}
-
-          {state.metricsEpisode.map((metric) => (
-            <div key={metric.id} className="rounded-3xl border border-black/8 bg-white p-4">
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-semibold text-[#0C1F36]">
-                  Episodio {metric.episodeId}
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>Alcance</Label><Input type="number" value={form.reach} onChange={e => setForm({...form, reach: parseInt(e.target.value)||0})} /></div>
+                  <div><Label>Reproducciones</Label><Input type="number" value={form.plays} onChange={e => setForm({...form, plays: parseInt(e.target.value)||0})} /></div>
                 </div>
-                <Badge tone="neutral">Retención {metric.retention}%</Badge>
-              </div>
-              <div className="mt-3 grid gap-2 text-sm text-black/60 sm:grid-cols-2 lg:grid-cols-3">
-                <span>48h: {metric.plays48h}</span>
-                <span>7d: {metric.plays7d}</span>
-                <span>Guardados: {metric.saves}</span>
-                <span>Compartidos: {metric.shares}</span>
-                <span>Comentarios: {metric.comments}</span>
-                <span>Conversiones: {metric.conversions}</span>
-              </div>
-              <p className="mt-3 text-sm text-black/55">{metric.insight}</p>
-            </div>
-          ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div><Label>DMs</Label><Input type="number" value={form.dms} onChange={e => setForm({...form, dms: parseInt(e.target.value)||0})} /></div>
+                  <div><Label>Conversiones</Label><Input type="number" value={form.conversions} onChange={e => setForm({...form, conversions: parseInt(e.target.value)||0})} /></div>
+                </div>
+                <div><Label>Ingresos</Label><Input type="number" step="0.01" value={form.revenue} onChange={e => setForm({...form, revenue: parseFloat(e.target.value)||0})} /></div>
+                <div><Label>Insight</Label><Input value={form.insight} onChange={e => setForm({...form, insight: e.target.value})} /></div>
+                <div><Label>Acción siguiente</Label><Input value={form.action} onChange={e => setForm({...form, action: e.target.value})} /></div>
+                <DialogFooter><Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button type="submit">Guardar</Button></DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
-      </Card>
+      </div>
 
-      <Card>
-        <div className="text-xs uppercase tracking-[0.22em] text-black/40">Registrar mes</div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Mes">
-            <Input
-              value={draft.month}
-              onChange={(event) => setDraft({ ...draft, month: event.target.value })}
-            />
-          </Field>
-          <Field label="Plataforma">
-            <Select
-              value={draft.platform}
-              onChange={(event) => setDraft({ ...draft, platform: event.target.value })}
-            >
-              <option>Spotify</option>
-              <option>Apple Podcasts</option>
-              <option>Instagram</option>
-              <option>TikTok</option>
-              <option>YouTube Shorts</option>
-            </Select>
-          </Field>
-          <Field label="Reach">
-            <Input
-              type="number"
-              value={draft.reach}
-              onChange={(event) => setDraft({ ...draft, reach: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Plays">
-            <Input
-              type="number"
-              value={draft.plays}
-              onChange={(event) => setDraft({ ...draft, plays: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Downloads">
-            <Input
-              type="number"
-              value={draft.downloads}
-              onChange={(event) => setDraft({ ...draft, downloads: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Engagement %">
-            <Input
-              type="number"
-              value={draft.engagement}
-              onChange={(event) => setDraft({ ...draft, engagement: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Visitas perfil">
-            <Input
-              type="number"
-              value={draft.profileVisits}
-              onChange={(event) =>
-                setDraft({ ...draft, profileVisits: Number(event.target.value) })
-              }
-            />
-          </Field>
-          <Field label="Clicks">
-            <Input
-              type="number"
-              value={draft.linkClicks}
-              onChange={(event) => setDraft({ ...draft, linkClicks: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="DMs">
-            <Input
-              type="number"
-              value={draft.dms}
-              onChange={(event) => setDraft({ ...draft, dms: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Conversiones">
-            <Input
-              type="number"
-              value={draft.conversions}
-              onChange={(event) => setDraft({ ...draft, conversions: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Revenue">
-            <Input
-              type="number"
-              value={draft.revenue}
-              onChange={(event) => setDraft({ ...draft, revenue: Number(event.target.value) })}
-            />
-          </Field>
-          <Field label="Insight">
-            <Textarea
-              rows={4}
-              value={draft.insight}
-              onChange={(event) => setDraft({ ...draft, insight: event.target.value })}
-            />
-          </Field>
-          <Field label="Acción">
-            <Textarea
-              rows={4}
-              value={draft.action}
-              onChange={(event) => setDraft({ ...draft, action: event.target.value })}
-            />
-          </Field>
+      {loading ? <div className="text-center py-12 text-muted-foreground">Cargando...</div> : metrics.length === 0 ? (
+        <Card><CardContent className="py-12 text-center"><p className="text-muted-foreground mb-4">Sin métricas registradas</p><Button className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]" onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Registrar primera métrica</Button></CardContent></Card>
+      ) : (
+        <div className="grid gap-6">
+          {metrics.map(m => {
+            const kpis = calcKPIs(m)
+            return (
+              <Card key={m.id}>
+                <CardHeader>
+                  <CardTitle>{m.platform} — {m.month}</CardTitle>
+                  <CardDescription>{m.plays.toLocaleString()} reproducciones · {m.reach.toLocaleString()} alcance</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div><p className="text-sm text-muted-foreground">Engagement</p><p className="text-2xl font-semibold">{kpis.engagementRate}%</p></div>
+                    <div><p className="text-sm text-muted-foreground">Conv. Rate</p><p className="text-2xl font-semibold">{kpis.conversionRate}%</p></div>
+                    <div><p className="text-sm text-muted-foreground">Plays→DM</p><p className="text-2xl font-semibold">{kpis.playsToDM}%</p></div>
+                    <div><p className="text-sm text-muted-foreground">DMs</p><p className="text-2xl font-semibold">{m.dms}</p></div>
+                    <div><p className="text-sm text-muted-foreground">Ingresos</p><p className="text-2xl font-semibold text-[#0c1f36]">${m.revenue.toFixed(0)}</p></div>
+                  </div>
+                  {m.insight && <p className="mt-4 text-sm text-muted-foreground border-t pt-3"><span className="font-medium text-foreground">Insight: </span>{m.insight}</p>}
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
-        <div className="mt-5">
-          <Button onClick={saveMetric}>Guardar ciclo mensual</Button>
-        </div>
-      </Card>
+      )}
     </div>
-  );
+  )
 }

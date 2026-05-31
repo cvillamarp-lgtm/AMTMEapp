@@ -1,175 +1,137 @@
-'use client';
-
-import { useMemo, useState } from 'react';
-import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
-import { generateContentPack } from '@/lib/studio-generators';
-import type { ContentPiece } from '@/lib/studio-types';
-import { formatDate } from '@/lib/studio-utils';
+'use client'
+import { useState, useEffect, useMemo } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { useOptimisticList } from '@/hooks/use-optimistic-list'
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/shadcn/card'
+import { Button } from '@/components/shadcn/button'
+import { Input } from '@/components/shadcn/input'
+import { Label } from '@/components/shadcn/label'
+import { Textarea } from '@/components/shadcn/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
+import { Plus, Pencil, Trash2, Search, Image } from 'lucide-react'
+import { toast } from 'sonner'
+import { getContentPieces, createContentPiece, updateContentPiece, deleteContentPiece } from '@/lib/database'
+import type { ContentPiece, Channel, ContentFormat, ContentStatus } from '@/types/database'
 
 export default function ContenidoPage() {
-  const { state, setState } = useStudio();
-  const [episodeId, setEpisodeId] = useState(state.episodes[0]?.id ?? '');
-  const episode = state.episodes.find((item) => item.id === episodeId) ?? state.episodes[0];
-  const [draft, setDraft] = useState<ContentPiece>(() =>
-    generateContentPack({
-      theme: episode?.theme ?? 'Tema',
-      emotion: 'Claridad contenida',
-      objective: episode?.objective ?? 'Abrir conversación',
-      episodeTitle: episode?.title ?? 'Nuevo episodio',
-    })
-  );
+  const { items, setItems, optimisticUpdate, optimisticCreate, optimisticRemove } = useOptimisticList<ContentPiece>([])
+  const [loading, setLoading] = useState(true)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editing, setEditing] = useState<ContentPiece | null>(null)
+  const [search, setSearch] = useState('')
+  const [channelFilter, setChannelFilter] = useState<Channel | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<ContentStatus | 'all'>('all')
+  const [form, setForm] = useState({ channel: '' as Channel, format: '' as ContentFormat, theme: '', hook: '', main_text: '', cta: '', status: 'borrador' as ContentStatus })
 
-  const channelOptions = useMemo(() => state.config.activeChannels, [state.config.activeChannels]);
+  const filtered = useMemo(() => items.filter(c => {
+    const matchSearch = search === '' || c.theme.toLowerCase().includes(search.toLowerCase()) || c.hook.toLowerCase().includes(search.toLowerCase())
+    return matchSearch && (channelFilter === 'all' || c.channel === channelFilter) && (statusFilter === 'all' || c.status === statusFilter)
+  }), [items, search, channelFilter, statusFilter])
 
-  const regenerate = () => {
-    const generated = generateContentPack({
-      theme: episode?.theme ?? draft.theme,
-      emotion: draft.emotion || 'Claridad contenida',
-      objective: draft.objective || 'Abrir conversación',
-      episodeTitle: episode?.title ?? draft.mainText,
-    });
-    setDraft({ ...generated, episodeId: episode?.id ?? '' });
-  };
+  useEffect(() => { load() }, [])
+  async function load() {
+    try { const d = await getContentPieces(); setItems(d) } catch { toast.error('Error al cargar contenido') } finally { setLoading(false) }
+  }
+  function resetForm() { setForm({ channel: '' as Channel, format: '' as ContentFormat, theme: '', hook: '', main_text: '', cta: '', status: 'borrador' }); setEditing(null) }
+  function handleEdit(c: ContentPiece) { setEditing(c); setForm({ channel: c.channel, format: c.format, theme: c.theme, hook: c.hook, main_text: c.main_text, cta: c.cta, status: c.status }); setDialogOpen(true) }
 
-  const saveContent = () => {
-    setState((current) => ({
-      ...current,
-      contentPieces: [draft, ...current.contentPieces],
-    }));
-  };
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.channel || !form.format || !form.theme || !form.hook || !form.main_text || !form.cta) { toast.error('Completa los campos obligatorios'); return }
+    setDialogOpen(false); resetForm()
+    if (editing) {
+      await optimisticUpdate(editing.id, form, () => updateContentPiece(editing.id, form)); toast.success('Contenido actualizado')
+    } else {
+      const full = { ...form, emotion: null, objective: null, visual_prompt: null, caption: null, publish_date: null, episode_id: null, metric_goal: null }
+      const temp = { id: crypto.randomUUID(), user_id: 'temp', created_at: new Date().toISOString(), updated_at: new Date().toISOString(), ...full } as ContentPiece
+      await optimisticCreate(temp, () => createContentPiece(full)); toast.success('Contenido creado')
+    }
+  }
+  async function handleDelete(id: string) {
+    if (!confirm('¿Eliminar?')) return
+    await optimisticRemove(id, () => deleteContentPiece(id)); toast.success('Eliminado')
+  }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
-      <Card>
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Contenido</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
-              Piezas listas para publicar
-            </h2>
-          </div>
-          <Badge tone="accent">{state.contentPieces.length} piezas</Badge>
-        </div>
+    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
+      <div className="flex items-center justify-between mb-6">
+        <div><h1 className="text-2xl md:text-3xl font-semibold">Contenido</h1><p className="text-sm text-muted-foreground mt-1">Gestión multicanal</p></div>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild><Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"><Plus className="mr-2 h-4 w-4" />Crear contenido</Button></DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader><DialogTitle>{editing ? 'Editar contenido' : 'Crear contenido'}</DialogTitle></DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Canal *</Label>
+                  <Select value={form.channel} onValueChange={v => setForm({...form, channel: v as Channel})}>
+                    <SelectTrigger><SelectValue placeholder="Canal" /></SelectTrigger>
+                    <SelectContent>{['instagram','tiktok','youtube-shorts','threads','spotify','email'].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div><Label>Formato *</Label>
+                  <Select value={form.format} onValueChange={v => setForm({...form, format: v as ContentFormat})}>
+                    <SelectTrigger><SelectValue placeholder="Formato" /></SelectTrigger>
+                    <SelectContent>{['reel','carrusel','story','short','post-texto','email'].map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div><Label>Tema *</Label><Input value={form.theme} onChange={e => setForm({...form, theme: e.target.value})} /></div>
+              <div><Label>Hook *</Label><Textarea value={form.hook} onChange={e => setForm({...form, hook: e.target.value})} rows={2} /></div>
+              <div><Label>Texto principal *</Label><Textarea value={form.main_text} onChange={e => setForm({...form, main_text: e.target.value})} rows={4} /></div>
+              <div><Label>CTA *</Label><Textarea value={form.cta} onChange={e => setForm({...form, cta: e.target.value})} rows={2} /></div>
+              <div><Label>Estado</Label>
+                <Select value={form.status} onValueChange={v => setForm({...form, status: v as ContentStatus})}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{['borrador','listo','publicado','medido'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button type="submit">{editing ? 'Guardar' : 'Crear'}</Button></DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-        <div className="mt-5 space-y-4">
-          <Field label="Episodio fuente">
-            <Select value={episodeId} onChange={(event) => setEpisodeId(event.target.value)}>
-              {state.episodes.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.episodeNumber ? `Episodio ${item.episodeNumber}` : item.title}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Canal principal">
-            <Select
-              value={draft.channel}
-              onChange={(event) => setDraft({ ...draft, channel: event.target.value })}
-            >
-              {channelOptions.map((channel) => (
-                <option key={channel}>{channel}</option>
-              ))}
-            </Select>
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Formato">
-              <Input
-                value={draft.format}
-                onChange={(event) => setDraft({ ...draft, format: event.target.value })}
-              />
-            </Field>
-            <Field label="Estado">
-              <Select
-                value={draft.status}
-                onChange={(event) =>
-                  setDraft({ ...draft, status: event.target.value as ContentPiece['status'] })
-                }
-              >
-                <option>Borrador</option>
-                <option>Listo</option>
-                <option>Publicado</option>
-                <option>Archivado</option>
-              </Select>
-            </Field>
-          </div>
-          <Field label="Tema">
-            <Input
-              value={draft.theme}
-              onChange={(event) => setDraft({ ...draft, theme: event.target.value })}
-            />
-          </Field>
-          <Field label="Emoción">
-            <Input
-              value={draft.emotion}
-              onChange={(event) => setDraft({ ...draft, emotion: event.target.value })}
-            />
-          </Field>
-          <Field label="Objetivo">
-            <Input
-              value={draft.objective}
-              onChange={(event) => setDraft({ ...draft, objective: event.target.value })}
-            />
-          </Field>
-          <Field label="Hook">
-            <Textarea
-              rows={3}
-              value={draft.hook}
-              onChange={(event) => setDraft({ ...draft, hook: event.target.value })}
-            />
-          </Field>
-        </div>
+      <div className="mb-6 grid md:grid-cols-[1fr_auto_auto] gap-4">
+        <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" /><Input type="search" placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" /></div>
+        <Select value={channelFilter} onValueChange={v => setChannelFilter(v as Channel | 'all')}><SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Todos los canales</SelectItem>{['instagram','tiktok','youtube-shorts','threads','spotify','email'].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
+        <Select value={statusFilter} onValueChange={v => setStatusFilter(v as ContentStatus | 'all')}><SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Todos</SelectItem>{['borrador','listo','publicado','medido'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent></Select>
+      </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Button onClick={regenerate}>Generar contenido</Button>
-          <Button variant="secondary" onClick={saveContent}>
-            Guardar pieza
-          </Button>
+      {loading ? <div className="text-center py-12 text-muted-foreground">Cargando...</div> : filtered.length === 0 ? (
+        <div className="text-center py-16"><Image className="h-12 w-12 text-muted-foreground mx-auto mb-4" /><p className="text-muted-foreground">Sin contenido todavía</p><Button className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]" onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Crear primer contenido</Button></div>
+      ) : (
+        <div className="grid gap-4">
+          <AnimatePresence mode="popLayout">
+            {filtered.map(c => (
+              <motion.div key={c.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ duration: 0.15 }}>
+                <Card><CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CardTitle className="text-lg">{c.theme}</CardTitle>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">{c.channel}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">{c.format}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.status === 'publicado' ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-gray-100 text-gray-700'}`}>{c.status}</span>
+                      </div>
+                      <CardDescription>{c.hook}</CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => handleEdit(c)}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleDelete(c.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent><div className="space-y-2 text-sm">
+                  <div><span className="text-muted-foreground">Texto: </span>{c.main_text.substring(0, 120)}{c.main_text.length > 120 ? '...' : ''}</div>
+                  <div><span className="text-muted-foreground">CTA: </span>{c.cta}</div>
+                </div></CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
-      </Card>
-
-      <Card>
-        <div className="text-xs uppercase tracking-[0.22em] text-black/40">Salida editorial</div>
-        <div className="mt-4 space-y-4">
-          <Field label="Texto principal">
-            <Textarea
-              rows={5}
-              value={draft.mainText}
-              onChange={(event) => setDraft({ ...draft, mainText: event.target.value })}
-            />
-          </Field>
-          <Field label="Caption">
-            <Textarea
-              rows={5}
-              value={draft.caption}
-              onChange={(event) => setDraft({ ...draft, caption: event.target.value })}
-            />
-          </Field>
-          <Field label="CTA">
-            <Input
-              value={draft.cta}
-              onChange={(event) => setDraft({ ...draft, cta: event.target.value })}
-            />
-          </Field>
-          <Field label="Promesa visual">
-            <Textarea
-              rows={4}
-              value={draft.visualPrompt}
-              onChange={(event) => setDraft({ ...draft, visualPrompt: event.target.value })}
-            />
-          </Field>
-          <Field label="Meta de medición">
-            <Input
-              value={draft.metricGoal}
-              onChange={(event) => setDraft({ ...draft, metricGoal: event.target.value })}
-            />
-          </Field>
-          <div className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm text-black/58">
-            Publicación sugerida: {formatDate(draft.publishDate)} · Episodio{' '}
-            {episode?.episodeNumber || 'nuevo'}
-          </div>
-        </div>
-      </Card>
+      )}
     </div>
-  );
+  )
 }
