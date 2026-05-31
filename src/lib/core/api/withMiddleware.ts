@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AppError, isAppError } from '../errors/AppError';
 import { logger } from '../logging/logger';
 import { createRequestContext, clearRequestContext } from '../telemetry/RequestContext';
-import { applySecurity, defaultSecurityConfig } from '../security/SecurityService';
+import { applySecurity, defaultSecurityConfig, SecurityService } from '../security/SecurityService';
 import { ApiResponseService } from '../api/ApiResponseService';
 
 export type ApiHandler = (request: NextRequest) => Promise<Response>;
@@ -37,6 +37,9 @@ export function withMiddleware(handler: ApiHandler): ApiHandler {
         if (!response.headers.has('x-request-id')) {
           response.headers.set('x-request-id', context.requestId);
         }
+        // Post-merge polish: activate SecurityService headers (CSP, HSTS, X-Frame-Options, etc.)
+        // These were implemented in foundations but never wired to responses.
+        SecurityService.applySecurityHeaders(response, defaultSecurityConfig);
       }
 
       // Log response
@@ -55,7 +58,9 @@ export function withMiddleware(handler: ApiHandler): ApiHandler {
           endpoint: context.endpoint,
           severity: error.severity,
         });
-        return ApiResponseService.error(error);
+        const errorResponse = ApiResponseService.error(error);
+        SecurityService.applySecurityHeaders(errorResponse, defaultSecurityConfig);
+        return errorResponse;
       }
 
       // Log unexpected error
@@ -70,7 +75,9 @@ export function withMiddleware(handler: ApiHandler): ApiHandler {
         endpoint: context.endpoint,
       });
 
-      return ApiResponseService.error(internalError);
+      const internalErrorResponse = ApiResponseService.error(internalError);
+      SecurityService.applySecurityHeaders(internalErrorResponse, defaultSecurityConfig);
+      return internalErrorResponse;
     } finally {
       clearRequestContext();
     }
