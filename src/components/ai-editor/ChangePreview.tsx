@@ -11,6 +11,10 @@ interface ChangePreviewProps {
   onEditInstruction: () => void;
   onSaveAsTask: () => void;
   applying: boolean;
+  // Surgical addition for explicit risk confirmation (medium+)
+  requireRiskConfirmation?: boolean;
+  riskConfirmed?: boolean;
+  onRiskConfirmationChange?: (checked: boolean) => void;
 }
 
 const validationStatusLabel: Record<string, string> = {
@@ -29,6 +33,9 @@ export function ChangePreview({
   onEditInstruction,
   onSaveAsTask,
   applying,
+  requireRiskConfirmation = false,
+  riskConfirmed = false,
+  onRiskConfirmationChange,
 }: ChangePreviewProps) {
   const validationFailed =
     plan.validationStatus === 'failed' ||
@@ -41,8 +48,13 @@ export function ChangePreview({
   // but block when validations have actually failed (security/destructive patterns)
   const canPrepare = !validationFailed;
 
+  // Additional gate: explicit user confirmation required for any risk !== low
+  const confirmationGatePassed = !requireRiskConfirmation || riskConfirmed;
+
   // Label reflects what the action actually does in Phase 2
   const applyLabel = applying ? 'Preparando…' : 'Preparar rama técnica';
+
+  const canApply = canPrepare && confirmationGatePassed;
 
   return (
     <div className="space-y-5">
@@ -177,10 +189,26 @@ export function ChangePreview({
       {/* Acciones */}
       <Card>
         <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">Acciones</div>
+
+        {requireRiskConfirmation && (
+          <label className="mt-4 flex items-start gap-3 rounded-xl border border-amtme-navy/20 bg-amtme-navy/5 p-3 text-sm">
+            <input
+              type="checkbox"
+              checked={riskConfirmed}
+              onChange={(e) => onRiskConfirmationChange?.(e.target.checked)}
+              className="mt-1 h-4 w-4 accent-amtme-navy"
+            />
+            <span className="text-semantic-text">
+              Entiendo el riesgo de este cambio (nivel <strong>{plan.riskLevel}</strong>) y confirmo
+              que deseo proceder.
+            </span>
+          </label>
+        )}
+
         <div className="mt-4 flex flex-wrap gap-3">
           <button
             onClick={onApply}
-            disabled={!canPrepare || applying}
+            disabled={!canApply || applying}
             className="inline-flex items-center justify-center rounded-full bg-amtme-navy px-4 py-2 text-sm font-medium text-amtme-white transition hover:bg-amtme-black disabled:cursor-not-allowed disabled:opacity-50"
           >
             {applyLabel}

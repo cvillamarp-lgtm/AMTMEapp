@@ -44,6 +44,8 @@ export function NaturalLanguageEditor() {
   });
   const [applying, setApplying] = useState(false);
   const [history, setHistory] = useState<ChangeHistoryEntry[]>([]);
+  // Explicit confirmation state for non-low risk applies (surgical safety gate)
+  const [riskConfirmed, setRiskConfirmed] = useState(false);
   const [persistenceInfo, setPersistenceInfo] = useState<{
     type: 'persistent' | 'session';
     source: 'supabase' | 'memory';
@@ -54,9 +56,15 @@ export function NaturalLanguageEditor() {
   });
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const loadHistory = async () => {
       try {
-        const res = await fetch('/api/ai-editor/history');
+        const res = await fetch('/api/ai-editor/history', {
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+
         const data = (await res.json()) as {
           entries?: ChangeHistoryEntry[];
           persistenceType?: 'persistent' | 'session';
@@ -64,7 +72,6 @@ export function NaturalLanguageEditor() {
           persistenceReason?: string;
         };
 
-        if (!res.ok) return;
         if (Array.isArray(data.entries)) {
           setHistory(data.entries);
         }
@@ -73,12 +80,16 @@ export function NaturalLanguageEditor() {
           source: data.persistenceSource ?? 'memory',
           reason: data.persistenceReason,
         });
-      } catch {
-        // fallback silencioso a historial local
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          // fallback silencioso a historial local
+        }
       }
     };
 
     void loadHistory();
+
+    return () => controller.abort();
   }, []);
 
   const analyze = async () => {
@@ -136,6 +147,7 @@ export function NaturalLanguageEditor() {
 
       if (data.plan) {
         setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: data.plan });
+        setRiskConfirmed(false); // reset confirmation for new plan
         if (data.entry) {
           const historyEntry = data.entry;
           setHistory((prev) => [historyEntry, ...prev]);
@@ -274,10 +286,12 @@ export function NaturalLanguageEditor() {
   const handleDiscard = () => {
     addHistoryEntry(`req-${Date.now()}`, prompt, state.plan, 'discarded');
     setState({ loading: false, error: '', blocked: false, blockedReason: '', plan: null });
+    setRiskConfirmed(false);
   };
 
   const handleEditInstruction = () => {
     setState((prev) => ({ ...prev, plan: null }));
+    setRiskConfirmed(false);
   };
 
   const handleSaveAsTask = () => {
@@ -472,6 +486,9 @@ export function NaturalLanguageEditor() {
             onEditInstruction={handleEditInstruction}
             onSaveAsTask={handleSaveAsTask}
             applying={applying}
+            requireRiskConfirmation={state.plan.riskLevel !== 'low'}
+            riskConfirmed={riskConfirmed}
+            onRiskConfirmationChange={setRiskConfirmed}
           />
         </>
       ) : null}
