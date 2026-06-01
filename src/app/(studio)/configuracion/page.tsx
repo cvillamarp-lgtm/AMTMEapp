@@ -92,11 +92,13 @@ export default function ConfiguracionPage() {
           grok: grokModel,
           gemini: geminiModel,
           claude: claudeModel,
+          groq: 'llama-3.1-70b-versatile',
         },
         aiVisibleModelsByProvider: {
           grok: asLines(visibleGrokModels),
           gemini: asLines(visibleGeminiModels),
           claude: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20251001'],
+          groq: ['llama-3.1-70b-versatile', 'mixtral-8x7b-32768'],
         },
         aiSystemPrompt,
         aiQualityRules: asLines(aiQualityRules),
