@@ -27,17 +27,17 @@ function getClient() {
 // ---- helpers ----
 
 function toRow(payload: object) {
-  return { owner_id: OWNER_ID, workspace_key: WORKSPACE, payload }
+  return { user_id: null, payload }
 }
 
 function fromRow<T>(row: any): T {
-  return { id: row.id, created_at: row.created_at, updated_at: row.updated_at, user_id: row.owner_id, ...row.payload } as T
+  return { id: row.id, created_at: row.created_at, updated_at: row.updated_at, user_id: row.user_id, ...row.payload } as T
 }
 
 async function getAll<T>(table: string): Promise<T[]> {
   const sb = getClient()
   if (!sb) return []
-  const { data, error } = await sb.from(table).select('*').eq('owner_id', OWNER_ID).eq('workspace_key', WORKSPACE).order('created_at', { ascending: false })
+  const { data, error } = await sb.from(table).select('*').is('user_id', null).order('created_at', { ascending: false })
   if (error) throw error
   return (data || []).map((r: any) => fromRow<T>(r))
 }
@@ -100,7 +100,7 @@ export async function deleteChecklist(id: string): Promise<void> { return delete
 export async function getCalendarEvents(): Promise<CalendarEvent[]> {
   const sb = getClient()
   if (!sb) return []
-  const { data, error } = await sb.from('calendar_events').select('*').eq('owner_id', OWNER_ID).eq('workspace_key', WORKSPACE).order('created_at', { ascending: true })
+  const { data, error } = await sb.from('calendar_events').select('*').is('user_id', null).order('created_at', { ascending: true })
   if (error) throw error
   return (data || []).map((r: any) => fromRow<CalendarEvent>(r))
 }
