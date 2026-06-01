@@ -11,10 +11,11 @@ import { Textarea } from '@/components/shadcn/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
 import { Alert, AlertDescription } from '@/components/shadcn/alert'
-import { Plus, Pencil, Trash2, Search, Sparkles, AlertTriangle, Mic } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, Sparkles, AlertTriangle, Mic, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { getEpisodes, createEpisode, updateEpisode, deleteEpisode } from '@/lib/database'
 import type { Episode, EpisodeStatus, NarrativeStructure } from '@/types/database'
+import { callAI } from '@/lib/ai-studio'
 
 export default function EpisodiosPage() {
   const { items: episodes, setItems: setEpisodes, optimisticUpdate, optimisticCreate, optimisticRemove } = useOptimisticList<Episode>([])
@@ -23,6 +24,8 @@ export default function EpisodiosPage() {
   const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<EpisodeStatus | 'all'>('all')
+  const [generatingHooks, setGeneratingHooks] = useState(false)
+  const [suggestedHooks, setSuggestedHooks] = useState<string[]>([])
   const [formData, setFormData] = useState({
     episode_number: '',
     title: '',
@@ -39,6 +42,36 @@ export default function EpisodiosPage() {
     apple_description: '',
     publish_date: null as string | null,
   })
+
+  async function generateHooks() {
+    if (!formData.theme || !formData.emotional_wound) {
+      toast.error('Completa tema y herida emocional primero')
+      return
+    }
+    setGeneratingHooks(true)
+    try {
+      const prompt = `Genera 5 títulos alternativos para un episodio de AMTME con este contexto:
+Tema: ${formData.theme}
+Herida emocional: ${formData.emotional_wound}
+Símbolo: ${formData.central_symbol || 'no definido'}
+
+Cada título debe:
+- Ser una pregunta directa de 5-10 palabras
+- Usar la segunda persona singular (tú)
+- Apuntar a la herida emocional
+- Generar tensión psicológica
+
+Devuelve solo los 5 títulos numerados, uno por línea.`
+      const result = await callAI(prompt, 'Episodio')
+      const hooks = result.split('\n').filter(l => l.match(/^\d/)).map(l => l.replace(/^\d+\.?\s*/, '').trim()).filter(Boolean).slice(0, 5)
+      setSuggestedHooks(hooks)
+      toast.success('Hooks generados')
+    } catch (e: any) {
+      toast.error(e.message || 'Error al generar')
+    } finally {
+      setGeneratingHooks(false)
+    }
+  }
 
   const filteredEpisodes = useMemo(() => episodes.filter(ep => {
     const matchSearch = searchQuery === '' ||
@@ -126,6 +159,21 @@ export default function EpisodiosPage() {
                 </div>
               </div>
               <div><Label>Título *</Label><Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="Cuando ya no puedes seguir fingiendo" /></div>
+              <div className="flex gap-2 mt-1">
+                <Button type="button" size="sm" variant="secondary" onClick={generateHooks} disabled={generatingHooks} className="text-xs">
+                  {generatingHooks ? <><Loader2 className="h-3 w-3 animate-spin mr-1" />Generando...</> : <><Sparkles className="h-3 w-3 mr-1" />Generar hooks con IA</>}
+                </Button>
+              </div>
+              {suggestedHooks.length > 0 && (
+                <div className="border rounded-lg p-3 bg-muted/50 space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Selecciona un hook:</p>
+                  {suggestedHooks.map((h, i) => (
+                    <button key={i} type="button" onClick={() => setFormData({...formData, title: h})} className="block w-full text-left text-sm p-2 rounded hover:bg-background transition-colors">
+                      {h}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div><Label>Tema *</Label><Input value={formData.theme} onChange={e => setFormData({...formData, theme: e.target.value})} placeholder="agotamiento emocional y verdad personal" /></div>
               <div><Label>Herida emocional *</Label><Input value={formData.emotional_wound} onChange={e => setFormData({...formData, emotional_wound: e.target.value})} /></div>
               <div><Label>Símbolo central *</Label><Input value={formData.central_symbol} onChange={e => setFormData({...formData, central_symbol: e.target.value})} /></div>

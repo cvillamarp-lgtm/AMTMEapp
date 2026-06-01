@@ -5,15 +5,18 @@ import { Button } from '@/components/shadcn/button'
 import { Input } from '@/components/shadcn/input'
 import { Label } from '@/components/shadcn/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
-import { Plus, Download } from 'lucide-react'
+import { Plus, Download, Sparkles, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { getMetricsMonthly, createMetricMonthly } from '@/lib/database'
 import type { MetricMonthly } from '@/types/database'
+import { callAI } from '@/lib/ai-studio'
 
 export default function MetricasPage() {
   const [metrics, setMetrics] = useState<MetricMonthly[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [aiInsight, setAiInsight] = useState<Record<string, string>>({})
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null)
   const [form, setForm] = useState({ month: new Date().toISOString().slice(0,7), platform: '', reach: 0, plays: 0, downloads: 0, engagement: 0, profile_visits: 0, link_clicks: 0, dms: 0, conversions: 0, revenue: 0, insight: '', action: '' })
 
   useEffect(() => { load() }, [])
@@ -30,6 +33,42 @@ export default function MetricasPage() {
       toast.success('Métrica registrada')
       setDialogOpen(false); resetForm(); await load()
     } catch { toast.error('Error al guardar') }
+  }
+
+  async function analyzeMetric(m: MetricMonthly) {
+    setAnalyzingId(m.id)
+    try {
+      const kpis = calcKPIs(m)
+      const prompt = `Analiza estas métricas del podcast AMTME para ${m.platform} en ${m.month}:
+
+Reproducciones: ${m.plays.toLocaleString()}
+Alcance: ${m.reach.toLocaleString()}
+DMs recibidos: ${m.dms}
+Conversiones: ${m.conversions}
+Ingresos: $${m.revenue}
+Tasa de engagement: ${kpis.engagementRate}%
+Tasa plays→DM: ${kpis.playsToDM}%
+Tasa DM→conversión: ${kpis.conversionRate}%
+
+Devuelve exactamente:
+[INSIGHT] - El hallazgo más importante en 2 frases
+[ACCIÓN] - La acción más concreta para mejorar en los próximos 7 días`
+
+      const result = await callAI(prompt, 'Métricas')
+      const extract = (tag: string) => {
+        const regex = new RegExp('\\[' + tag + '\\]\\s*[-–]?\\s*([\\s\\S]*?)(?=\\[|$)', 'i')
+        const match = result.match(regex)
+        return match ? match[1].trim() : ''
+      }
+      const insight = extract('INSIGHT')
+      const accion = extract('ACCIÓN') || extract('ACCION')
+      setAiInsight(prev => ({ ...prev, [m.id]: [insight, accion].filter(Boolean).join(' → ') }))
+      toast.success('Análisis completado')
+    } catch (e: any) {
+      toast.error(e.message || 'Error al analizar')
+    } finally {
+      setAnalyzingId(null)
+    }
   }
 
   function calcKPIs(m: MetricMonthly) {
@@ -104,6 +143,12 @@ export default function MetricasPage() {
                     <div><p className="text-sm text-muted-foreground">Ingresos</p><p className="text-2xl font-semibold text-[#0c1f36]">${m.revenue.toFixed(0)}</p></div>
                   </div>
                   {m.insight && <p className="mt-4 text-sm text-muted-foreground border-t pt-3"><span className="font-medium text-foreground">Insight: </span>{m.insight}</p>}
+                  {aiInsight[m.id] && <p className="mt-3 text-sm bg-[#0c1f36] text-white rounded-lg p-3"><span className="font-medium text-[#e8ff40]">IA: </span>{aiInsight[m.id]}</p>}
+                  <div className="mt-3">
+                    <Button size="sm" variant="secondary" onClick={() => analyzeMetric(m)} disabled={analyzingId === m.id} className="text-xs">
+                      {analyzingId === m.id ? <><Loader2 className="h-3 w-3 animate-spin mr-1" />Analizando...</> : <><Sparkles className="h-3 w-3 mr-1" />Analizar con IA</>}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )

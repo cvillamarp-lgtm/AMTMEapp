@@ -9,10 +9,11 @@ import { Label } from '@/components/shadcn/label'
 import { Textarea } from '@/components/shadcn/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
-import { Plus, Pencil, Trash2, Search, Image } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, Image, Sparkles, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { getContentPieces, createContentPiece, updateContentPiece, deleteContentPiece } from '@/lib/database'
 import type { ContentPiece, Channel, ContentFormat, ContentStatus } from '@/types/database'
+import { callAI } from '@/lib/ai-studio'
 
 export default function ContenidoPage() {
   const { items, setItems, optimisticUpdate, optimisticCreate, optimisticRemove } = useOptimisticList<ContentPiece>([])
@@ -22,7 +23,47 @@ export default function ContenidoPage() {
   const [search, setSearch] = useState('')
   const [channelFilter, setChannelFilter] = useState<Channel | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<ContentStatus | 'all'>('all')
+  const [generatingContent, setGeneratingContent] = useState(false)
   const [form, setForm] = useState({ channel: '' as Channel, format: '' as ContentFormat, theme: '', hook: '', main_text: '', cta: '', status: 'borrador' as ContentStatus })
+
+  async function generateContent() {
+    if (!form.theme || !form.channel || !form.format) {
+      toast.error('Completa tema, canal y formato primero')
+      return
+    }
+    setGeneratingContent(true)
+    try {
+      const prompt = `Genera una pieza de contenido para AMTME con este contexto:
+Canal: ${form.channel}
+Formato: ${form.format}
+Tema: ${form.theme}
+
+Devuelve exactamente en este formato:
+[HOOK] - Una frase gancho de 10-15 palabras que genere tensión emocional
+[TEXTO] - El texto principal (adapta la longitud al formato: reel=3-4 frases, carrusel=6-8 frases, story=2-3 frases)
+[CTA] - Una llamada a la acción corta y específica`
+
+      const result = await callAI(prompt, 'Copy')
+      const extract = (tag: string) => {
+        const regex = new RegExp('\\[' + tag + '\\]\\s*[-–]?\\s*([\\s\\S]*?)(?=\\[|$)', 'i')
+        const match = result.match(regex)
+        return match ? match[1].trim() : ''
+      }
+      const hook = extract('HOOK')
+      const texto = extract('TEXTO')
+      const cta = extract('CTA')
+      if (hook || texto) {
+        setForm(f => ({ ...f, hook: hook || f.hook, main_text: texto || f.main_text, cta: cta || f.cta }))
+        toast.success('Contenido generado con IA')
+      } else {
+        toast.error('No se pudo parsear el resultado')
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Error al generar')
+    } finally {
+      setGeneratingContent(false)
+    }
+  }
 
   const filtered = useMemo(() => items.filter(c => {
     const matchSearch = search === '' || c.theme.toLowerCase().includes(search.toLowerCase()) || c.hook.toLowerCase().includes(search.toLowerCase())
@@ -76,6 +117,9 @@ export default function ContenidoPage() {
                   </Select>
                 </div>
               </div>
+              <Button type="button" onClick={generateContent} disabled={generatingContent} className="w-full bg-[#0c1f36] text-white hover:bg-[#1a3a5c]">
+                {generatingContent ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generando con IA...</> : <><Sparkles className="mr-2 h-4 w-4" />Generar contenido con IA</>}
+              </Button>
               <div><Label>Tema *</Label><Input value={form.theme} onChange={e => setForm({...form, theme: e.target.value})} /></div>
               <div><Label>Hook *</Label><Textarea value={form.hook} onChange={e => setForm({...form, hook: e.target.value})} rows={2} /></div>
               <div><Label>Texto principal *</Label><Textarea value={form.main_text} onChange={e => setForm({...form, main_text: e.target.value})} rows={4} /></div>

@@ -7,15 +7,18 @@ import { Label } from '@/components/shadcn/label'
 import { Textarea } from '@/components/shadcn/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
-import { Plus, Pencil } from 'lucide-react'
+import { Plus, Pencil, Sparkles, Loader2, Copy } from 'lucide-react'
 import { toast } from 'sonner'
 import { getMonetizationLeads, createMonetizationLead, updateMonetizationLead } from '@/lib/database'
 import type { MonetizationLead, LeadStatus } from '@/types/database'
+import { callAI } from '@/lib/ai-studio'
 
 export default function MonetizacionPage() {
   const [leads, setLeads] = useState<MonetizationLead[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [aiMessages, setAiMessages] = useState<Record<string, string>>({})
+  const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [editing, setEditing] = useState<MonetizationLead | null>(null)
   const [form, setForm] = useState({ name: '', source: '', contact: '', status: 'nuevo-lead' as LeadStatus, offer: '', potential_value: 0, real_revenue: 0, close_probability: 50, next_action: '', notes: '' })
 
@@ -34,6 +37,45 @@ export default function MonetizacionPage() {
       else { await createMonetizationLead({ ...form, follow_up_date: null, conversion_origin: null, episode_id: null, content_id: null }); toast.success('Lead creado') }
       setDialogOpen(false); resetForm(); await load()
     } catch { toast.error('Error al guardar') }
+  }
+
+  async function generateFollowUp(l: MonetizationLead) {
+    setGeneratingId(l.id)
+    try {
+      const prompt = `Genera el mensaje de seguimiento exacto para este lead de AMTME:
+
+Nombre: ${l.name}
+Oferta: ${l.offer}
+Fuente: ${l.source}
+Estado actual: ${l.status}
+Valor potencial: $${l.potential_value}
+Próxima acción registrada: ${l.next_action || 'no definida'}
+
+Contexto AMTME: podcast de acompañamiento emocional para hombres, lecturas de tarot simbólico, voz cercana y directa, nunca vendedora ni insistente.
+
+Devuelve exactamente:
+[MENSAJE] - El mensaje completo listo para enviar por DM de Instagram (máximo 4 frases, tono natural, sin emojis excesivos)
+[NEXT] - El siguiente paso concreto después de este mensaje`
+
+      const result = await callAI(prompt, 'Monetización')
+      const extract = (tag: string) => {
+        const regex = new RegExp('\\[' + tag + '\\]\\s*[-–]?\\s*([\\s\\S]*?)(?=\\[|$)', 'i')
+        const match = result.match(regex)
+        return match ? match[1].trim() : ''
+      }
+      const mensaje = extract('MENSAJE')
+      const next = extract('NEXT')
+      setAiMessages(prev => ({ ...prev, [l.id]: mensaje }))
+      if (next) {
+        await updateMonetizationLead(l.id, { next_action: next })
+        await load()
+      }
+      toast.success('Mensaje generado')
+    } catch (e: any) {
+      toast.error(e.message || 'Error al generar')
+    } finally {
+      setGeneratingId(null)
+    }
   }
 
   const active = leads.filter(l => !['pagado','entregado','perdido'].includes(l.status))
