@@ -80,7 +80,7 @@ export async function generateEpisodeFields(
   }
 ): Promise<{ fields: EpisodeFields; metadata: Record<string, unknown> }> {
   const validated = EpisodeInputSchema.parse(input);
-  const provider = options?.provider ?? 'gemini';
+  const provider = (options?.provider ?? 'gemini') as AIProvider;
 
   try {
     const response = await generateWithProvider({
@@ -122,7 +122,7 @@ export async function generateSemanticMap(
   }
 ): Promise<{ map: SemanticMap; metadata: Record<string, unknown> }> {
   const validated = SemanticMapInputSchema.parse(input);
-  const provider = options?.provider ?? 'gemini';
+  const provider = (options?.provider ?? 'gemini') as AIProvider;
 
   try {
     const response = await generateWithProvider({
