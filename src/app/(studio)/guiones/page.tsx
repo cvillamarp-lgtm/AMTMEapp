@@ -114,7 +114,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
     <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
       <div className="flex items-center justify-between mb-6">
         <div><h1 className="text-2xl md:text-3xl font-semibold">Guiones</h1><p className="text-sm text-muted-foreground mt-1">Estructura narrativa AZTIYARTE</p></div>
-        <Dialog open={dialogOpen} onOpenChange={v => { setDialogOpen(v); if (!v) resetForm() }}>
+        <Dialog open={dialogOpen} onOpenChange={v => { if (generating) return; setDialogOpen(v); if (!v) resetForm() }}>
           <DialogTrigger asChild><Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"><Plus className="mr-2 h-4 w-4" />Crear guion</Button></DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>{editing ? 'Editar guion' : 'Crear guion'}</DialogTitle></DialogHeader>
@@ -143,7 +143,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                   <SelectContent>{['borrador','revision','listo-grabar','grabado','archivado'].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button type="submit">{editing ? 'Guardar' : 'Crear'}</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button type="submit" disabled={generating}>{generating ? 'Espera...' : editing ? 'Guardar' : 'Crear'}</Button></DialogFooter>
             </form>
           </DialogContent>
         </Dialog>

@@ -31,7 +31,14 @@ function toRow(payload: object) {
 }
 
 function fromRow<T>(row: any): T {
-  return { id: row.id, created_at: row.created_at, updated_at: row.updated_at, user_id: row.user_id, ...row.payload } as T
+  // Si tiene payload jsonb, expandirlo; si no, usar las columnas directas
+  const base = { id: row.id, created_at: row.created_at, updated_at: row.updated_at, user_id: row.user_id }
+  if (row.payload && typeof row.payload === 'object' && Object.keys(row.payload).length > 0) {
+    return { ...base, ...row.payload } as T
+  }
+  // Schema con columnas directas — omitir id/timestamps ya incluidos
+  const { id, created_at, updated_at, user_id, owner_id, workspace_key, payload, ...rest } = row
+  return { ...base, ...rest } as T
 }
 
 async function getAll<T>(table: string): Promise<T[]> {
@@ -109,9 +116,50 @@ export async function updateCalendarEvent(id: string, updates: Partial<CalendarE
 export async function deleteCalendarEvent(id: string): Promise<void> { return deleteOne('calendar_events', id) }
 
 // ---- SCRIPTS ----
-export async function getScripts(): Promise<Script[]> { return getAll<Script>('scripts') }
-export async function createScript(s: Omit<Script, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'version'>): Promise<Script> { return insertOne<Script>('scripts', { ...s, version: 1 }) }
-export async function updateScript(id: string, updates: Partial<Script>): Promise<Script> { return updateOne<Script>('scripts', id, updates) }
+// Scripts en Supabase usan columnas directas (no payload jsonb)
+export async function getScripts(): Promise<Script[]> {
+  const sb = getClient()
+  if (!sb) return []
+  const { data, error } = await sb.from('scripts').select('*').is('user_id', null).order('created_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map((r: any) => {
+    // Si tiene payload (nuestro schema), usar fromRow; si tiene columnas directas, usar directo
+    if (r.payload && typeof r.payload === 'object') return fromRow<Script>(r)
+    return { ...r } as Script
+  })
+}
+export async function createScript(s: Omit<Script, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'version'>): Promise<Script> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  // Intentar insertar con columnas directas primero (schema AMTMEultima)
+  const { data, error } = await sb.from('scripts').insert([{
+    user_id: null,
+    episode_id: (s as any).episode_id,
+    title: (s as any).title,
+    status: (s as any).status || 'borrador',
+    version: 1,
+    opening: (s as any).opening || null,
+    threshold: (s as any).threshold || null,
+    wound: (s as any).wound || null,
+    symbol: (s as any).symbol || null,
+    truth: (s as any).truth || null,
+    bridge: (s as any).bridge || null,
+    action: (s as any).action || null,
+    closing: (s as any).closing || null,
+    cta: (s as any).cta || null,
+    voice_notes: (s as any).voice_notes || null,
+  }]).select().single()
+  if (!error) return data as Script
+  // Fallback: payload jsonb
+  return insertOne<Script>('scripts', { ...s, version: 1 })
+}
+export async function updateScript(id: string, updates: Partial<Script>): Promise<Script> {
+  const sb = getClient()
+  if (!sb) throw new Error('Supabase no configurado')
+  const { data, error } = await sb.from('scripts').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).select().single()
+  if (error) throw error
+  return data as Script
+}
 export async function deleteScript(id: string): Promise<void> { return deleteOne('scripts', id) }
 
 // ---- VISUAL ASSETS ----
