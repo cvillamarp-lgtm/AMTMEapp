@@ -67,9 +67,10 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       const result = await callAI(prompt, 'Episodio')
 
       const extract = (tag: string) => {
-        const regex = new RegExp(`\\[${tag}\\]([\\s\\S]*?)(?=\\[|$)`, 'i')
+        // Ignora asteriscos de markdown antes/despues del tag
+        const regex = new RegExp('[*]*\\[' + tag + '\\][*]*[\\s\\-]*([\\s\\S]*?)(?=[*]*\\[|$)', 'i')
         const match = result.match(regex)
-        return match ? match[1].trim() : ''
+        return match ? match[1].replace(/^[-\s]+/, '').trim() : ''
       }
 
       setForm(f => ({
