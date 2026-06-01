@@ -6,6 +6,10 @@ function isAuthPath(pathname: string) {
   return pathname.startsWith('/auth');
 }
 
+function isPublicRoute(pathname: string) {
+  return pathname === '/' || pathname.startsWith('/api/public');
+}
+
 function isPublicAsset(pathname: string) {
   return (
     pathname.startsWith('/_next')
@@ -26,6 +30,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAuthPath(request.nextUrl.pathname)) {
+    return response;
+  }
+
+  if (isPublicRoute(request.nextUrl.pathname)) {
     return response;
   }
 
