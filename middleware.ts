@@ -23,6 +23,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Rutas publicas siempre pasan sin auth
+  if (isPublicRoute(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   const { user, response } = await refreshSession(request);
 
   if (!isAuthRequired()) {
