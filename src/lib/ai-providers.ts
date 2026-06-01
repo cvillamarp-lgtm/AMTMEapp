@@ -14,11 +14,19 @@ type GenerateAIInput = {
 };
 
 function getProviderEnv(provider: AIProvider): ProviderEnv {
-  if (provider === 'grok') {
+  if (provider === 'grok' || provider === 'groq') {
     return {
       apiKey: process.env.XAI_API_KEY,
       apiUrl: 'https://api.x.ai/v1/chat/completions',
       model: process.env.XAI_MODEL ?? 'grok-2-latest',
+    };
+  }
+
+  if (provider === 'groq') {
+    return {
+      apiKey: process.env.GROQ_API_KEY,
+      apiUrl: 'https://api.groq.com/openai/v1/chat/completions',
+      model: process.env.GROQ_MODEL ?? 'llama-3.1-70b-versatile',
     };
   }
 
@@ -70,6 +78,14 @@ export async function generateWithProvider({
     throw new Error(`Falta configurar ${keyName} en las variables de entorno.`);
   }
 
+  if (provider === 'groq') {
+    return {
+      apiKey: process.env.GROQ_API_KEY,
+      apiUrl: 'https://api.groq.com/openai/v1/chat/completions',
+      model: process.env.GROQ_MODEL ?? 'llama-3.1-70b-versatile',
+    };
+  }
+
   if (provider === 'claude') {
     const response = await fetch(env.apiUrl, {
       method: 'POST',
@@ -98,7 +114,7 @@ export async function generateWithProvider({
     return content;
   }
 
-  if (provider === 'grok') {
+  if (provider === 'grok' || provider === 'groq') {
     const response = await fetch(env.apiUrl, {
       method: 'POST',
       headers: {

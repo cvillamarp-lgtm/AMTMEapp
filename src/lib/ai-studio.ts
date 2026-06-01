@@ -15,7 +15,7 @@ export async function callAI(prompt: string, mode: string = 'Episodio'): Promise
     body: JSON.stringify({
       prompt,
       mode,
-      provider: 'claude',
+      provider: 'groq',
       systemPrompt: SYSTEM_PROMPT,
     }),
   })
