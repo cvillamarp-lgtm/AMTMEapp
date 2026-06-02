@@ -4,28 +4,6 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { Button } from '@/components/shadcn/button'
 import { Input } from '@/components/shadcn/input'
 import { Label } from '@/components/shadcn/label'
-<<<<<<< HEAD
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
-import { Plus, Download, Sparkles, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
-import { getMetricsMonthly, createMetricMonthly } from '@/lib/database'
-import type { MetricMonthly } from '@/types/database'
-import { callAI } from '@/lib/ai-studio'
-
-export default function MetricasPage() {
-  const [metrics, setMetrics] = useState<MetricMonthly[]>([])
-  const [loading, setLoading] = useState(true)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [aiInsight, setAiInsight] = useState<Record<string, string>>({})
-  const [analyzingId, setAnalyzingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ month: new Date().toISOString().slice(0,7), platform: '', reach: 0, plays: 0, downloads: 0, engagement: 0, profile_visits: 0, link_clicks: 0, dms: 0, conversions: 0, revenue: 0, insight: '', action: '' })
-
-  useEffect(() => { load() }, [])
-  async function load() {
-    try { const d = await getMetricsMonthly(); setMetrics(d) } catch { toast.error('Error al cargar métricas') } finally { setLoading(false) }
-  }
-  function resetForm() { setForm({ month: new Date().toISOString().slice(0,7), platform: '', reach: 0, plays: 0, downloads: 0, engagement: 0, profile_visits: 0, link_clicks: 0, dms: 0, conversions: 0, revenue: 0, insight: '', action: '' }) }
-=======
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shadcn/tabs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/shadcn/dialog'
 import { Plus, Download, Sparkles, RefreshCw } from 'lucide-react'
@@ -74,7 +52,6 @@ export default function MetricasPage() {
   function resetForm() {
     setForm({ month: new Date().toISOString().slice(0,7), platform: '', reach: 0, plays: 0, downloads: 0, engagement: 0, profile_visits: 0, link_clicks: 0, dms: 0, conversions: 0, revenue: 0, insight: '', action: '' })
   }
->>>>>>> f04b222 (feat: revision-episodios+checklists+notas Supabase, metricas reportes IA, seeds maestro 25 secciones, 16 checklists)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -86,41 +63,6 @@ export default function MetricasPage() {
     } catch { toast.error('Error al guardar') }
   }
 
-<<<<<<< HEAD
-  async function analyzeMetric(m: MetricMonthly) {
-    setAnalyzingId(m.id)
-    try {
-      const kpis = calcKPIs(m)
-      const prompt = `Analiza estas métricas del podcast AMTME para ${m.platform} en ${m.month}:
-
-Reproducciones: ${m.plays.toLocaleString()}
-Alcance: ${m.reach.toLocaleString()}
-DMs recibidos: ${m.dms}
-Conversiones: ${m.conversions}
-Ingresos: $${m.revenue}
-Tasa de engagement: ${kpis.engagementRate}%
-Tasa plays→DM: ${kpis.playsToDM}%
-Tasa DM→conversión: ${kpis.conversionRate}%
-
-Devuelve exactamente:
-[INSIGHT] - El hallazgo más importante en 2 frases
-[ACCIÓN] - La acción más concreta para mejorar en los próximos 7 días`
-
-      const result = await callAI(prompt, 'Métricas')
-      const extract = (tag: string) => {
-        const regex = new RegExp('\\[' + tag + '\\]\\s*[-–]?\\s*([\\s\\S]*?)(?=\\[|$)', 'i')
-        const match = result.match(regex)
-        return match ? match[1].trim() : ''
-      }
-      const insight = extract('INSIGHT')
-      const accion = extract('ACCIÓN') || extract('ACCION')
-      setAiInsight(prev => ({ ...prev, [m.id]: [insight, accion].filter(Boolean).join(' → ') }))
-      toast.success('Análisis completado')
-    } catch (e: any) {
-      toast.error(e.message || 'Error al analizar')
-    } finally {
-      setAnalyzingId(null)
-=======
   async function generateReport(m: MetricMonthly) {
     setGenerating(true)
     const prev = metrics.find(x => x.month < m.month && x.platform === m.platform)
@@ -164,7 +106,6 @@ Devuelve SOLO el JSON. Español neutro. Sin clichés.`
       toast.error(err instanceof Error ? err.message : 'Error al generar reporte')
     } finally {
       setGenerating(false)
->>>>>>> f04b222 (feat: revision-episodios+checklists+notas Supabase, metricas reportes IA, seeds maestro 25 secciones, 16 checklists)
     }
   }
 
@@ -189,13 +130,6 @@ Devuelve SOLO el JSON. Español neutro. Sin clichés.`
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
       <div className="flex items-center justify-between mb-6">
-<<<<<<< HEAD
-        <div><h1 className="text-2xl md:text-3xl font-semibold">Métricas</h1><p className="text-sm text-muted-foreground mt-1">Registro y análisis mensual</p></div>
-        <div className="flex gap-2">
-          {metrics.length > 0 && <Button variant="secondary" onClick={exportCSV}><Download className="mr-2 h-4 w-4" />CSV</Button>}
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild><Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"><Plus className="mr-2 h-4 w-4" />Registrar métrica</Button></DialogTrigger>
-=======
         <div><h1 className="text-2xl md:text-3xl font-semibold">Métricas</h1><p className="text-sm text-muted-foreground mt-1">Registro mensual y reportes automáticos IA</p></div>
         <div className="flex gap-2">
           {metrics.length > 0 && <Button variant="outline" size="sm" onClick={exportCSV}><Download className="mr-1 h-4 w-4" />CSV</Button>}
@@ -205,7 +139,6 @@ Devuelve SOLO el JSON. Español neutro. Sin clichés.`
                 <Plus className="mr-2 h-4 w-4" />Registrar métrica
               </Button>
             </DialogTrigger>
->>>>>>> f04b222 (feat: revision-episodios+checklists+notas Supabase, metricas reportes IA, seeds maestro 25 secciones, 16 checklists)
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>Registrar métrica mensual</DialogTitle></DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -221,12 +154,6 @@ Devuelve SOLO el JSON. Español neutro. Sin clichés.`
                   <div><Label>DMs</Label><Input type="number" value={form.dms} onChange={e => setForm({...form, dms: parseInt(e.target.value)||0})} /></div>
                   <div><Label>Conversiones</Label><Input type="number" value={form.conversions} onChange={e => setForm({...form, conversions: parseInt(e.target.value)||0})} /></div>
                 </div>
-<<<<<<< HEAD
-                <div><Label>Ingresos</Label><Input type="number" step="0.01" value={form.revenue} onChange={e => setForm({...form, revenue: parseFloat(e.target.value)||0})} /></div>
-                <div><Label>Insight</Label><Input value={form.insight} onChange={e => setForm({...form, insight: e.target.value})} /></div>
-                <div><Label>Acción siguiente</Label><Input value={form.action} onChange={e => setForm({...form, action: e.target.value})} /></div>
-                <DialogFooter><Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button><Button type="submit">Guardar</Button></DialogFooter>
-=======
                 <div><Label>Ingresos (USD)</Label><Input type="number" step="0.01" value={form.revenue} onChange={e => setForm({...form, revenue: parseFloat(e.target.value)||0})} /></div>
                 <div><Label>Insight</Label><Input value={form.insight} onChange={e => setForm({...form, insight: e.target.value})} placeholder="Qué aprendiste este mes" /></div>
                 <div><Label>Acción siguiente</Label><Input value={form.action} onChange={e => setForm({...form, action: e.target.value})} /></div>
@@ -234,48 +161,12 @@ Devuelve SOLO el JSON. Español neutro. Sin clichés.`
                   <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button>
                   <Button type="submit">Guardar</Button>
                 </DialogFooter>
->>>>>>> f04b222 (feat: revision-episodios+checklists+notas Supabase, metricas reportes IA, seeds maestro 25 secciones, 16 checklists)
               </form>
             </DialogContent>
           </Dialog>
         </div>
       </div>
 
-<<<<<<< HEAD
-      {loading ? <div className="text-center py-12 text-muted-foreground">Cargando...</div> : metrics.length === 0 ? (
-        <Card><CardContent className="py-12 text-center"><p className="text-muted-foreground mb-4">Sin métricas registradas</p><Button className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]" onClick={() => setDialogOpen(true)}><Plus className="mr-2 h-4 w-4" />Registrar primera métrica</Button></CardContent></Card>
-      ) : (
-        <div className="grid gap-6">
-          {metrics.map(m => {
-            const kpis = calcKPIs(m)
-            return (
-              <Card key={m.id}>
-                <CardHeader>
-                  <CardTitle>{m.platform} — {m.month}</CardTitle>
-                  <CardDescription>{m.plays.toLocaleString()} reproducciones · {m.reach.toLocaleString()} alcance</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div><p className="text-sm text-muted-foreground">Engagement</p><p className="text-2xl font-semibold">{kpis.engagementRate}%</p></div>
-                    <div><p className="text-sm text-muted-foreground">Conv. Rate</p><p className="text-2xl font-semibold">{kpis.conversionRate}%</p></div>
-                    <div><p className="text-sm text-muted-foreground">Plays→DM</p><p className="text-2xl font-semibold">{kpis.playsToDM}%</p></div>
-                    <div><p className="text-sm text-muted-foreground">DMs</p><p className="text-2xl font-semibold">{m.dms}</p></div>
-                    <div><p className="text-sm text-muted-foreground">Ingresos</p><p className="text-2xl font-semibold text-[#0c1f36]">${m.revenue.toFixed(0)}</p></div>
-                  </div>
-                  {m.insight && <p className="mt-4 text-sm text-muted-foreground border-t pt-3"><span className="font-medium text-foreground">Insight: </span>{m.insight}</p>}
-                  {aiInsight[m.id] && <p className="mt-3 text-sm bg-[#0c1f36] text-white rounded-lg p-3"><span className="font-medium text-[#e8ff40]">IA: </span>{aiInsight[m.id]}</p>}
-                  <div className="mt-3">
-                    <Button size="sm" variant="secondary" onClick={() => analyzeMetric(m)} disabled={analyzingId === m.id} className="text-xs">
-                      {analyzingId === m.id ? <><Loader2 className="h-3 w-3 animate-spin mr-1" />Analizando...</> : <><Sparkles className="h-3 w-3 mr-1" />Analizar con IA</>}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-      )}
-=======
       <Tabs defaultValue="mensual">
         <TabsList className="mb-6">
           <TabsTrigger value="mensual">Métricas Mensuales</TabsTrigger>
@@ -372,7 +263,6 @@ Devuelve SOLO el JSON. Español neutro. Sin clichés.`
           </div>
         </TabsContent>
       </Tabs>
->>>>>>> f04b222 (feat: revision-episodios+checklists+notas Supabase, metricas reportes IA, seeds maestro 25 secciones, 16 checklists)
     </div>
   )
 }
