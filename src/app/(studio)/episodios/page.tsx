@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOptimisticList } from '@/hooks/use-optimistic-list';
 import {
@@ -10,7 +11,6 @@ import {
   CardDescription,
 } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
-import { Badge } from '@/components/shadcn/badge';
 import { Input } from '@/components/shadcn/input';
 import { Label } from '@/components/shadcn/label';
 import { Textarea } from '@/components/shadcn/textarea';
@@ -29,8 +29,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Alert, AlertDescription } from '@/components/shadcn/alert';
-import { Plus, Pencil, Trash2, Search, Sparkles, AlertTriangle, Mic, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Sparkles, Mic, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEpisodes, createEpisode, updateEpisode, deleteEpisode } from '@/lib/database';
 import type { Episode, EpisodeStatus, NarrativeStructure } from '@/types/database';
@@ -96,8 +95,8 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
         .slice(0, 5);
       setSuggestedHooks(hooks);
       toast.success('Hooks generados');
-    } catch (e: any) {
-      toast.error(e.message || 'Error al generar');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Error al generar');
     } finally {
       setGeneratingHooks(false);
     }
@@ -230,7 +229,38 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
     edicion: 'bg-purple-100 text-purple-800',
     guion: 'bg-yellow-100 text-yellow-800',
     idea: 'bg-gray-100 text-gray-700',
+    investigacion: 'bg-orange-100 text-orange-800',
+    distribuido: 'bg-green-100 text-green-800',
+    medido: 'bg-teal-100 text-teal-800',
+    archivado: 'bg-gray-50 text-gray-400',
   };
+
+  // Pipeline ordenado de estados editoriales
+  const PIPELINE: EpisodeStatus[] = [
+    'idea',
+    'investigacion',
+    'guion',
+    'grabacion',
+    'edicion',
+    'publicado',
+    'distribuido',
+    'medido',
+  ];
+
+  function nextAction(status: EpisodeStatus): string {
+    const map: Record<EpisodeStatus, string> = {
+      idea: 'Definir herida emocional y símbolo central',
+      investigacion: 'Crear guion en estructura AZTIYARTE',
+      guion: 'Revisar guion y marcar listo para grabar',
+      grabacion: 'Editar el audio grabado',
+      edicion: 'Publicar en Spotify y plataformas',
+      publicado: 'Distribuir en redes sociales',
+      distribuido: 'Registrar métricas del episodio',
+      medido: 'Episodio completado',
+      archivado: 'Episodio archivado',
+    };
+    return map[status] ?? '';
+  }
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
@@ -466,7 +496,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <CardTitle className="text-lg">
                             #{ep.episode_number}: {ep.title}
                           </CardTitle>
@@ -474,6 +504,11 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                             className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[ep.status] || 'bg-gray-100 text-gray-700'}`}
                           >
                             {ep.status}
+                          </span>
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${ep.script ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-gray-100 text-gray-500'}`}
+                          >
+                            {ep.script ? 'Con guion' : 'Sin guion'}
                           </span>
                         </div>
                         <CardDescription>{ep.theme}</CardDescription>
@@ -505,6 +540,55 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                         </div>
                       )}
                     </div>
+
+                    {/* Pipeline de estados */}
+                    <div className="mt-4 flex items-center gap-1 flex-wrap">
+                      {PIPELINE.map((step, i) => {
+                        const currentIdx = PIPELINE.indexOf(ep.status as EpisodeStatus);
+                        const isDone = i < currentIdx;
+                        const isCurrent = step === ep.status;
+                        return (
+                          <span
+                            key={step}
+                            className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                              isCurrent
+                                ? 'bg-[#0c1f36] text-white'
+                                : isDone
+                                  ? 'bg-[#e8ff40] text-[#0c1f36]'
+                                  : 'bg-gray-100 text-gray-400'
+                            }`}
+                          >
+                            {step}
+                          </span>
+                        );
+                      })}
+                    </div>
+
+                    {/* Siguiente acción */}
+                    {ep.status !== 'medido' && ep.status !== 'archivado' && (
+                      <div className="mt-3 flex items-start justify-between gap-3">
+                        <p className="text-xs text-muted-foreground">
+                          <span className="font-medium text-foreground">Siguiente:</span>{' '}
+                          {nextAction(ep.status as EpisodeStatus)}
+                        </p>
+                        {(ep.status === 'idea' || ep.status === 'investigacion') && (
+                          <Link
+                            href="/guiones"
+                            className="shrink-0 text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                          >
+                            Ir a guiones →
+                          </Link>
+                        )}
+                        {ep.status === 'guion' && (
+                          <Link
+                            href="/revision-episodios"
+                            className="shrink-0 text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                          >
+                            Ir a revisión →
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

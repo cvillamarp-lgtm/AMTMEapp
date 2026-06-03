@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Card,
   CardHeader,
@@ -32,7 +33,9 @@ import { getScripts, createScript, updateScript, deleteScript } from '@/lib/data
 import { callAI } from '@/lib/ai-studio';
 import type { Script, ScriptStatus } from '@/types/database';
 
-const blocks = [
+type ScriptBlock = 'opening' | 'threshold' | 'wound' | 'symbol' | 'truth' | 'bridge' | 'action' | 'closing';
+
+const blocks: { key: ScriptBlock; label: string }[] = [
   { key: 'opening', label: 'Apertura' },
   { key: 'threshold', label: 'Umbral' },
   { key: 'wound', label: 'Herida' },
@@ -165,8 +168,8 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
         closing: extract('CIERRE') || f.closing,
       }));
       toast.success('Guion generado con IA');
-    } catch (e: any) {
-      toast.error(e.message || 'Error al generar');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Error al generar');
     } finally {
       setGenerating(false);
     }
@@ -230,7 +233,9 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold">Guiones</h1>
-          <p className="text-sm text-muted-foreground mt-1">Estructura narrativa AZTIYARTE</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Producción narrativa AZTIYARTE — de la idea al audio
+          </p>
         </div>
         <Dialog
           open={dialogOpen}
@@ -321,7 +326,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                 <div key={b.key}>
                   <Label>{b.label}</Label>
                   <Textarea
-                    value={(form as any)[b.key]}
+                    value={form[b.key]}
                     onChange={(e) => setForm({ ...form, [b.key]: e.target.value })}
                     rows={3}
                   />
@@ -375,12 +380,12 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
             <div className="space-y-4 text-sm">
               {blocks.map(
                 (b) =>
-                  (viewing as any)[b.key] && (
+                  viewing[b.key] && (
                     <div key={b.key} className="border-l-2 border-[#e8ff40] pl-4">
                       <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
                         {b.label}
                       </p>
-                      <p className="whitespace-pre-wrap">{(viewing as any)[b.key]}</p>
+                      <p className="whitespace-pre-wrap">{viewing[b.key]}</p>
                     </div>
                   )
               )}
@@ -400,18 +405,34 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       ) : scripts.length === 0 ? (
         <div className="text-center py-16">
           <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Sin guiones</p>
-          <Button
-            className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
-            onClick={() => setDialogOpen(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Crear primero
-          </Button>
+          <p className="text-muted-foreground">Sin guiones todavía</p>
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
+            Empieza desde un episodio en estado &quot;investigacion&quot; o crea uno nuevo
+          </p>
+          <div className="flex gap-2 justify-center">
+            <Link
+              href="/episodios"
+              className="rounded-lg border border-black/10 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              Ver episodios
+            </Link>
+            <Button
+              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+              onClick={() => setDialogOpen(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Crear primero
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4">
-          {scripts.map((s) => (
+          {scripts.map((s) => {
+            const scriptBlocks = ['opening', 'threshold', 'wound', 'symbol', 'truth', 'bridge', 'action', 'closing'] as const;
+            const filled = scriptBlocks.filter((b) => !!s[b]).length;
+            const pct = Math.round((filled / scriptBlocks.length) * 100);
+
+            return (
             <Card key={s.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -441,13 +462,66 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                   </div>
                 </div>
               </CardHeader>
-              {s.opening && (
-                <CardContent>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{s.opening}</p>
-                </CardContent>
-              )}
+              <CardContent>
+                {s.opening && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{s.opening}</p>
+                )}
+
+                {/* Barra de completitud de bloques narrativos */}
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-muted-foreground">Bloques completados</span>
+                    <span className="text-xs font-medium text-foreground">{filled}/{scriptBlocks.length}</span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-[#e8ff40]' : pct >= 50 ? 'bg-[#0c1f36]' : 'bg-gray-300'}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="flex gap-1 mt-1.5 flex-wrap">
+                    {scriptBlocks.map((b) => (
+                      <span
+                        key={b}
+                        className={`text-[10px] px-1 py-0.5 rounded ${s[b] ? 'bg-[#0c1f36] text-white' : 'bg-gray-100 text-gray-400'}`}
+                      >
+                        {b === 'opening' ? 'Apertura' : b === 'threshold' ? 'Umbral' : b === 'wound' ? 'Herida' : b === 'symbol' ? 'Símbolo' : b === 'truth' ? 'Verdad' : b === 'bridge' ? 'Puente' : b === 'action' ? 'Acción' : 'Cierre'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Links de acción según estado */}
+                <div className="flex gap-2 flex-wrap">
+                  {(s.status === 'borrador' || s.status === 'revision') && (
+                    <Link
+                      href="/revision-episodios"
+                      className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                    >
+                      Ir a revisión →
+                    </Link>
+                  )}
+                  {s.status === 'listo-grabar' && (
+                    <Link
+                      href="/contenido"
+                      className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                    >
+                      Ir a contenido →
+                    </Link>
+                  )}
+                  {s.status === 'grabado' && (
+                    <Link
+                      href="/contenido"
+                      className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                    >
+                      Producir contenido →
+                    </Link>
+                  )}
+                </div>
+              </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

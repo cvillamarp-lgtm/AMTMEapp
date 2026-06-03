@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
 import {
   getMasterSections,
@@ -108,7 +109,7 @@ export default function DocumentoMaestroPage() {
     if (!newForm.title.trim()) return;
     setSaving(true);
     try {
-      const created = await createMasterSection({ ...newForm, version: 1 } as any);
+      const created = await createMasterSection({ ...newForm, version: 1 } as Omit<MasterSection, 'id' | 'created_at' | 'updated_at' | 'user_id'>);
       setSections((prev) => [created, ...prev]);
       setSelectedId(created.id);
       setDraft(created);
@@ -146,8 +147,11 @@ export default function DocumentoMaestroPage() {
               Documento Maestro
             </div>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
-              Fuente central de conocimiento
+              Materia prima editorial
             </h2>
+            <p className="mt-0.5 text-xs text-black/40">
+              Ideas, heridas y temas que esperan convertirse en episodio
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Badge tone="accent">{sections.length} secciones</Badge>
@@ -320,10 +324,49 @@ export default function DocumentoMaestroPage() {
                 Revertir
               </Button>
             </div>
+
+            {/* Destino editorial */}
+            <div className="rounded-2xl border border-[#0C1F36]/10 bg-[#F5F2EA] p-4">
+              <div className="text-xs uppercase tracking-[0.18em] text-black/40 mb-3">
+                Destino editorial
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href="/episodios"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-[#0C1F36] hover:text-white transition-colors"
+                >
+                  → Convertir en episodio
+                </Link>
+                <Link
+                  href="/guiones"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-[#0C1F36] hover:text-white transition-colors"
+                >
+                  → Ir a guiones
+                </Link>
+              </div>
+              <p className="mt-2 text-xs text-black/40">
+                Esta sección puede ser el punto de partida de un episodio, un reel o una reflexión
+                futura.
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-black/40 py-20">
-            Selecciona una sección para editarla.
+          <div className="flex h-full flex-col items-center justify-center gap-4 py-20 text-center">
+            <p className="text-sm text-black/40">Selecciona una sección para editarla.</p>
+            <div className="flex gap-2">
+              <Link
+                href="/episodios"
+                className="rounded-xl border border-black/10 bg-[#F5F2EA] px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-white transition-colors"
+              >
+                Ver episodios
+              </Link>
+              <Link
+                href="/guiones"
+                className="rounded-xl border border-black/10 bg-[#F5F2EA] px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-white transition-colors"
+              >
+                Ver guiones
+              </Link>
+            </div>
           </div>
         )}
       </Card>
