@@ -92,6 +92,16 @@ const EDITORIAL_PRESETS: PresetCard[] = [
     promptHint:
       'Genera un brief visual para una pieza de AMTME. Paleta: Navy #001F36, Cian #9DC4D5, Lima #E8FF40, Blanco. Tipografia: Big Shoulders Display + DM Sans. Sin cursivas. Estilo sobrio, emocional, no generico.\n\nTitulo: [TITULO]\nSimbolo: [SIMBOLO]\nTono: [TONO]',
   },
+  {
+    title: 'Generar paquete de publicacion',
+    description: 'Convierte un guion o nota en el paquete completo: hooks, captions, frases, reels, brief visual y CTA.',
+    input: 'Guion completo, resumen o nota del episodio',
+    output: '5 hooks, 3 captions, 5 frases, 3 ideas de reel, 3 ideas de carrusel, brief visual, CTA, checklist y siguiente accion',
+    href: '/contenido',
+    mode: 'Copy',
+    promptHint:
+      'A partir de este contenido de AMTME, genera el paquete de publicacion completo en JSON con estos campos:\n{\n  "hooks": ["...","...","...","...","..."],\n  "captions": ["...","...","..."],\n  "frases": ["...","...","...","...","..."],\n  "reels": ["...","...","..."],\n  "carouselIdeas": ["...","...","..."],\n  "briefVisual": "...",\n  "cta": "...",\n  "checklist": ["...","...","...","...","..."],\n  "nextAction": "..."\n}\n\nContenido:\n[PEGA EL GUION O NOTA AQUI]',
+  },
 ];
 
 export default function IAPage() {
