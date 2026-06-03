@@ -584,7 +584,15 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                             href="/revision-episodios"
                             className="shrink-0 text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
                           >
-                            Ir a revisión →
+                            Ir a revision →
+                          </Link>
+                        )}
+                        {ep.status === 'distribuido' && (
+                          <Link
+                            href="/metricas"
+                            className="shrink-0 text-xs font-medium text-teal-700 underline underline-offset-2 hover:no-underline"
+                          >
+                            Registrar metricas →
                           </Link>
                         )}
                       </div>

@@ -56,6 +56,10 @@ export default function DashboardPage() {
     load();
   }, []);
 
+  const episodesPendingMeasure = episodes.filter(
+    (e) => e.status === 'publicado' || e.status === 'distribuido'
+  ).length;
+
   const inProgress = episodes.filter(
     (e) => !['publicado', 'distribuido', 'medido', 'archivado'].includes(e.status)
   ).length;
@@ -121,6 +125,19 @@ export default function DashboardPage() {
                 <Lightning size={20} className="text-primary" />
               </div>
               <div className="mt-4 space-y-3">
+                {episodesPendingMeasure > 0 ? (
+                  <Link
+                    href="/metricas"
+                    className="block p-3 rounded-lg bg-teal-50 hover:bg-teal-100 transition-colors border border-teal-200"
+                  >
+                    <p className="text-sm font-medium text-teal-800">
+                      {episodesPendingMeasure} episodio(s) listos para medir
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Registra las metricas para cerrar el ciclo de produccion
+                    </p>
+                  </Link>
+                ) : null}
                 {leadsNoAction.length > 0 ? (
                   <Link
                     href="/monetizacion"

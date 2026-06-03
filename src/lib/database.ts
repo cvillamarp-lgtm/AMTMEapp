@@ -306,6 +306,37 @@ export async function deleteArchiveItem(id: string): Promise<void> {
   return deleteOne('archive_items', id);
 }
 
+// ---- METRICS EPISODE ----
+export async function getMetricsEpisode(): Promise<import('@/types/database').MetricEpisode[]> {
+  return getAll<import('@/types/database').MetricEpisode>('metrics_episode');
+}
+export async function getMetricsEpisodeByEpisode(
+  episodeId: string
+): Promise<import('@/types/database').MetricEpisode | null> {
+  const sb = getClient();
+  if (!sb) return null;
+  const { data, error } = await sb
+    .from('metrics_episode')
+    .select('*')
+    .eq('payload->>episode_id', episodeId)
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  if (!data) return null;
+  return fromRow<import('@/types/database').MetricEpisode>(data);
+}
+export async function createMetricEpisode(
+  m: Omit<import('@/types/database').MetricEpisode, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+): Promise<import('@/types/database').MetricEpisode> {
+  return insertOne<import('@/types/database').MetricEpisode>('metrics_episode', m);
+}
+export async function updateMetricEpisode(
+  id: string,
+  updates: Partial<import('@/types/database').MetricEpisode>
+): Promise<import('@/types/database').MetricEpisode> {
+  return updateOne<import('@/types/database').MetricEpisode>('metrics_episode', id, updates);
+}
+
 // ---- MASTER SECTIONS ----
 export async function getMasterSections(): Promise<any[]> {
   return getAll<any>('master_sections');
