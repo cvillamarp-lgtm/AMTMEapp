@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 
+// FASE 8C.1 — Compatibilidad de lectura dual
+const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
+const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
+
 async function getRecentEpisodes() {
   try {
     const sb = getSupabaseServiceRoleClient();
@@ -8,7 +12,7 @@ async function getRecentEpisodes() {
     const { data } = await sb
       .from('episodes')
       .select('payload')
-      .is('user_id', null)
+      .or(CHRISTIAN_UUID_FILTER)
       .order('created_at', { ascending: false })
       .limit(3);
 

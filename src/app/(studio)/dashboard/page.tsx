@@ -321,7 +321,9 @@ export default function DashboardPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="font-semibold text-primary">Energia y sostén</h2>
-                <p className="text-sm text-muted-foreground mt-1">Recomendacion sostenible de hoy</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Recomendacion sostenible de hoy
+                </p>
               </div>
               <Leaf size={20} className="text-primary" />
             </div>
@@ -329,14 +331,18 @@ export default function DashboardPage() {
               <div className="p-3 rounded-lg bg-muted/30">
                 <p className="text-sm font-medium text-primary">Modo normal: produce.</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Si tienes energia, avanza en el episodio actual. Si no, ve a Notas y activa el modo baja energia.
+                  Si tienes energia, avanza en el episodio actual. Si no, ve a Notas y activa el
+                  modo baja energia.
                 </p>
               </div>
               {activeLeads === 0 && (
                 <div className="p-3 rounded-lg bg-[#e8ff40]/10 border border-[#e8ff40]/30">
-                  <p className="text-sm font-medium text-primary">Sin leads activos en Monetizacion.</p>
+                  <p className="text-sm font-medium text-primary">
+                    Sin leads activos en Monetizacion.
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Cuando alguien exprese interes, registralo. No hace falta buscarlo; el contenido lo atrae.
+                    Cuando alguien exprese interes, registralo. No hace falta buscarlo; el contenido
+                    lo atrae.
                   </p>
                 </div>
               )}

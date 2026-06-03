@@ -20,6 +20,13 @@ import type {
 const OWNER_ID = 'public';
 const WORKSPACE = 'primary';
 
+// FASE 8C.1 — Compatibilidad de lectura dual
+// Permite leer datos con user_id IS NULL (pre-migración)
+// y user_id = CHRISTIAN_UUID (post-migración) simultáneamente.
+// Retirar CHRISTIAN_UUID y CHRISTIAN_UUID_FILTER en FASE 8E cuando RLS esté activa.
+const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
+const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
+
 function getClient() {
   return getSupabaseBrowserClient() as any;
 }
@@ -52,7 +59,7 @@ async function getAll<T>(table: string): Promise<T[]> {
   const { data, error } = await sb
     .from(table)
     .select('*')
-    .is('user_id', null)
+    .or(CHRISTIAN_UUID_FILTER)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []).map((r: any) => fromRow<T>(r));
@@ -182,7 +189,7 @@ export async function getCalendarEvents(): Promise<CalendarEvent[]> {
   const { data, error } = await sb
     .from('calendar_events')
     .select('*')
-    .is('user_id', null)
+    .or(CHRISTIAN_UUID_FILTER)
     .order('created_at', { ascending: true });
   if (error) throw error;
   return (data || []).map((r: any) => fromRow<CalendarEvent>(r));
@@ -210,7 +217,7 @@ export async function getScripts(): Promise<Script[]> {
   const { data, error } = await sb
     .from('scripts')
     .select('*')
-    .is('user_id', null)
+    .or(CHRISTIAN_UUID_FILTER)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []).map((r: any) => {

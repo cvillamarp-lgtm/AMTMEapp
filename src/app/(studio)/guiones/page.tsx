@@ -33,7 +33,15 @@ import { getScripts, createScript, updateScript, deleteScript } from '@/lib/data
 import { callAI } from '@/lib/ai-studio';
 import type { Script, ScriptStatus } from '@/types/database';
 
-type ScriptBlock = 'opening' | 'threshold' | 'wound' | 'symbol' | 'truth' | 'bridge' | 'action' | 'closing';
+type ScriptBlock =
+  | 'opening'
+  | 'threshold'
+  | 'wound'
+  | 'symbol'
+  | 'truth'
+  | 'bridge'
+  | 'action'
+  | 'closing';
 
 const blocks: { key: ScriptBlock; label: string }[] = [
   { key: 'opening', label: 'Apertura' },
@@ -428,98 +436,123 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       ) : (
         <div className="grid gap-4">
           {scripts.map((s) => {
-            const scriptBlocks = ['opening', 'threshold', 'wound', 'symbol', 'truth', 'bridge', 'action', 'closing'] as const;
+            const scriptBlocks = [
+              'opening',
+              'threshold',
+              'wound',
+              'symbol',
+              'truth',
+              'bridge',
+              'action',
+              'closing',
+            ] as const;
             const filled = scriptBlocks.filter((b) => !!s[b]).length;
             const pct = Math.round((filled / scriptBlocks.length) * 100);
 
             return (
-            <Card key={s.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <CardTitle className="text-lg">{s.title}</CardTitle>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[s.status] || 'bg-gray-100 text-gray-700'}`}
-                      >
-                        {s.status}
+              <Card key={s.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <CardTitle className="text-lg">{s.title}</CardTitle>
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[s.status] || 'bg-gray-100 text-gray-700'}`}
+                        >
+                          {s.status}
+                        </span>
+                      </div>
+                      <CardDescription>
+                        EP: {s.episode_id} · v{s.version}
+                      </CardDescription>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" onClick={() => setViewing(s)}>
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleEdit(s)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleDelete(s.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {s.opening && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{s.opening}</p>
+                  )}
+
+                  {/* Barra de completitud de bloques narrativos */}
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-muted-foreground">Bloques completados</span>
+                      <span className="text-xs font-medium text-foreground">
+                        {filled}/{scriptBlocks.length}
                       </span>
                     </div>
-                    <CardDescription>
-                      EP: {s.episode_id} · v{s.version}
-                    </CardDescription>
+                    <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-[#e8ff40]' : pct >= 50 ? 'bg-[#0c1f36]' : 'bg-gray-300'}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <div className="flex gap-1 mt-1.5 flex-wrap">
+                      {scriptBlocks.map((b) => (
+                        <span
+                          key={b}
+                          className={`text-[10px] px-1 py-0.5 rounded ${s[b] ? 'bg-[#0c1f36] text-white' : 'bg-gray-100 text-gray-400'}`}
+                        >
+                          {b === 'opening'
+                            ? 'Apertura'
+                            : b === 'threshold'
+                              ? 'Umbral'
+                              : b === 'wound'
+                                ? 'Herida'
+                                : b === 'symbol'
+                                  ? 'Símbolo'
+                                  : b === 'truth'
+                                    ? 'Verdad'
+                                    : b === 'bridge'
+                                      ? 'Puente'
+                                      : b === 'action'
+                                        ? 'Acción'
+                                        : 'Cierre'}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => setViewing(s)}>
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleEdit(s)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleDelete(s.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {s.opening && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{s.opening}</p>
-                )}
 
-                {/* Barra de completitud de bloques narrativos */}
-                <div className="mb-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-muted-foreground">Bloques completados</span>
-                    <span className="text-xs font-medium text-foreground">{filled}/{scriptBlocks.length}</span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-[#e8ff40]' : pct >= 50 ? 'bg-[#0c1f36]' : 'bg-gray-300'}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  <div className="flex gap-1 mt-1.5 flex-wrap">
-                    {scriptBlocks.map((b) => (
-                      <span
-                        key={b}
-                        className={`text-[10px] px-1 py-0.5 rounded ${s[b] ? 'bg-[#0c1f36] text-white' : 'bg-gray-100 text-gray-400'}`}
+                  {/* Links de acción según estado */}
+                  <div className="flex gap-2 flex-wrap">
+                    {(s.status === 'borrador' || s.status === 'revision') && (
+                      <Link
+                        href="/revision-episodios"
+                        className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
                       >
-                        {b === 'opening' ? 'Apertura' : b === 'threshold' ? 'Umbral' : b === 'wound' ? 'Herida' : b === 'symbol' ? 'Símbolo' : b === 'truth' ? 'Verdad' : b === 'bridge' ? 'Puente' : b === 'action' ? 'Acción' : 'Cierre'}
-                      </span>
-                    ))}
+                        Ir a revisión →
+                      </Link>
+                    )}
+                    {s.status === 'listo-grabar' && (
+                      <Link
+                        href="/contenido"
+                        className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                      >
+                        Ir a contenido →
+                      </Link>
+                    )}
+                    {s.status === 'grabado' && (
+                      <Link
+                        href="/contenido"
+                        className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                      >
+                        Producir contenido →
+                      </Link>
+                    )}
                   </div>
-                </div>
-
-                {/* Links de acción según estado */}
-                <div className="flex gap-2 flex-wrap">
-                  {(s.status === 'borrador' || s.status === 'revision') && (
-                    <Link
-                      href="/revision-episodios"
-                      className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
-                    >
-                      Ir a revisión →
-                    </Link>
-                  )}
-                  {s.status === 'listo-grabar' && (
-                    <Link
-                      href="/contenido"
-                      className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
-                    >
-                      Ir a contenido →
-                    </Link>
-                  )}
-                  {s.status === 'grabado' && (
-                    <Link
-                      href="/contenido"
-                      className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
-                    >
-                      Producir contenido →
-                    </Link>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

@@ -140,9 +140,7 @@ export default function MetricasPage() {
   // --- episodios pendientes de medir ---
   const measuredEpisodeIds = new Set(metricsEpisode.map((m) => m.episode_id));
   const pendingToMeasure = episodes.filter(
-    (e) =>
-      (e.status === 'publicado' || e.status === 'distribuido') &&
-      !measuredEpisodeIds.has(e.id)
+    (e) => (e.status === 'publicado' || e.status === 'distribuido') && !measuredEpisodeIds.has(e.id)
   );
 
   // --- mejor rendimiento mensual ---
@@ -154,9 +152,7 @@ export default function MetricasPage() {
   // --- episodio con mejor rendimiento (metricas_episode) ---
   const bestEpisode =
     metricsEpisode.length > 0
-      ? [...metricsEpisode].sort(
-          (a, b) => b.plays_7d + b.dms * 10 - (a.plays_7d + a.dms * 10)
-        )[0]
+      ? [...metricsEpisode].sort((a, b) => b.plays_7d + b.dms * 10 - (a.plays_7d + a.dms * 10))[0]
       : null;
   const bestEpisodeData = bestEpisode
     ? episodes.find((e) => e.id === bestEpisode.episode_id)
@@ -300,10 +296,16 @@ Solo JSON. Espanol neutro.`;
   }
 
   function exportCSV() {
-    if (!metrics.length) { toast.error('Sin metricas para exportar'); return; }
+    if (!metrics.length) {
+      toast.error('Sin metricas para exportar');
+      return;
+    }
     const headers = 'mes,plataforma,reproducciones,alcance,dms,conversiones,ingresos\n';
     const rows = metrics
-      .map((m) => `${m.month},${m.platform},${m.plays},${m.reach},${m.dms},${m.conversions},${m.revenue}`)
+      .map(
+        (m) =>
+          `${m.month},${m.platform},${m.plays},${m.reach},${m.dms},${m.conversions},${m.revenue}`
+      )
       .join('\n');
     const blob = new Blob([headers + rows], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -319,9 +321,7 @@ Solo JSON. Espanol neutro.`;
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold">Metricas</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Registro y decisiones editoriales
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Registro y decisiones editoriales</p>
         </div>
         <div className="flex gap-2">
           {metrics.length > 0 && (
@@ -363,39 +363,87 @@ Solo JSON. Espanol neutro.`;
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>Reproducciones 48h</Label>
-                    <Input type="number" value={epForm.plays_48h} onChange={(e) => setEpForm({ ...epForm, plays_48h: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={epForm.plays_48h}
+                      onChange={(e) =>
+                        setEpForm({ ...epForm, plays_48h: parseInt(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                   <div>
                     <Label>Reproducciones 7d</Label>
-                    <Input type="number" value={epForm.plays_7d} onChange={(e) => setEpForm({ ...epForm, plays_7d: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={epForm.plays_7d}
+                      onChange={(e) =>
+                        setEpForm({ ...epForm, plays_7d: parseInt(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                   <div>
                     <Label>Retencion (%)</Label>
-                    <Input type="number" step="0.1" value={epForm.retention} onChange={(e) => setEpForm({ ...epForm, retention: parseFloat(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      step="0.1"
+                      value={epForm.retention}
+                      onChange={(e) =>
+                        setEpForm({ ...epForm, retention: parseFloat(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                   <div>
                     <Label>Guardados</Label>
-                    <Input type="number" value={epForm.saves} onChange={(e) => setEpForm({ ...epForm, saves: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={epForm.saves}
+                      onChange={(e) =>
+                        setEpForm({ ...epForm, saves: parseInt(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                   <div>
                     <Label>Compartidos</Label>
-                    <Input type="number" value={epForm.shares} onChange={(e) => setEpForm({ ...epForm, shares: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={epForm.shares}
+                      onChange={(e) =>
+                        setEpForm({ ...epForm, shares: parseInt(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                   <div>
                     <Label>DMs generados</Label>
-                    <Input type="number" value={epForm.dms} onChange={(e) => setEpForm({ ...epForm, dms: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={epForm.dms}
+                      onChange={(e) => setEpForm({ ...epForm, dms: parseInt(e.target.value) || 0 })}
+                    />
                   </div>
                   <div>
                     <Label>Conversiones</Label>
-                    <Input type="number" value={epForm.conversions} onChange={(e) => setEpForm({ ...epForm, conversions: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={epForm.conversions}
+                      onChange={(e) =>
+                        setEpForm({ ...epForm, conversions: parseInt(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                 </div>
                 <div>
                   <Label>Insight del episodio</Label>
-                  <Textarea value={epForm.insight || ''} onChange={(e) => setEpForm({ ...epForm, insight: e.target.value })} rows={2} placeholder="Que aprendiste de este episodio" />
+                  <Textarea
+                    value={epForm.insight || ''}
+                    onChange={(e) => setEpForm({ ...epForm, insight: e.target.value })}
+                    rows={2}
+                    placeholder="Que aprendiste de este episodio"
+                  />
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="secondary" onClick={() => setEpDialogOpen(false)}>Cancelar</Button>
+                  <Button type="button" variant="secondary" onClick={() => setEpDialogOpen(false)}>
+                    Cancelar
+                  </Button>
                   <Button type="submit">Guardar</Button>
                 </DialogFooter>
               </form>
@@ -404,7 +452,10 @@ Solo JSON. Espanol neutro.`;
           {/* Dialog: metrica mensual */}
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={resetForm} className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold">
+              <Button
+                onClick={resetForm}
+                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Registrar metrica
               </Button>
@@ -417,47 +468,87 @@ Solo JSON. Espanol neutro.`;
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Mes *</Label>
-                    <Input type="month" value={form.month} onChange={(e) => setForm({ ...form, month: e.target.value })} />
+                    <Input
+                      type="month"
+                      value={form.month}
+                      onChange={(e) => setForm({ ...form, month: e.target.value })}
+                    />
                   </div>
                   <div>
                     <Label>Plataforma *</Label>
-                    <Input value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} placeholder="Spotify" />
+                    <Input
+                      value={form.platform}
+                      onChange={(e) => setForm({ ...form, platform: e.target.value })}
+                      placeholder="Spotify"
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Alcance</Label>
-                    <Input type="number" value={form.reach} onChange={(e) => setForm({ ...form, reach: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={form.reach}
+                      onChange={(e) => setForm({ ...form, reach: parseInt(e.target.value) || 0 })}
+                    />
                   </div>
                   <div>
                     <Label>Reproducciones</Label>
-                    <Input type="number" value={form.plays} onChange={(e) => setForm({ ...form, plays: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={form.plays}
+                      onChange={(e) => setForm({ ...form, plays: parseInt(e.target.value) || 0 })}
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>DMs</Label>
-                    <Input type="number" value={form.dms} onChange={(e) => setForm({ ...form, dms: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={form.dms}
+                      onChange={(e) => setForm({ ...form, dms: parseInt(e.target.value) || 0 })}
+                    />
                   </div>
                   <div>
                     <Label>Conversiones</Label>
-                    <Input type="number" value={form.conversions} onChange={(e) => setForm({ ...form, conversions: parseInt(e.target.value) || 0 })} />
+                    <Input
+                      type="number"
+                      value={form.conversions}
+                      onChange={(e) =>
+                        setForm({ ...form, conversions: parseInt(e.target.value) || 0 })
+                      }
+                    />
                   </div>
                 </div>
                 <div>
                   <Label>Ingresos (USD)</Label>
-                  <Input type="number" step="0.01" value={form.revenue} onChange={(e) => setForm({ ...form, revenue: parseFloat(e.target.value) || 0 })} />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={form.revenue}
+                    onChange={(e) => setForm({ ...form, revenue: parseFloat(e.target.value) || 0 })}
+                  />
                 </div>
                 <div>
                   <Label>Insight</Label>
-                  <Input value={form.insight} onChange={(e) => setForm({ ...form, insight: e.target.value })} placeholder="Que aprendiste este mes" />
+                  <Input
+                    value={form.insight}
+                    onChange={(e) => setForm({ ...form, insight: e.target.value })}
+                    placeholder="Que aprendiste este mes"
+                  />
                 </div>
                 <div>
                   <Label>Accion siguiente</Label>
-                  <Input value={form.action} onChange={(e) => setForm({ ...form, action: e.target.value })} />
+                  <Input
+                    value={form.action}
+                    onChange={(e) => setForm({ ...form, action: e.target.value })}
+                  />
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                  <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
+                    Cancelar
+                  </Button>
                   <Button type="submit">Guardar</Button>
                 </DialogFooter>
               </form>
@@ -480,7 +571,6 @@ Solo JSON. Espanol neutro.`;
             <div className="text-center py-12 text-muted-foreground">Cargando...</div>
           ) : (
             <div className="space-y-5">
-
               {/* 1. EPISODIOS PENDIENTES DE MEDIR */}
               <Card>
                 <CardHeader className="pb-3">
@@ -488,7 +578,9 @@ Solo JSON. Espanol neutro.`;
                     <AlertCircle className="h-5 w-5 text-amber-500" />
                     <CardTitle className="text-base">Pendientes de medir</CardTitle>
                   </div>
-                  <CardDescription>Episodios publicados o distribuidos sin metrica registrada</CardDescription>
+                  <CardDescription>
+                    Episodios publicados o distribuidos sin metrica registrada
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {pendingToMeasure.length === 0 ? (
@@ -499,16 +591,26 @@ Solo JSON. Espanol neutro.`;
                   ) : (
                     <div className="space-y-2">
                       {pendingToMeasure.map((ep) => (
-                        <div key={ep.id} className="flex items-center justify-between p-3 rounded-lg bg-amber-50 border border-amber-200">
+                        <div
+                          key={ep.id}
+                          className="flex items-center justify-between p-3 rounded-lg bg-amber-50 border border-amber-200"
+                        >
                           <div>
-                            <p className="text-sm font-medium">#{ep.episode_number}: {ep.title}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">Estado: {ep.status}</p>
+                            <p className="text-sm font-medium">
+                              #{ep.episode_number}: {ep.title}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Estado: {ep.status}
+                            </p>
                           </div>
                           <Button
                             size="sm"
                             variant="outline"
                             className="shrink-0"
-                            onClick={() => { resetEpForm(ep.id); setEpDialogOpen(true); }}
+                            onClick={() => {
+                              resetEpForm(ep.id);
+                              setEpDialogOpen(true);
+                            }}
                           >
                             <BarChart2 className="h-3.5 w-3.5 mr-1" />
                             Medir
@@ -531,12 +633,22 @@ Solo JSON. Espanol neutro.`;
                   </CardHeader>
                   <CardContent>
                     {!bestMonth ? (
-                      <p className="text-sm text-muted-foreground">Sin datos mensuales. Registra tu primera metrica.</p>
+                      <p className="text-sm text-muted-foreground">
+                        Sin datos mensuales. Registra tu primera metrica.
+                      </p>
                     ) : (
                       <div className="space-y-1">
-                        <p className="font-semibold">{bestMonth.platform} — {bestMonth.month}</p>
-                        <p className="text-sm text-muted-foreground">{bestMonth.plays.toLocaleString()} reproducciones · {bestMonth.dms} DMs</p>
-                        {bestMonth.insight && <p className="text-xs text-muted-foreground mt-2 border-t pt-2">{bestMonth.insight}</p>}
+                        <p className="font-semibold">
+                          {bestMonth.platform} — {bestMonth.month}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {bestMonth.plays.toLocaleString()} reproducciones · {bestMonth.dms} DMs
+                        </p>
+                        {bestMonth.insight && (
+                          <p className="text-xs text-muted-foreground mt-2 border-t pt-2">
+                            {bestMonth.insight}
+                          </p>
+                        )}
                       </div>
                     )}
                   </CardContent>
@@ -552,8 +664,17 @@ Solo JSON. Espanol neutro.`;
                   <CardContent>
                     {!bestEpisode ? (
                       <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Sin metricas por episodio todavia.</p>
-                        <Button size="sm" variant="outline" onClick={() => { resetEpForm(); setEpDialogOpen(true); }}>
+                        <p className="text-sm text-muted-foreground">
+                          Sin metricas por episodio todavia.
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            resetEpForm();
+                            setEpDialogOpen(true);
+                          }}
+                        >
                           <Plus className="h-3.5 w-3.5 mr-1" />
                           Medir un episodio
                         </Button>
@@ -561,11 +682,22 @@ Solo JSON. Espanol neutro.`;
                     ) : (
                       <div className="space-y-1">
                         {bestEpisodeData && (
-                          <p className="font-semibold">#{bestEpisodeData.episode_number}: {bestEpisodeData.title}</p>
+                          <p className="font-semibold">
+                            #{bestEpisodeData.episode_number}: {bestEpisodeData.title}
+                          </p>
                         )}
-                        <p className="text-sm text-muted-foreground">{bestEpisode.plays_7d.toLocaleString()} plays 7d · {bestEpisode.dms} DMs · {bestEpisode.saves} guardados</p>
-                        {bestEpisode.insight && <p className="text-xs text-muted-foreground mt-2 border-t pt-2">{bestEpisode.insight}</p>}
-                        <p className="text-xs font-medium text-[#0c1f36] mt-2">Considera repetir el angulo o formato de este episodio</p>
+                        <p className="text-sm text-muted-foreground">
+                          {bestEpisode.plays_7d.toLocaleString()} plays 7d · {bestEpisode.dms} DMs ·{' '}
+                          {bestEpisode.saves} guardados
+                        </p>
+                        {bestEpisode.insight && (
+                          <p className="text-xs text-muted-foreground mt-2 border-t pt-2">
+                            {bestEpisode.insight}
+                          </p>
+                        )}
+                        <p className="text-xs font-medium text-[#0c1f36] mt-2">
+                          Considera repetir el angulo o formato de este episodio
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -578,19 +710,34 @@ Solo JSON. Espanol neutro.`;
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5" />
-                      <CardTitle className="text-base">Recomendacion activa — {latestReport.month}</CardTitle>
+                      <CardTitle className="text-base">
+                        Recomendacion activa — {latestReport.month}
+                      </CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">Proximos 7 dias</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
+                        Proximos 7 dias
+                      </p>
                       <p className="text-sm font-medium">{latestReport.recommendation_7d}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">Hipotesis proximo episodio</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-0.5">
+                        Hipotesis proximo episodio
+                      </p>
                       <p className="text-sm">{latestReport.next_episode_hypothesis}</p>
                     </div>
-                    <Link href="#" onClick={(e) => { e.preventDefault(); document.querySelector('[data-value="reportes"]')?.dispatchEvent(new MouseEvent('click')); }} className="text-xs text-[#0c1f36] underline">
+                    <Link
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document
+                          .querySelector('[data-value="reportes"]')
+                          ?.dispatchEvent(new MouseEvent('click'));
+                      }}
+                      className="text-xs text-[#0c1f36] underline"
+                    >
                       Ver reporte completo
                     </Link>
                   </CardContent>
@@ -610,33 +757,45 @@ Solo JSON. Espanol neutro.`;
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Aprendizaje de la semana</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Aprendizaje de la semana
+                    </Label>
                     <Textarea
                       className="mt-1.5"
                       rows={2}
                       placeholder="Que aprendiste esta semana sobre tu audiencia o contenido"
                       value={decisionNotes.weekly_learning}
-                      onChange={(e) => setDecisionNotes({ ...decisionNotes, weekly_learning: e.target.value })}
+                      onChange={(e) =>
+                        setDecisionNotes({ ...decisionNotes, weekly_learning: e.target.value })
+                      }
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Proximo experimento editorial</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Proximo experimento editorial
+                    </Label>
                     <Textarea
                       className="mt-1.5"
                       rows={2}
                       placeholder="Que vas a probar diferente en el proximo episodio o pieza"
                       value={decisionNotes.next_experiment}
-                      onChange={(e) => setDecisionNotes({ ...decisionNotes, next_experiment: e.target.value })}
+                      onChange={(e) =>
+                        setDecisionNotes({ ...decisionNotes, next_experiment: e.target.value })
+                      }
                     />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Siguiente decision editorial</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Siguiente decision editorial
+                    </Label>
                     <Textarea
                       className="mt-1.5"
                       rows={2}
                       placeholder="La accion concreta que tomas ahora"
                       value={decisionNotes.next_decision}
-                      onChange={(e) => setDecisionNotes({ ...decisionNotes, next_decision: e.target.value })}
+                      onChange={(e) =>
+                        setDecisionNotes({ ...decisionNotes, next_decision: e.target.value })
+                      }
                     />
                   </div>
                   <div className="flex items-center justify-between pt-1">
@@ -703,9 +862,12 @@ Solo JSON. Espanol neutro.`;
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <CardTitle>{m.platform} — {m.month}</CardTitle>
+                          <CardTitle>
+                            {m.platform} — {m.month}
+                          </CardTitle>
                           <CardDescription>
-                            {m.plays.toLocaleString()} reproducciones · {m.reach.toLocaleString()} alcance
+                            {m.plays.toLocaleString()} reproducciones · {m.reach.toLocaleString()}{' '}
+                            alcance
                           </CardDescription>
                         </div>
                         <Button
@@ -739,7 +901,9 @@ Solo JSON. Espanol neutro.`;
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground">Ingresos</p>
-                          <p className="text-2xl font-semibold text-[#0c1f36]">${m.revenue.toFixed(0)}</p>
+                          <p className="text-2xl font-semibold text-[#0c1f36]">
+                            ${m.revenue.toFixed(0)}
+                          </p>
                         </div>
                       </div>
                       {m.insight && (
@@ -761,7 +925,14 @@ Solo JSON. Espanol neutro.`;
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <p className="text-sm text-muted-foreground">Metricas individuales por episodio</p>
-              <Button size="sm" variant="outline" onClick={() => { resetEpForm(); setEpDialogOpen(true); }}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  resetEpForm();
+                  setEpDialogOpen(true);
+                }}
+              >
                 <Plus className="h-4 w-4 mr-1" /> Medir episodio
               </Button>
             </div>
@@ -777,7 +948,10 @@ Solo JSON. Espanol neutro.`;
                   </p>
                   <Button
                     className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
-                    onClick={() => { resetEpForm(); setEpDialogOpen(true); }}
+                    onClick={() => {
+                      resetEpForm();
+                      setEpDialogOpen(true);
+                    }}
                   >
                     <Plus className="mr-2 h-4 w-4" />
                     Medir primer episodio
@@ -871,28 +1045,40 @@ Solo JSON. Espanol neutro.`;
                   <CardContent className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="rounded-xl bg-[#F5F2EA] p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Diagnostico</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                          Diagnostico
+                        </p>
                         <p className="text-sm">{r.diagnosis}</p>
                       </div>
                       <div className="rounded-xl bg-[#F5F2EA] p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Patron de crecimiento</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                          Patron de crecimiento
+                        </p>
                         <p className="text-sm">{r.growth_pattern}</p>
                       </div>
                       <div className="rounded-xl bg-[#F5F2EA] p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Mejor contenido</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                          Mejor contenido
+                        </p>
                         <p className="text-sm">{r.best_content}</p>
                       </div>
                       <div className="rounded-xl bg-red-50 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-1">Alerta</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-1">
+                          Alerta
+                        </p>
                         <p className="text-sm">{r.alert}</p>
                       </div>
                     </div>
                     <div className="rounded-xl bg-[#e8ff40]/20 border border-[#e8ff40] p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-[#0c1f36] mb-1">Recomendacion 7 dias</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[#0c1f36] mb-1">
+                        Recomendacion 7 dias
+                      </p>
                       <p className="text-sm font-medium">{r.recommendation_7d}</p>
                     </div>
                     <div className="rounded-xl bg-[#0c1f36] text-white p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mb-1">Hipotesis proximo episodio</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mb-1">
+                        Hipotesis proximo episodio
+                      </p>
                       <p className="text-sm">{r.next_episode_hypothesis}</p>
                     </div>
                   </CardContent>

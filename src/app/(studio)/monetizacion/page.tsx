@@ -26,7 +26,16 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Plus, Pencil, Sparkles, Loader2, Copy, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Sparkles,
+  Loader2,
+  Copy,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import {
   getMonetizationLeads,
@@ -349,7 +358,9 @@ Devuelve exactamente:
             {urgente ? (
               <>
                 <p className="text-sm font-medium text-[#0c1f36]">{urgente.name}</p>
-                <p className="text-xs text-muted-foreground">{urgente.offer} — sin proxima accion definida</p>
+                <p className="text-xs text-muted-foreground">
+                  {urgente.offer} — sin proxima accion definida
+                </p>
                 <Button
                   size="sm"
                   className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] text-xs mt-1"
@@ -359,9 +370,13 @@ Devuelve exactamente:
                 </Button>
               </>
             ) : active.length > 0 ? (
-              <p className="text-sm text-muted-foreground">Todos los leads activos tienen siguiente paso. Buen ritmo.</p>
+              <p className="text-sm text-muted-foreground">
+                Todos los leads activos tienen siguiente paso. Buen ritmo.
+              </p>
             ) : (
-              <p className="text-sm text-muted-foreground">Sin leads activos. Cuando llegue un interes, registralo aqui.</p>
+              <p className="text-sm text-muted-foreground">
+                Sin leads activos. Cuando llegue un interes, registralo aqui.
+              </p>
             )}
           </CardContent>
         </Card>
@@ -378,14 +393,18 @@ Devuelve exactamente:
             <p className="text-sm text-[#0c1f36] leading-relaxed">
               {CTA_SUAVES[new Date().getDay() % CTA_SUAVES.length]}
             </p>
-            <p className="text-xs text-muted-foreground mt-2">Rotacion diaria — para usar al cierre de contenido o en DM.</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Rotacion diaria — para usar al cierre de contenido o en DM.
+            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Servicios disponibles */}
       <div className="mb-6">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Servicios disponibles</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+          Servicios disponibles
+        </h2>
         <div className="grid gap-3 md:grid-cols-2">
           {SERVICIOS_DISPONIBLES.map((s) => (
             <Card key={s.nombre} className="border-border/50">
@@ -430,13 +449,20 @@ Devuelve exactamente:
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-4 w-4 text-amber-600" />
-            <span className="text-sm font-medium text-amber-800">{pendingFollowUp.length} leads sin siguiente paso</span>
+            <span className="text-sm font-medium text-amber-800">
+              {pendingFollowUp.length} leads sin siguiente paso
+            </span>
           </div>
-          <p className="text-xs text-amber-700">Define la proxima accion para cada uno. No hace falta apresurarse, pero si tener claridad.</p>
+          <p className="text-xs text-amber-700">
+            Define la proxima accion para cada uno. No hace falta apresurarse, pero si tener
+            claridad.
+          </p>
         </div>
       )}
 
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Pipeline de leads</h2>
+      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+        Pipeline de leads
+      </h2>
 
       {loading ? (
         <div className="text-center py-12 text-muted-foreground">Cargando...</div>
@@ -444,7 +470,9 @@ Devuelve exactamente:
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground mb-2">Sin leads registrados</p>
-            <p className="text-xs text-muted-foreground mb-4">Cuando alguien exprese interes en un servicio, registralo aqui para darle seguimiento.</p>
+            <p className="text-xs text-muted-foreground mb-4">
+              Cuando alguien exprese interes en un servicio, registralo aqui para darle seguimiento.
+            </p>
             <Button
               className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
               onClick={() => setDialogOpen(true)}
@@ -491,13 +519,17 @@ Devuelve exactamente:
                     {l.next_action ? (
                       <span className="text-[#0c1f36]">{l.next_action}</span>
                     ) : (
-                      <span className="text-amber-600 font-medium">Sin definir — requiere atencion</span>
+                      <span className="text-amber-600 font-medium">
+                        Sin definir — requiere atencion
+                      </span>
                     )}
                   </div>
                 </div>
                 {aiMessages[l.id] && (
                   <div className="mt-3 p-3 rounded-lg bg-muted/40 text-sm">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Mensaje generado:</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">
+                      Mensaje generado:
+                    </p>
                     <p className="text-[#0c1f36] leading-relaxed">{aiMessages[l.id]}</p>
                     <Button
                       size="sm"

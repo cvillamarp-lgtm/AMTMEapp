@@ -25,9 +25,25 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Plus, Trash2, CalendarDays, AlertCircle, Clock3, CheckCircle2, CircleDot, CalendarCheck, Layers, ArrowRight } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  CalendarDays,
+  AlertCircle,
+  Clock3,
+  CheckCircle2,
+  CircleDot,
+  CalendarCheck,
+  Layers,
+  ArrowRight,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { getCalendarEvents, createCalendarEvent, deleteCalendarEvent, updateCalendarEvent } from '@/lib/database';
+import {
+  getCalendarEvents,
+  createCalendarEvent,
+  deleteCalendarEvent,
+  updateCalendarEvent,
+} from '@/lib/database';
 import type { CalendarEvent, EventType, EventStatus } from '@/types/database';
 
 // ---- helpers de fecha ----
@@ -62,7 +78,9 @@ export default function CalendarioPage() {
     content_id: null as string | null,
   });
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   async function load() {
     try {
@@ -127,7 +145,7 @@ export default function CalendarioPage() {
   async function handleMarkPublished(id: string) {
     try {
       await updateCalendarEvent(id, { status: 'publicado' });
-      setEvents((prev) => prev.map((e) => e.id === id ? { ...e, status: 'publicado' } : e));
+      setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, status: 'publicado' } : e)));
       toast.success('Marcado como publicado');
     } catch {
       toast.error('Error al actualizar');
@@ -138,27 +156,52 @@ export default function CalendarioPage() {
   const today = todayStr();
   const in7 = addDays(today, 7);
 
-  const secHoy = useMemo(() => events.filter(e => e.date === today && e.status !== 'publicado' && e.status !== 'archivado'), [events, today]);
-  const secProximas = useMemo(() => events.filter(e => e.date > today && e.date <= in7 && e.status !== 'publicado' && e.status !== 'archivado'), [events, today, in7]);
-  const secAtrasadas = useMemo(() => events.filter(e => e.date < today && e.status !== 'publicado' && e.status !== 'archivado'), [events, today]);
-  const secPublicadas = useMemo(() => events.filter(e => e.status === 'publicado'), [events]);
+  const secHoy = useMemo(
+    () =>
+      events.filter(
+        (e) => e.date === today && e.status !== 'publicado' && e.status !== 'archivado'
+      ),
+    [events, today]
+  );
+  const secProximas = useMemo(
+    () =>
+      events.filter(
+        (e) =>
+          e.date > today && e.date <= in7 && e.status !== 'publicado' && e.status !== 'archivado'
+      ),
+    [events, today, in7]
+  );
+  const secAtrasadas = useMemo(
+    () =>
+      events.filter((e) => e.date < today && e.status !== 'publicado' && e.status !== 'archivado'),
+    [events, today]
+  );
+  const secPublicadas = useMemo(() => events.filter((e) => e.status === 'publicado'), [events]);
 
   // carga semanal: eventos entre hoy y +7
   const cargaSemanal = useMemo(() => {
     const map: Record<string, number> = {};
-    events.filter(e => e.date >= today && e.date <= in7).forEach(e => {
-      map[e.date] = (map[e.date] || 0) + 1;
-    });
+    events
+      .filter((e) => e.date >= today && e.date <= in7)
+      .forEach((e) => {
+        map[e.date] = (map[e.date] || 0) + 1;
+      });
     return map;
   }, [events, today, in7]);
 
   // siguiente accion: primer evento pendiente o atrasado
   const siguienteAccion = useMemo(() => {
-    return [...secAtrasadas, ...secHoy, ...secProximas].sort((a, b) => a.date.localeCompare(b.date))[0] || null;
+    return (
+      [...secAtrasadas, ...secHoy, ...secProximas].sort((a, b) =>
+        a.date.localeCompare(b.date)
+      )[0] || null
+    );
   }, [secAtrasadas, secHoy, secProximas]);
 
   // huecos: dias sin contenido en los proximos 7
-  const diasConContenido = new Set(events.filter(e => e.date >= today && e.date <= in7).map(e => e.date));
+  const diasConContenido = new Set(
+    events.filter((e) => e.date >= today && e.date <= in7).map((e) => e.date)
+  );
   const huecos: string[] = [];
   for (let i = 1; i <= 7; i++) {
     const d = addDays(today, i);
@@ -166,12 +209,15 @@ export default function CalendarioPage() {
   }
 
   // agrupacion por mes para vista de mes
-  const grouped = events.reduce((acc, ev) => {
-    const m = ev.date.slice(0, 7);
-    if (!acc[m]) acc[m] = [];
-    acc[m].push(ev);
-    return acc;
-  }, {} as Record<string, CalendarEvent[]>);
+  const grouped = events.reduce(
+    (acc, ev) => {
+      const m = ev.date.slice(0, 7);
+      if (!acc[m]) acc[m] = [];
+      acc[m].push(ev);
+      return acc;
+    },
+    {} as Record<string, CalendarEvent[]>
+  );
 
   const statusColor: Record<string, string> = {
     pendiente: 'bg-gray-100 text-gray-600',
@@ -183,27 +229,55 @@ export default function CalendarioPage() {
   };
 
   // ---- sub-componente de tarjeta de evento ----
-  function EventCard({ ev, showMarkPublished = true }: { ev: CalendarEvent; showMarkPublished?: boolean }) {
+  function EventCard({
+    ev,
+    showMarkPublished = true,
+  }: {
+    ev: CalendarEvent;
+    showMarkPublished?: boolean;
+  }) {
     return (
-      <div className={`rounded-xl border bg-card p-4 flex items-start gap-3 ${ev.date < today && ev.status !== 'publicado' ? 'border-red-200' : 'border-border'}` }>
+      <div
+        className={`rounded-xl border bg-card p-4 flex items-start gap-3 ${ev.date < today && ev.status !== 'publicado' ? 'border-red-200' : 'border-border'}`}
+      >
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span className="font-medium text-sm text-primary truncate">{ev.title}</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[ev.status] || 'bg-gray-100 text-gray-600'}`}>{ev.status}</span>
-            {ev.channel && <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{ev.channel}</span>}
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[ev.status] || 'bg-gray-100 text-gray-600'}`}
+            >
+              {ev.status}
+            </span>
+            {ev.channel && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {ev.channel}
+              </span>
+            )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {weekLabel(ev.date)}{ev.time ? ` · ${ev.time}` : ''} · {ev.type}
+            {weekLabel(ev.date)}
+            {ev.time ? ` · ${ev.time}` : ''} · {ev.type}
           </p>
           {ev.notes && <p className="text-xs text-muted-foreground mt-1 truncate">{ev.notes}</p>}
         </div>
         <div className="flex flex-col gap-1 shrink-0">
           {showMarkPublished && ev.status !== 'publicado' && (
-            <Button size="sm" variant="ghost" className="text-green-700 hover:text-green-900 text-xs h-7" onClick={() => handleMarkPublished(ev.id)}>
-              <CheckCircle2 className="h-3 w-3 mr-1" />Publicado
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-green-700 hover:text-green-900 text-xs h-7"
+              onClick={() => handleMarkPublished(ev.id)}
+            >
+              <CheckCircle2 className="h-3 w-3 mr-1" />
+              Publicado
             </Button>
           )}
-          <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive h-7" onClick={() => handleDelete(ev.id)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-muted-foreground hover:text-destructive h-7"
+            onClick={() => handleDelete(ev.id)}
+          >
             <Trash2 className="h-3 w-3" />
           </Button>
         </div>
@@ -282,13 +356,23 @@ export default function CalendarioPage() {
                       value={form.type}
                       onValueChange={(v) => setForm({ ...form, type: v as EventType })}
                     >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         {[
-                          'publicacion','distribucion','produccion','grabacion',
-                          'edicion','medicion','revision','monetizacion',
+                          'publicacion',
+                          'distribucion',
+                          'produccion',
+                          'grabacion',
+                          'edicion',
+                          'medicion',
+                          'revision',
+                          'monetizacion',
                         ].map((t) => (
-                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -299,10 +383,22 @@ export default function CalendarioPage() {
                       value={form.channel || ''}
                       onValueChange={(v) => setForm({ ...form, channel: v })}
                     >
-                      <SelectTrigger><SelectValue placeholder="Canal" /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Canal" />
+                      </SelectTrigger>
                       <SelectContent>
-                        {['Spotify','Instagram','TikTok','YouTube Shorts','Threads','Email','WhatsApp'].map((c) => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        {[
+                          'Spotify',
+                          'Instagram',
+                          'TikTok',
+                          'YouTube Shorts',
+                          'Threads',
+                          'Email',
+                          'WhatsApp',
+                        ].map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {c}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -314,10 +410,14 @@ export default function CalendarioPage() {
                     value={form.status}
                     onValueChange={(v) => setForm({ ...form, status: v as EventStatus })}
                   >
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      {['pendiente','en-proceso','listo','publicado'].map((s) => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      {['pendiente', 'en-proceso', 'listo', 'publicado'].map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -331,7 +431,9 @@ export default function CalendarioPage() {
                   />
                 </div>
                 <DialogFooter>
-                  <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+                  <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
+                    Cancelar
+                  </Button>
                   <Button type="submit">Agendar</Button>
                 </DialogFooter>
               </form>
@@ -344,13 +446,14 @@ export default function CalendarioPage() {
         <div className="text-center py-12 text-muted-foreground">Cargando...</div>
       ) : view === 'operativo' ? (
         <div className="space-y-8">
-
           {/* SIGUIENTE ACCION */}
           {siguienteAccion && (
             <div className="rounded-xl border border-[#e8ff40]/60 bg-[#e8ff40]/10 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <ArrowRight className="h-4 w-4 text-[#0c1f36]" />
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#0c1f36]">Siguiente accion</span>
+                <span className="text-xs font-semibold uppercase tracking-widest text-[#0c1f36]">
+                  Siguiente accion
+                </span>
               </div>
               <p className="font-medium text-primary">{siguienteAccion.title}</p>
               <p className="text-xs text-muted-foreground mt-1">
@@ -370,14 +473,24 @@ export default function CalendarioPage() {
             </div>
             {secHoy.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-4 text-center">
-                <p className="text-sm text-muted-foreground">No hay publicaciones agendadas para hoy</p>
-                <Button size="sm" variant="ghost" className="mt-2 text-xs" onClick={() => setDialogOpen(true)}>
-                  <Plus className="h-3 w-3 mr-1" />Agendar para hoy
+                <p className="text-sm text-muted-foreground">
+                  No hay publicaciones agendadas para hoy
+                </p>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="mt-2 text-xs"
+                  onClick={() => setDialogOpen(true)}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Agendar para hoy
                 </Button>
               </div>
             ) : (
               <div className="grid gap-2">
-                {secHoy.map(ev => <EventCard key={ev.id} ev={ev} />)}
+                {secHoy.map((ev) => (
+                  <EventCard key={ev.id} ev={ev} />
+                ))}
               </div>
             )}
           </div>
@@ -387,11 +500,17 @@ export default function CalendarioPage() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <AlertCircle className="h-4 w-4 text-red-500" />
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600">Atrasadas</h2>
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">{secAtrasadas.length}</span>
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600">
+                  Atrasadas
+                </h2>
+                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                  {secAtrasadas.length}
+                </span>
               </div>
               <div className="grid gap-2">
-                {secAtrasadas.map(ev => <EventCard key={ev.id} ev={ev} />)}
+                {secAtrasadas.map((ev) => (
+                  <EventCard key={ev.id} ev={ev} />
+                ))}
               </div>
             </div>
           )}
@@ -400,18 +519,30 @@ export default function CalendarioPage() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Clock3 className="h-4 w-4 text-primary" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">Proximos 7 dias</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">
+                Proximos 7 dias
+              </h2>
             </div>
             {secProximas.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-4 text-center">
-                <p className="text-sm text-muted-foreground">Sin publicaciones agendadas esta semana</p>
-                <Button size="sm" variant="ghost" className="mt-2 text-xs" onClick={() => setDialogOpen(true)}>
-                  <Plus className="h-3 w-3 mr-1" />Agendar
+                <p className="text-sm text-muted-foreground">
+                  Sin publicaciones agendadas esta semana
+                </p>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="mt-2 text-xs"
+                  onClick={() => setDialogOpen(true)}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  Agendar
                 </Button>
               </div>
             ) : (
               <div className="grid gap-2">
-                {secProximas.map(ev => <EventCard key={ev.id} ev={ev} />)}
+                {secProximas.map((ev) => (
+                  <EventCard key={ev.id} ev={ev} />
+                ))}
               </div>
             )}
           </div>
@@ -427,14 +558,24 @@ export default function CalendarioPage() {
                 <p className="text-xs text-muted-foreground">Sin eventos esta semana</p>
               ) : (
                 <div className="space-y-2">
-                  {Object.entries(cargaSemanal).sort().map(([date, count]) => (
-                    <div key={date} className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">{weekLabel(date)}</span>
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                        count >= 3 ? 'bg-red-100 text-red-700' : count === 2 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
-                      }`}>{count} evento{count > 1 ? 's' : ''}</span>
-                    </div>
-                  ))}
+                  {Object.entries(cargaSemanal)
+                    .sort()
+                    .map(([date, count]) => (
+                      <div key={date} className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">{weekLabel(date)}</span>
+                        <span
+                          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                            count >= 3
+                              ? 'bg-red-100 text-red-700'
+                              : count === 2
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-green-100 text-green-700'
+                          }`}
+                        >
+                          {count} evento{count > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>
@@ -448,14 +589,17 @@ export default function CalendarioPage() {
                 <p className="text-xs text-green-700 font-medium">Semana completa. Buen ritmo.</p>
               ) : (
                 <div className="space-y-1">
-                  {huecos.slice(0, 5).map(d => (
+                  {huecos.slice(0, 5).map((d) => (
                     <div key={d} className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">{weekLabel(d)}</span>
                       <Button
                         size="sm"
                         variant="ghost"
                         className="text-xs h-6"
-                        onClick={() => { setForm(f => ({ ...f, date: d })); setDialogOpen(true); }}
+                        onClick={() => {
+                          setForm((f) => ({ ...f, date: d }));
+                          setDialogOpen(true);
+                        }}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -470,14 +614,20 @@ export default function CalendarioPage() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Publicadas</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                Publicadas
+              </h2>
               <span className="text-xs text-muted-foreground">{secPublicadas.length} total</span>
             </div>
             {secPublicadas.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-2">Ninguna publicacion marcada como completada todavia</p>
+              <p className="text-sm text-muted-foreground py-2">
+                Ninguna publicacion marcada como completada todavia
+              </p>
             ) : (
               <div className="grid gap-2">
-                {secPublicadas.slice(0, 5).map(ev => <EventCard key={ev.id} ev={ev} showMarkPublished={false} />)}
+                {secPublicadas.slice(0, 5).map((ev) => (
+                  <EventCard key={ev.id} ev={ev} showMarkPublished={false} />
+                ))}
                 {secPublicadas.length > 5 && (
                   <p className="text-xs text-muted-foreground text-center pt-1">
                     +{secPublicadas.length - 5} mas — cambia a vista por mes para ver todo
@@ -492,7 +642,10 @@ export default function CalendarioPage() {
             <div className="text-center py-16">
               <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="font-medium text-primary mb-1">El calendario esta vacio</p>
-              <p className="text-sm text-muted-foreground mb-4">Agenda tu primera publicacion. Cada semana necesita al menos un punto de distribucion.</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                Agenda tu primera publicacion. Cada semana necesita al menos un punto de
+                distribucion.
+              </p>
               <Button
                 className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
                 onClick={() => setDialogOpen(true)}
@@ -514,52 +667,65 @@ export default function CalendarioPage() {
                 className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
                 onClick={() => setDialogOpen(true)}
               >
-                <Plus className="mr-2 h-4 w-4" />Agendar
+                <Plus className="mr-2 h-4 w-4" />
+                Agendar
               </Button>
             </div>
           ) : (
-            Object.keys(grouped).sort().map((month) => (
-              <div key={month}>
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{month}</h2>
-                <div className="grid gap-2">
-                  {grouped[month].map((ev) => (
-                    <Card key={ev.id}>
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <CardTitle className="text-base">{ev.title}</CardTitle>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[ev.status] || 'bg-gray-100 text-gray-600'}`}>
-                                {ev.status}
-                              </span>
+            Object.keys(grouped)
+              .sort()
+              .map((month) => (
+                <div key={month}>
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    {month}
+                  </h2>
+                  <div className="grid gap-2">
+                    {grouped[month].map((ev) => (
+                      <Card key={ev.id}>
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <CardTitle className="text-base">{ev.title}</CardTitle>
+                                <span
+                                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[ev.status] || 'bg-gray-100 text-gray-600'}`}
+                                >
+                                  {ev.status}
+                                </span>
+                              </div>
+                              <CardDescription className="mt-0.5">
+                                {weekLabel(ev.date)}
+                                {ev.time ? ` · ${ev.time}` : ''} · {ev.type}
+                                {ev.channel ? ` · ${ev.channel}` : ''}
+                              </CardDescription>
                             </div>
-                            <CardDescription className="mt-0.5">
-                              {weekLabel(ev.date)}{ev.time ? ` · ${ev.time}` : ''} · {ev.type}
-                              {ev.channel ? ` · ${ev.channel}` : ''}
-                            </CardDescription>
-                          </div>
-                          <div className="flex gap-1">
-                            {ev.status !== 'publicado' && (
-                              <Button size="sm" variant="ghost" className="h-8" onClick={() => handleMarkPublished(ev.id)}>
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                            <div className="flex gap-1">
+                              {ev.status !== 'publicado' && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8"
+                                  onClick={() => handleMarkPublished(ev.id)}
+                                >
+                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                </Button>
+                              )}
+                              <Button size="sm" variant="ghost" onClick={() => handleDelete(ev.id)}>
+                                <Trash2 className="h-4 w-4" />
                               </Button>
-                            )}
-                            <Button size="sm" variant="ghost" onClick={() => handleDelete(ev.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            </div>
                           </div>
-                        </div>
-                      </CardHeader>
-                      {ev.notes && (
-                        <CardContent className="pt-0">
-                          <p className="text-sm text-muted-foreground">{ev.notes}</p>
-                        </CardContent>
-                      )}
-                    </Card>
-                  ))}
+                        </CardHeader>
+                        {ev.notes && (
+                          <CardContent className="pt-0">
+                            <p className="text-sm text-muted-foreground">{ev.notes}</p>
+                          </CardContent>
+                        )}
+                      </Card>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))
           )}
         </div>
       )}

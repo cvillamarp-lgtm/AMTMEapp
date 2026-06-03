@@ -109,7 +109,10 @@ export default function DocumentoMaestroPage() {
     if (!newForm.title.trim()) return;
     setSaving(true);
     try {
-      const created = await createMasterSection({ ...newForm, version: 1 } as Omit<MasterSection, 'id' | 'created_at' | 'updated_at' | 'user_id'>);
+      const created = await createMasterSection({ ...newForm, version: 1 } as Omit<
+        MasterSection,
+        'id' | 'created_at' | 'updated_at' | 'user_id'
+      >);
       setSections((prev) => [created, ...prev]);
       setSelectedId(created.id);
       setDraft(created);

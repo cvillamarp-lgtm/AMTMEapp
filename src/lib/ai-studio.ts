@@ -23,7 +23,7 @@ export async function callAI(prompt: string, mode: string = 'Episodio'): Promise
     const err = await res.json().catch(() => ({}));
     throw new Error((err as { error?: string }).error || 'Error al generar con IA');
   }
-  const data = await res.json() as { result?: string };
+  const data = (await res.json()) as { result?: string };
   return data.result || '';
 }
 
@@ -44,7 +44,9 @@ Voz: compañero honesto, no guru. Tono sobrio, directo, sin autoayuda genérica.
 Español neutro latinoamericano. Sin asteriscos ni markdown.
 El oyente objetivo: hombre hispano 28-44 años navegando amor, apego, identidad.`;
 
-const PACKAGE_PROMPT = (text: string) => `A partir del siguiente contenido de AMTME, genera un paquete de publicación completo.
+const PACKAGE_PROMPT = (
+  text: string
+) => `A partir del siguiente contenido de AMTME, genera un paquete de publicación completo.
 
 CONTENIDO:
 ${text}
@@ -88,7 +90,7 @@ export async function generatePublicationPackage(text: string): Promise<Publicat
     const err = await res.json().catch(() => ({}));
     throw new Error((err as { error?: string }).error || 'Error al generar paquete');
   }
-  const data = await res.json() as { result?: string };
+  const data = (await res.json()) as { result?: string };
   const raw: string = data.result || '';
   try {
     const clean = raw.replace(/```json|```/g, '').trim();

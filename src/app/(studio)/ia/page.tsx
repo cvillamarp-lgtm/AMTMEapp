@@ -94,9 +94,11 @@ const EDITORIAL_PRESETS: PresetCard[] = [
   },
   {
     title: 'Generar paquete de publicacion',
-    description: 'Convierte un guion o nota en el paquete completo: hooks, captions, frases, reels, brief visual y CTA.',
+    description:
+      'Convierte un guion o nota en el paquete completo: hooks, captions, frases, reels, brief visual y CTA.',
     input: 'Guion completo, resumen o nota del episodio',
-    output: '5 hooks, 3 captions, 5 frases, 3 ideas de reel, 3 ideas de carrusel, brief visual, CTA, checklist y siguiente accion',
+    output:
+      '5 hooks, 3 captions, 5 frases, 3 ideas de reel, 3 ideas de carrusel, brief visual, CTA, checklist y siguiente accion',
     href: '/contenido',
     mode: 'Copy',
     promptHint:
@@ -166,7 +168,9 @@ export default function IAPage() {
     <div className="space-y-8 pb-24">
       {/* Encabezado editorial */}
       <div>
-        <div className="text-xs uppercase tracking-[0.22em] text-black/40">IA / Asistente editorial</div>
+        <div className="text-xs uppercase tracking-[0.22em] text-black/40">
+          IA / Asistente editorial
+        </div>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#0C1F36]">IA para AMTME</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-black/60">
           Asistente editorial para revisar, estructurar y convertir contenido real. Elige un preset,
@@ -282,10 +286,7 @@ export default function IAPage() {
               <Input value={model} onChange={(event) => setModel(event.target.value)} />
             </Field>
             <Field label="Modo">
-              <Select
-                value={mode}
-                onChange={(event) => syncMode(event.target.value as AIWorkMode)}
-              >
+              <Select value={mode} onChange={(event) => syncMode(event.target.value as AIWorkMode)}>
                 <option value="Episodio">Episodio</option>
                 <option value="Copy">Copy</option>
                 <option value="Visual">Visual</option>
@@ -297,7 +298,11 @@ export default function IAPage() {
           </div>
 
           <Field label="Prompt" hint="Carga un preset de arriba o escribe tu instruccion.">
-            <Textarea rows={10} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
+            <Textarea
+              rows={10}
+              value={prompt}
+              onChange={(event) => setPrompt(event.target.value)}
+            />
           </Field>
 
           <Field label="System prompt">
@@ -380,8 +385,8 @@ export default function IAPage() {
               Editor tecnico de la app
             </div>
             <p className="text-xs leading-5 text-black/60 mb-3">
-              Para modificar la propia aplicacion en lenguaje natural — cambios de UI, componentes
-              o copy — usa el Editor tecnico. Es distinto al asistente editorial de arriba.
+              Para modificar la propia aplicacion en lenguaje natural — cambios de UI, componentes o
+              copy — usa el Editor tecnico. Es distinto al asistente editorial de arriba.
             </p>
             <Link
               href="/ia/editor"

@@ -16,6 +16,10 @@ import { Pin, Trash2, Plus, Save, X, Zap, BookOpen, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
+// FASE 8C.1 — Compatibilidad de lectura dual
+const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
+const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
+
 type Note = {
   id: string;
   user_id: string | null;
@@ -54,7 +58,7 @@ async function getNotes(): Promise<Note[]> {
   const { data, error } = await sb
     .from('notes')
     .select('*')
-    .is('user_id', null)
+    .or(CHRISTIAN_UUID_FILTER)
     .order('pinned', { ascending: false })
     .order('updated_at', { ascending: false });
   if (error) {
@@ -282,7 +286,9 @@ export default function NotasPage() {
               </p>
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground">Activa si hoy tienes poca energia para producir.</p>
+            <p className="text-xs text-muted-foreground">
+              Activa si hoy tienes poca energia para producir.
+            </p>
           )}
         </div>
         <div className="flex gap-2">
@@ -313,7 +319,7 @@ export default function NotasPage() {
             ))}
           </SelectContent>
         </Select>
-          <div className="flex-1 overflow-y-auto space-y-2">
+        <div className="flex-1 overflow-y-auto space-y-2">
           {loading ? (
             <p className="text-xs text-center text-muted-foreground py-4">Cargando...</p>
           ) : filtered.length === 0 ? (
