@@ -23,7 +23,7 @@ export function getSupabaseAuthBrowserClient(): BrowserAuthClient | null {
   browserAuthClient = createBrowserClient<Database>(env.url, env.anonKey, {
     cookieOptions: {
       sameSite: 'lax',
-      secure: false,
+      secure: true,
     } as CookieOptions,
   });
 
