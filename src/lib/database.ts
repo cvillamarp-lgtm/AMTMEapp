@@ -5,6 +5,7 @@
  */
 
 import { getSupabaseBrowserClient } from './supabase/client';
+import { getSupabaseAuthBrowserClient } from './supabase/auth-browser';
 import type {
   Episode,
   ContentPiece,
@@ -27,14 +28,32 @@ const WORKSPACE = 'primary';
 const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
 const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
 
+// FASE 8D — Helper de sesión real controlada
+// Intenta obtener el user_id de la sesión activa de Supabase Auth.
+// Si no hay sesión (modo público), devuelve null → compatibilidad dual se mantiene.
+// No rompe producción sin login. No requiere NEXT_PUBLIC_REQUIRE_AUTH.
+async function getActiveUserId(): Promise<string | null> {
+  try {
+    const authClient = getSupabaseAuthBrowserClient();
+    if (!authClient) return null;
+    const { data: { session } } = await authClient.auth.getSession();
+    return session?.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function getClient() {
   return getSupabaseBrowserClient() as any;
 }
 
 // ---- helpers ----
 
-function toRow(payload: object) {
-  return { user_id: null, payload };
+// FASE 8D: toRow acepta userId opcional.
+// Si hay sesión activa, user_id = UUID real.
+// Si no hay sesión, user_id = null → compatibilidad dual activa.
+function toRow(payload: object, userId: string | null = null) {
+  return { user_id: userId, payload };
 }
 
 function fromRow<T>(row: any): T {
@@ -53,24 +72,33 @@ function fromRow<T>(row: any): T {
   return { ...base, ...rest } as T;
 }
 
+// FASE 8D: getAll usa sesión real si existe; si no, mantiene compatibilidad dual.
+// Con sesión → filtra por user_id = UUID real del usuario autenticado.
+// Sin sesión → filtra por CHRISTIAN_UUID_FILTER (dual: null OR uuid fijo).
 async function getAll<T>(table: string): Promise<T[]> {
   const sb = getClient();
   if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  const filter = activeUserId
+    ? `user_id.eq.${activeUserId}`
+    : CHRISTIAN_UUID_FILTER;
   const { data, error } = await sb
     .from(table)
     .select('*')
-    .or(CHRISTIAN_UUID_FILTER)
+    .or(filter)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 
+// FASE 8D: insertOne usa user_id real si hay sesión; null si no.
 async function insertOne<T>(table: string, payload: object): Promise<T> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
   const { data, error } = await sb
     .from(table)
-    .insert([toRow(payload)])
+    .insert([toRow(payload, activeUserId)])
     .select()
     .single();
   if (error) throw error;
@@ -186,10 +214,14 @@ export async function deleteChecklist(id: string): Promise<void> {
 export async function getCalendarEvents(): Promise<CalendarEvent[]> {
   const sb = getClient();
   if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  const filter = activeUserId
+    ? `user_id.eq.${activeUserId}`
+    : CHRISTIAN_UUID_FILTER;
   const { data, error } = await sb
     .from('calendar_events')
     .select('*')
-    .or(CHRISTIAN_UUID_FILTER)
+    .or(filter)
     .order('created_at', { ascending: true });
   if (error) throw error;
   return (data || []).map((r: any) => fromRow<CalendarEvent>(r));
@@ -214,14 +246,17 @@ export async function deleteCalendarEvent(id: string): Promise<void> {
 export async function getScripts(): Promise<Script[]> {
   const sb = getClient();
   if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  const filter = activeUserId
+    ? `user_id.eq.${activeUserId}`
+    : CHRISTIAN_UUID_FILTER;
   const { data, error } = await sb
     .from('scripts')
     .select('*')
-    .or(CHRISTIAN_UUID_FILTER)
+    .or(filter)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []).map((r: any) => {
-    // Si tiene payload (nuestro schema), usar fromRow; si tiene columnas directas, usar directo
     if (r.payload && typeof r.payload === 'object') return fromRow<Script>(r);
     return { ...r } as Script;
   });
@@ -231,12 +266,12 @@ export async function createScript(
 ): Promise<Script> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
-  // Intentar insertar con columnas directas primero (schema AMTMEultima)
+  const activeUserId = await getActiveUserId();
   const { data, error } = await sb
     .from('scripts')
     .insert([
       {
-        user_id: null,
+        user_id: activeUserId,
         episode_id: (s as any).episode_id,
         title: (s as any).title,
         status: (s as any).status || 'borrador',
