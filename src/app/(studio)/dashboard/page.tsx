@@ -127,10 +127,23 @@ export default function DashboardPage() {
                     className="block p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
                   >
                     <p className="text-sm font-medium text-primary">
-                      {leadsNoAction.length} lead(s) sin próxima acción
+                      {leadsNoAction.length} lead(s) sin proxima accion
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       Define el siguiente paso para mantener el flujo
+                    </p>
+                  </Link>
+                ) : null}
+                {contentPending > 0 ? (
+                  <Link
+                    href="/calendario"
+                    className="block p-3 rounded-lg bg-[#e8ff40]/20 hover:bg-[#e8ff40]/30 transition-colors border border-[#e8ff40]/40"
+                  >
+                    <p className="text-sm font-medium text-primary">
+                      {contentPending} pieza(s) lista(s) sin agendar
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Ve al calendario y agenda la distribucion
                     </p>
                   </Link>
                 ) : null}

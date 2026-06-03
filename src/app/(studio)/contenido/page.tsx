@@ -28,7 +28,8 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Plus, Pencil, Trash2, Search, Image, Sparkles, Loader2, Copy, CheckCheck, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Image, Sparkles, Loader2, Copy, CheckCheck, Package, CalendarPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   getContentPieces,
@@ -95,6 +96,7 @@ function PackageSingle({ title, text }: { title: string; text: string }) {
 
 
 export default function ContenidoPage() {
+  const router = useRouter();
   const { items, setItems, optimisticUpdate, optimisticCreate, optimisticRemove } =
     useOptimisticList<ContentPiece>([]);
   const [loading, setLoading] = useState(true);
@@ -356,6 +358,22 @@ Devuelve exactamente en este formato:
               {pkg && (
                 <Button variant="outline" onClick={() => { setPkg(null); setPackageInput(''); }}>
                   Limpiar
+                </Button>
+              )}
+              {pkg && (
+                <Button
+                  variant="outline"
+                  className="border-[#0c1f36] text-[#0c1f36] hover:bg-[#0c1f36] hover:text-white"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(
+                      `Hooks:\n${pkg.hooks.join('\n')}\n\nCaptions:\n${pkg.captions.join('\n')}\n\nCTA: ${pkg.cta}`
+                    );
+                    toast.success('Contenido copiado. Pega en el evento del calendario.');
+                    router.push('/calendario');
+                  }}
+                >
+                  <CalendarPlus className="mr-2 h-4 w-4" />
+                  Planificar en calendario
                 </Button>
               )}
               <Button variant="ghost" size="sm" className="ml-auto text-xs" onClick={() => setPackageTab('library')}>
