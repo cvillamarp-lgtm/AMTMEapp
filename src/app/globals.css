@@ -5,7 +5,12 @@
 @layer base {
   * {
     border-color: hsl(var(--border));
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family:
+      'Inter',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
   }
   body {
     background-color: hsl(var(--background));
@@ -54,9 +59,22 @@
 }
 
 /* Scrollbar discreta */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(12,31,54,0.15); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(12,31,54,0.28); }
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(12, 31, 54, 0.15);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(12, 31, 54, 0.28);
+}
 
-::selection { background: rgba(232,255,64,0.4); color: #0c1f36; }
+::selection {
+  background: rgba(232, 255, 64, 0.4);
+  color: #0c1f36;
+}

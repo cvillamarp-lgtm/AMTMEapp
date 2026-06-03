@@ -49,7 +49,10 @@ async function readJsonResponse(response: Response) {
       typeof payload.error === 'string'
         ? payload.error
         : typeof payload.error === 'object' && payload.error !== null && 'message' in payload.error
-          ? String((payload.error as { message?: unknown }).message ?? `La API respondio con estado ${response.status}`)
+          ? String(
+              (payload.error as { message?: unknown }).message ??
+                `La API respondio con estado ${response.status}`
+            )
           : `La API respondio con estado ${response.status}`;
     throw new Error(message);
   }
@@ -66,9 +69,13 @@ export async function generateWithProvider({
 
   if (!env.apiKey) {
     const keyName =
-      provider === 'grok' ? 'XAI_API_KEY' :
-      provider === 'groq' ? 'GROQ_API_KEY' :
-      provider === 'claude' ? 'ANTHROPIC_API_KEY' : 'GEMINI_API_KEY';
+      provider === 'grok'
+        ? 'XAI_API_KEY'
+        : provider === 'groq'
+          ? 'GROQ_API_KEY'
+          : provider === 'claude'
+            ? 'ANTHROPIC_API_KEY'
+            : 'GEMINI_API_KEY';
     throw new Error(`Falta configurar ${keyName} en las variables de entorno.`);
   }
 
@@ -93,7 +100,8 @@ export async function generateWithProvider({
       choices?: Array<{ message?: { content?: string } }>;
     };
     const content = payload.choices?.[0]?.message?.content?.trim();
-    if (!content) throw new Error(`${provider === 'groq' ? 'Groq' : 'Grok'} no devolvio contenido utilizable.`);
+    if (!content)
+      throw new Error(`${provider === 'groq' ? 'Groq' : 'Grok'} no devolvio contenido utilizable.`);
     return content;
   }
 
@@ -137,7 +145,10 @@ export async function generateWithProvider({
   const payload = (await readJsonResponse(response)) as {
     candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
   };
-  const content = payload.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('').trim();
+  const content = payload.candidates?.[0]?.content?.parts
+    ?.map((p) => p.text ?? '')
+    .join('')
+    .trim();
   if (!content) throw new Error('Gemini no devolvio contenido utilizable.');
   return content;
 }

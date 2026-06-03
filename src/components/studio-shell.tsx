@@ -43,7 +43,7 @@ const navItems = [
   { href: '/notas', label: 'Notas', icon: NotePencil },
   { href: '/automatizacion', label: 'Automatización', icon: Lightning },
   { href: '/estrategia', label: 'Estrategia', icon: 'TrendingUp' },
-    { href: '/historico', label: 'Histórico', icon: Archive },
+  { href: '/historico', label: 'Histórico', icon: Archive },
   { href: '/ia', label: 'IA', icon: Robot },
   { href: '/instagram', label: 'Instagram', icon: InstagramLogo },
   { href: '/configuracion', label: 'Configuración', icon: Gear },
@@ -80,9 +80,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
-            <h1 className="text-base font-semibold text-white tracking-tight">
-              AMTME Studio OS
-            </h1>
+            <h1 className="text-base font-semibold text-white tracking-tight">AMTME Studio OS</h1>
           </div>
 
           {/* Nav */}
@@ -128,9 +126,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
 
       {/* ── Main content ────────────────────────────────────────────────── */}
       <main className="flex-1 md:pl-64 min-h-screen">
-        <div className="h-full p-6 pb-24 md:pb-6">
-          {children}
-        </div>
+        <div className="h-full p-6 pb-24 md:pb-6">{children}</div>
       </main>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
@@ -145,9 +141,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
-                  isActive
-                    ? 'bg-[#e8ff40] text-[#0c1f36]'
-                    : 'text-white/70'
+                  isActive ? 'bg-[#e8ff40] text-[#0c1f36]' : 'text-white/70'
                 )}
               >
                 <Icon size={20} weight="regular" />

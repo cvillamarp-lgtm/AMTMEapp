@@ -2,10 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { getAutomationRules, createAutomationRule, updateAutomationRule, deleteAutomationRule } from '@/lib/database';
+import {
+  getAutomationRules,
+  createAutomationRule,
+  updateAutomationRule,
+  deleteAutomationRule,
+} from '@/lib/database';
 import type { AutomationRule, AutomationStatus } from '@/types/database';
 
-const STATUS_OPTIONS: AutomationStatus[] = ['idea', 'pendiente', 'en-proceso', 'listo', 'activo', 'pausado', 'archivado'];
+const STATUS_OPTIONS: AutomationStatus[] = [
+  'idea',
+  'pendiente',
+  'en-proceso',
+  'listo',
+  'activo',
+  'pausado',
+  'archivado',
+];
 
 const STATUS_TONE: Record<AutomationStatus, 'good' | 'accent' | 'warning' | 'neutral'> = {
   activo: 'good',
@@ -39,7 +52,9 @@ export default function AutomatizacionPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    getAutomationRules().then(setRules).finally(() => setLoading(false));
+    getAutomationRules()
+      .then(setRules)
+      .finally(() => setLoading(false));
   }, []);
 
   function openNew() {
@@ -71,10 +86,10 @@ export default function AutomatizacionPage() {
     try {
       if (editing) {
         const updated = await updateAutomationRule(editing.id, form);
-        setRules(prev => prev.map(r => r.id === updated.id ? updated : r));
+        setRules((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
       } else {
         const created = await createAutomationRule(form);
-        setRules(prev => [created, ...prev]);
+        setRules((prev) => [created, ...prev]);
       }
       setOpen(false);
     } finally {
@@ -84,13 +99,13 @@ export default function AutomatizacionPage() {
 
   async function remove(id: string) {
     await deleteAutomationRule(id);
-    setRules(prev => prev.filter(r => r.id !== id));
+    setRules((prev) => prev.filter((r) => r.id !== id));
   }
 
-  const set = (k: keyof typeof form) => (v: string) => setForm(f => ({ ...f, [k]: v }));
+  const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const activas = rules.filter(r => r.status === 'activo').length;
-  const listas = rules.filter(r => r.status === 'listo').length;
+  const activas = rules.filter((r) => r.status === 'activo').length;
+  const listas = rules.filter((r) => r.status === 'listo').length;
 
   return (
     <div className="space-y-5">
@@ -115,28 +130,65 @@ export default function AutomatizacionPage() {
         ) : rules.length === 0 ? (
           <div className="mt-8 text-center text-sm text-black/40">
             <p>No hay reglas de automatización.</p>
-            <button onClick={openNew} className="mt-2 text-[#0C1F36] underline underline-offset-2">Crear primera regla</button>
+            <button onClick={openNew} className="mt-2 text-[#0C1F36] underline underline-offset-2">
+              Crear primera regla
+            </button>
           </div>
         ) : (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
-            {rules.map(rule => (
+            {rules.map((rule) => (
               <div key={rule.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-lg font-semibold text-[#0C1F36]">{rule.name}</h3>
                   <div className="flex shrink-0 items-center gap-1.5">
                     <Badge tone={STATUS_TONE[rule.status]}>{rule.status}</Badge>
-                    <button onClick={() => openEdit(rule)} className="text-xs text-black/40 hover:text-black/70">Editar</button>
-                    <button onClick={() => remove(rule.id)} className="text-xs text-red-400 hover:text-red-600">Eliminar</button>
+                    <button
+                      onClick={() => openEdit(rule)}
+                      className="text-xs text-black/40 hover:text-black/70"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => remove(rule.id)}
+                      className="text-xs text-red-400 hover:text-red-600"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-black/58">{rule.objective}</p>
                 <div className="mt-4 grid gap-1.5 text-xs text-black/55 sm:grid-cols-2">
-                  {rule.trigger && <span><span className="font-medium text-black/70">Trigger:</span> {rule.trigger}</span>}
-                  {rule.tool && <span><span className="font-medium text-black/70">Tool:</span> {rule.tool}</span>}
-                  {rule.responsible && <span><span className="font-medium text-black/70">Responsable:</span> {rule.responsible}</span>}
-                  {rule.risk && <span><span className="font-medium text-black/70">Riesgo:</span> {rule.risk}</span>}
-                  {rule.input && <span><span className="font-medium text-black/70">Entrada:</span> {rule.input}</span>}
-                  {rule.output && <span><span className="font-medium text-black/70">Salida:</span> {rule.output}</span>}
+                  {rule.trigger && (
+                    <span>
+                      <span className="font-medium text-black/70">Trigger:</span> {rule.trigger}
+                    </span>
+                  )}
+                  {rule.tool && (
+                    <span>
+                      <span className="font-medium text-black/70">Tool:</span> {rule.tool}
+                    </span>
+                  )}
+                  {rule.responsible && (
+                    <span>
+                      <span className="font-medium text-black/70">Responsable:</span>{' '}
+                      {rule.responsible}
+                    </span>
+                  )}
+                  {rule.risk && (
+                    <span>
+                      <span className="font-medium text-black/70">Riesgo:</span> {rule.risk}
+                    </span>
+                  )}
+                  {rule.input && (
+                    <span>
+                      <span className="font-medium text-black/70">Entrada:</span> {rule.input}
+                    </span>
+                  )}
+                  {rule.output && (
+                    <span>
+                      <span className="font-medium text-black/70">Salida:</span> {rule.output}
+                    </span>
+                  )}
                 </div>
                 {rule.next_review && (
                   <p className="mt-3 text-xs text-black/40">Próxima revisión: {rule.next_review}</p>
@@ -154,24 +206,95 @@ export default function AutomatizacionPage() {
               {editing ? 'Editar regla' : 'Nueva regla de automatización'}
             </h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field label="Nombre *"><Input value={form.name} onChange={e => set('name')(e.target.value)} placeholder="Nombre de la regla" /></Field>
-              <Field label="Objetivo *"><Textarea value={form.objective} onChange={e => set('objective')(e.target.value)} placeholder="¿Qué automatiza esta regla?" rows={2} /></Field>
-              <Field label="Trigger"><Input value={form.trigger} onChange={e => set('trigger')(e.target.value)} placeholder="¿Qué lo activa?" /></Field>
-              <Field label="Herramienta"><Input value={form.tool} onChange={e => set('tool')(e.target.value)} placeholder="Make, Zapier, Claude..." /></Field>
-              <Field label="Entrada"><Input value={form.input} onChange={e => set('input')(e.target.value)} placeholder="¿Qué recibe?" /></Field>
-              <Field label="Salida"><Input value={form.output} onChange={e => set('output')(e.target.value)} placeholder="¿Qué produce?" /></Field>
-              <Field label="Responsable"><Input value={form.responsible ?? ''} onChange={e => set('responsible')(e.target.value)} placeholder="¿Quién la mantiene?" /></Field>
-              <Field label="Riesgo"><Input value={form.risk ?? ''} onChange={e => set('risk')(e.target.value)} placeholder="Nivel de riesgo" /></Field>
+              <Field label="Nombre *">
+                <Input
+                  value={form.name}
+                  onChange={(e) => set('name')(e.target.value)}
+                  placeholder="Nombre de la regla"
+                />
+              </Field>
+              <Field label="Objetivo *">
+                <Textarea
+                  value={form.objective}
+                  onChange={(e) => set('objective')(e.target.value)}
+                  placeholder="¿Qué automatiza esta regla?"
+                  rows={2}
+                />
+              </Field>
+              <Field label="Trigger">
+                <Input
+                  value={form.trigger}
+                  onChange={(e) => set('trigger')(e.target.value)}
+                  placeholder="¿Qué lo activa?"
+                />
+              </Field>
+              <Field label="Herramienta">
+                <Input
+                  value={form.tool}
+                  onChange={(e) => set('tool')(e.target.value)}
+                  placeholder="Make, Zapier, Claude..."
+                />
+              </Field>
+              <Field label="Entrada">
+                <Input
+                  value={form.input}
+                  onChange={(e) => set('input')(e.target.value)}
+                  placeholder="¿Qué recibe?"
+                />
+              </Field>
+              <Field label="Salida">
+                <Input
+                  value={form.output}
+                  onChange={(e) => set('output')(e.target.value)}
+                  placeholder="¿Qué produce?"
+                />
+              </Field>
+              <Field label="Responsable">
+                <Input
+                  value={form.responsible ?? ''}
+                  onChange={(e) => set('responsible')(e.target.value)}
+                  placeholder="¿Quién la mantiene?"
+                />
+              </Field>
+              <Field label="Riesgo">
+                <Input
+                  value={form.risk ?? ''}
+                  onChange={(e) => set('risk')(e.target.value)}
+                  placeholder="Nivel de riesgo"
+                />
+              </Field>
               <Field label="Estado">
-                <Select value={form.status} onChange={e => set('status')(e.target.value as AutomationStatus)}>
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                <Select
+                  value={form.status}
+                  onChange={(e) => set('status')(e.target.value as AutomationStatus)}
+                >
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </Select>
               </Field>
-              <Field label="Próxima revisión"><Input type="date" value={form.next_review ?? ''} onChange={e => set('next_review')(e.target.value)} /></Field>
+              <Field label="Próxima revisión">
+                <Input
+                  type="date"
+                  value={form.next_review ?? ''}
+                  onChange={(e) => set('next_review')(e.target.value)}
+                />
+              </Field>
             </div>
             <div className="mt-5 flex justify-end gap-3">
-              <button onClick={() => setOpen(false)} className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors">Cancelar</button>
-              <button onClick={save} disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50">
+              <button
+                onClick={() => setOpen(false)}
+                className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={save}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50"
+              >
                 {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear regla'}
               </button>
             </div>

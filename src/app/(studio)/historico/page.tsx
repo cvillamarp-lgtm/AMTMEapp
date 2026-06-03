@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { getArchiveItems, createArchiveItem, updateArchiveItem, deleteArchiveItem } from '@/lib/database';
+import {
+  getArchiveItems,
+  createArchiveItem,
+  updateArchiveItem,
+  deleteArchiveItem,
+} from '@/lib/database';
 import type { ArchiveItem } from '@/types/database';
 
 const EMPTY: Omit<ArchiveItem, 'id' | 'created_at' | 'updated_at' | 'user_id'> = {
@@ -26,13 +31,16 @@ export default function HistoricoPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    getArchiveItems().then(setItems).finally(() => setLoading(false));
+    getArchiveItems()
+      .then(setItems)
+      .finally(() => setLoading(false));
   }, []);
 
-  const filtered = items.filter(i =>
-    i.name.toLowerCase().includes(search.toLowerCase()) ||
-    i.type.toLowerCase().includes(search.toLowerCase()) ||
-    i.origin.toLowerCase().includes(search.toLowerCase())
+  const filtered = items.filter(
+    (i) =>
+      i.name.toLowerCase().includes(search.toLowerCase()) ||
+      i.type.toLowerCase().includes(search.toLowerCase()) ||
+      i.origin.toLowerCase().includes(search.toLowerCase())
   );
 
   function openNew() {
@@ -62,10 +70,10 @@ export default function HistoricoPage() {
     try {
       if (editing) {
         const updated = await updateArchiveItem(editing.id, form);
-        setItems(prev => prev.map(i => i.id === updated.id ? updated : i));
+        setItems((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
       } else {
         const created = await createArchiveItem(form);
-        setItems(prev => [created, ...prev]);
+        setItems((prev) => [created, ...prev]);
       }
       setOpen(false);
     } finally {
@@ -75,11 +83,10 @@ export default function HistoricoPage() {
 
   async function remove(id: string) {
     await deleteArchiveItem(id);
-    setItems(prev => prev.filter(i => i.id !== id));
+    setItems((prev) => prev.filter((i) => i.id !== id));
   }
 
-  const set = (k: keyof typeof form) => (v: string | boolean) =>
-    setForm(f => ({ ...f, [k]: v }));
+  const set = (k: keyof typeof form) => (v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
     <div className="space-y-5">
@@ -100,7 +107,7 @@ export default function HistoricoPage() {
         <div className="mt-4">
           <input
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar en histórico..."
             className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm placeholder:text-black/30 focus:outline-none focus:ring-2 focus:ring-[#0C1F36]/20"
           />
@@ -111,11 +118,18 @@ export default function HistoricoPage() {
         ) : filtered.length === 0 ? (
           <div className="mt-8 text-center text-sm text-black/40">
             <p>{search ? 'Sin resultados para esa búsqueda.' : 'No hay material archivado.'}</p>
-            {!search && <button onClick={openNew} className="mt-2 text-[#0C1F36] underline underline-offset-2">Archivar primer elemento</button>}
+            {!search && (
+              <button
+                onClick={openNew}
+                className="mt-2 text-[#0C1F36] underline underline-offset-2"
+              >
+                Archivar primer elemento
+              </button>
+            )}
           </div>
         ) : (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filtered.map(item => (
+            {filtered.map((item) => (
               <div key={item.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -127,15 +141,34 @@ export default function HistoricoPage() {
                   </div>
                 </div>
                 <div className="mt-3 grid gap-1 text-xs text-black/55">
-                  <span><span className="font-medium text-black/70">Origen:</span> {item.origin}</span>
-                  <span><span className="font-medium text-black/70">Motivo:</span> {item.archive_reason}</span>
-                  <span><span className="font-medium text-black/70">Archivado:</span> {item.archived_at}</span>
-                  <span><span className="font-medium text-black/70">Recuperable:</span> {item.recoverable ? 'Sí' : 'No'}</span>
+                  <span>
+                    <span className="font-medium text-black/70">Origen:</span> {item.origin}
+                  </span>
+                  <span>
+                    <span className="font-medium text-black/70">Motivo:</span> {item.archive_reason}
+                  </span>
+                  <span>
+                    <span className="font-medium text-black/70">Archivado:</span> {item.archived_at}
+                  </span>
+                  <span>
+                    <span className="font-medium text-black/70">Recuperable:</span>{' '}
+                    {item.recoverable ? 'Sí' : 'No'}
+                  </span>
                 </div>
                 {item.notes && <p className="mt-2 text-xs text-black/40 leading-5">{item.notes}</p>}
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => openEdit(item)} className="text-xs text-black/40 hover:text-black/70">Editar</button>
-                  <button onClick={() => remove(item.id)} className="text-xs text-red-400 hover:text-red-600">Eliminar</button>
+                  <button
+                    onClick={() => openEdit(item)}
+                    className="text-xs text-black/40 hover:text-black/70"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => remove(item.id)}
+                    className="text-xs text-red-400 hover:text-red-600"
+                  >
+                    Eliminar
+                  </button>
                 </div>
               </div>
             ))}
@@ -150,27 +183,82 @@ export default function HistoricoPage() {
               {editing ? 'Editar elemento' : 'Archivar elemento'}
             </h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field label="Nombre *"><Input value={form.name} onChange={e => set('name')(e.target.value)} placeholder="Nombre del elemento" /></Field>
-              <Field label="Tipo"><Input value={form.type} onChange={e => set('type')(e.target.value)} placeholder="episodio, herramienta, copy..." /></Field>
-              <Field label="Origen"><Input value={form.origin} onChange={e => set('origin')(e.target.value)} placeholder="¿De dónde viene?" /></Field>
-              <Field label="Motivo de archivo"><Textarea value={form.archive_reason} onChange={e => set('archive_reason')(e.target.value)} placeholder="¿Por qué se archiva?" rows={2} /></Field>
-              <Field label="Fecha archivo"><Input type="date" value={form.archived_at} onChange={e => set('archived_at')(e.target.value)} /></Field>
-              <Field label="Estado"><Input value={form.status} onChange={e => set('status')(e.target.value)} placeholder="archivado, pausado..." /></Field>
-              <Field label="Notas"><Textarea value={form.notes ?? ''} onChange={e => set('notes')(e.target.value)} placeholder="Contexto adicional" rows={2} /></Field>
+              <Field label="Nombre *">
+                <Input
+                  value={form.name}
+                  onChange={(e) => set('name')(e.target.value)}
+                  placeholder="Nombre del elemento"
+                />
+              </Field>
+              <Field label="Tipo">
+                <Input
+                  value={form.type}
+                  onChange={(e) => set('type')(e.target.value)}
+                  placeholder="episodio, herramienta, copy..."
+                />
+              </Field>
+              <Field label="Origen">
+                <Input
+                  value={form.origin}
+                  onChange={(e) => set('origin')(e.target.value)}
+                  placeholder="¿De dónde viene?"
+                />
+              </Field>
+              <Field label="Motivo de archivo">
+                <Textarea
+                  value={form.archive_reason}
+                  onChange={(e) => set('archive_reason')(e.target.value)}
+                  placeholder="¿Por qué se archiva?"
+                  rows={2}
+                />
+              </Field>
+              <Field label="Fecha archivo">
+                <Input
+                  type="date"
+                  value={form.archived_at}
+                  onChange={(e) => set('archived_at')(e.target.value)}
+                />
+              </Field>
+              <Field label="Estado">
+                <Input
+                  value={form.status}
+                  onChange={(e) => set('status')(e.target.value)}
+                  placeholder="archivado, pausado..."
+                />
+              </Field>
+              <Field label="Notas">
+                <Textarea
+                  value={form.notes ?? ''}
+                  onChange={(e) => set('notes')(e.target.value)}
+                  placeholder="Contexto adicional"
+                  rows={2}
+                />
+              </Field>
               <div className="flex items-center gap-2 col-span-2">
                 <input
                   type="checkbox"
                   id="recoverable"
                   checked={form.recoverable}
-                  onChange={e => set('recoverable')(e.target.checked)}
+                  onChange={(e) => set('recoverable')(e.target.checked)}
                   className="h-4 w-4 rounded border-black/20"
                 />
-                <label htmlFor="recoverable" className="text-sm text-black/70">¿Recuperable?</label>
+                <label htmlFor="recoverable" className="text-sm text-black/70">
+                  ¿Recuperable?
+                </label>
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-3">
-              <button onClick={() => setOpen(false)} className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors">Cancelar</button>
-              <button onClick={save} disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50">
+              <button
+                onClick={() => setOpen(false)}
+                className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={save}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50"
+              >
                 {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Archivar'}
               </button>
             </div>

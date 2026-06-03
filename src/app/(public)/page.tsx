@@ -1,25 +1,25 @@
-import Link from 'next/link'
-import { getSupabaseServiceRoleClient } from '@/lib/supabase/server'
+import Link from 'next/link';
+import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 
 async function getRecentEpisodes() {
   try {
-    const sb = getSupabaseServiceRoleClient()
-    if (!sb) return []
+    const sb = getSupabaseServiceRoleClient();
+    if (!sb) return [];
     const { data } = await sb
       .from('episodes')
       .select('payload')
       .is('user_id', null)
       .order('created_at', { ascending: false })
-      .limit(3)
+      .limit(3);
 
-    return (data || []).map((r: any) => r.payload)
+    return (data || []).map((r: any) => r.payload);
   } catch {
-    return []
+    return [];
   }
 }
 
 export default async function HomePage() {
-  const episodes = await getRecentEpisodes()
+  const episodes = await getRecentEpisodes();
 
   return (
     <div className="min-h-screen bg-[#0c1f36] text-white">
@@ -40,11 +40,13 @@ export default async function HomePage() {
           Podcast en español
         </p>
         <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-          A Mí Tampoco<br />Me Explicaron
+          A Mí Tampoco
+          <br />
+          Me Explicaron
         </h1>
         <p className="text-[#9DC4D5] text-lg md:text-xl leading-relaxed mb-10 max-w-xl mx-auto">
-          Conversaciones sobre amor, apego e identidad para hombres que quieren entenderse de verdad.
-          No venimos a enseñar. Venimos a recordar.
+          Conversaciones sobre amor, apego e identidad para hombres que quieren entenderse de
+          verdad. No venimos a enseñar. Venimos a recordar.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
@@ -99,8 +101,8 @@ export default async function HomePage() {
           </p>
           <h2 className="text-3xl font-bold mb-4">Tarot como herramienta de autoconocimiento</h2>
           <p className="text-[#9DC4D5] mb-8 max-w-lg mx-auto">
-            No predicción. No magia. Una lectura profunda de tu momento actual usando el tarot como espejo.
-            Para hombres que quieren entender qué les está pasando de verdad.
+            No predicción. No magia. Una lectura profunda de tu momento actual usando el tarot como
+            espejo. Para hombres que quieren entender qué les está pasando de verdad.
           </p>
           <a
             href="https://instagram.com/yosoyvillamar"
@@ -146,15 +148,11 @@ export default async function HomePage() {
       <footer className="border-t border-white/10 px-6 py-8 text-center text-[#9DC4D5] text-sm">
         <p>
           © 2026 A Mí Tampoco Me Explicaron ·{' '}
-          <a
-            href="https://instagram.com/amtmepodcast"
-            target="_blank"
-            className="hover:text-white"
-          >
+          <a href="https://instagram.com/amtmepodcast" target="_blank" className="hover:text-white">
             @amtmepodcast
           </a>
         </p>
       </footer>
     </div>
-  )
+  );
 }

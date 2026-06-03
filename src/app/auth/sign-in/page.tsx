@@ -1,26 +1,37 @@
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser'
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 
 export default function SignInPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
-      const client = getSupabaseAuthBrowserClient()
-      if (!client) { setError('Supabase no configurado'); setLoading(false); return }
-      const { error } = await client.auth.signInWithPassword({ email, password })
-      if (error) { setError(error.message); setLoading(false); return }
-      router.push('/dashboard')
-    } catch { setError('Error inesperado'); setLoading(false) }
+      const client = getSupabaseAuthBrowserClient();
+      if (!client) {
+        setError('Supabase no configurado');
+        setLoading(false);
+        return;
+      }
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+      router.push('/dashboard');
+    } catch {
+      setError('Error inesperado');
+      setLoading(false);
+    }
   }
 
   return (
@@ -36,7 +47,7 @@ export default function SignInPage() {
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c1f36]"
               placeholder="tu@email.com"
@@ -47,7 +58,7 @@ export default function SignInPage() {
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0c1f36]"
               placeholder="••••••••"
@@ -67,5 +78,5 @@ export default function SignInPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

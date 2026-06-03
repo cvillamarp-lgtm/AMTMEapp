@@ -2,10 +2,20 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { getMasterSections, createMasterSection, updateMasterSection, deleteMasterSection } from '@/lib/database';
+import {
+  getMasterSections,
+  createMasterSection,
+  updateMasterSection,
+  deleteMasterSection,
+} from '@/lib/database';
 import type { MasterSection } from '@/types/database';
 
-const STATUS_OPTIONS: MasterSection['status'][] = ['vigente', 'pendiente', 'historico', 'requiere-decision'];
+const STATUS_OPTIONS: MasterSection['status'][] = [
+  'vigente',
+  'pendiente',
+  'historico',
+  'requiere-decision',
+];
 const PRIORITY_OPTIONS: MasterSection['priority'][] = ['alta', 'media', 'baja'];
 
 const STATUS_TONE: Record<MasterSection['status'], 'good' | 'warning' | 'neutral'> = {
@@ -36,19 +46,22 @@ export default function DocumentoMaestroPage() {
   const [newForm, setNewForm] = useState({ ...EMPTY });
 
   useEffect(() => {
-    getMasterSections().then(data => {
-      setSections(data);
-      if (data.length > 0) {
-        setSelectedId(data[0].id);
-        setDraft(data[0]);
-      }
-    }).finally(() => setLoading(false));
+    getMasterSections()
+      .then((data) => {
+        setSections(data);
+        if (data.length > 0) {
+          setSelectedId(data[0].id);
+          setDraft(data[0]);
+        }
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const filtered = useMemo(() =>
-    sections.filter(s =>
-      `${s.title} ${s.content}`.toLowerCase().includes(query.toLowerCase())
-    ), [sections, query]);
+  const filtered = useMemo(
+    () =>
+      sections.filter((s) => `${s.title} ${s.content}`.toLowerCase().includes(query.toLowerCase())),
+    [sections, query]
+  );
 
   function selectSection(s: MasterSection) {
     setSelectedId(s.id);
@@ -68,7 +81,7 @@ export default function DocumentoMaestroPage() {
         notes: draft.notes,
         last_reviewed_at: draft.last_reviewed_at,
       });
-      setSections(prev => prev.map(s => s.id === updated.id ? updated : s));
+      setSections((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
       setDraft(updated);
     } finally {
       setSaving(false);
@@ -84,7 +97,7 @@ export default function DocumentoMaestroPage() {
         status: 'vigente',
         last_reviewed_at: today,
       });
-      setSections(prev => prev.map(s => s.id === updated.id ? updated : s));
+      setSections((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
       setDraft(updated);
     } finally {
       setSaving(false);
@@ -96,7 +109,7 @@ export default function DocumentoMaestroPage() {
     setSaving(true);
     try {
       const created = await createMasterSection({ ...newForm, version: 1 } as any);
-      setSections(prev => [created, ...prev]);
+      setSections((prev) => [created, ...prev]);
       setSelectedId(created.id);
       setDraft(created);
       setNewOpen(false);
@@ -108,8 +121,8 @@ export default function DocumentoMaestroPage() {
 
   async function removeSection(id: string) {
     await deleteMasterSection(id);
-    setSections(prev => {
-      const next = prev.filter(s => s.id !== id);
+    setSections((prev) => {
+      const next = prev.filter((s) => s.id !== id);
       if (selectedId === id && next.length > 0) {
         setSelectedId(next[0].id);
         setDraft(next[0]);
@@ -121,8 +134,7 @@ export default function DocumentoMaestroPage() {
     });
   }
 
-  const setNew = (k: keyof typeof newForm) => (v: string) =>
-    setNewForm(f => ({ ...f, [k]: v }));
+  const setNew = (k: keyof typeof newForm) => (v: string) => setNewForm((f) => ({ ...f, [k]: v }));
 
   return (
     <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
@@ -130,7 +142,9 @@ export default function DocumentoMaestroPage() {
       <Card>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-black/40">Documento Maestro</div>
+            <div className="text-xs uppercase tracking-[0.22em] text-black/40">
+              Documento Maestro
+            </div>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
               Fuente central de conocimiento
             </h2>
@@ -144,7 +158,7 @@ export default function DocumentoMaestroPage() {
         <div className="mt-4 space-y-4">
           <input
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar sección..."
             className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm placeholder:text-black/30 focus:outline-none focus:ring-2 focus:ring-[#0C1F36]/20"
           />
@@ -157,7 +171,7 @@ export default function DocumentoMaestroPage() {
             </p>
           ) : (
             <div className="max-h-[580px] space-y-2 overflow-auto pr-1">
-              {filtered.map(section => (
+              {filtered.map((section) => (
                 <button
                   key={section.id}
                   onClick={() => selectSection(section)}
@@ -166,17 +180,23 @@ export default function DocumentoMaestroPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="text-sm font-semibold">{section.title}</div>
-                      <div className={`mt-0.5 text-xs uppercase tracking-[0.18em] ${selectedId === section.id ? 'text-white/60' : 'text-black/38'}`}>
+                      <div
+                        className={`mt-0.5 text-xs uppercase tracking-[0.18em] ${selectedId === section.id ? 'text-white/60' : 'text-black/38'}`}
+                      >
                         {section.status} · {section.priority}
                       </div>
                     </div>
                     {section.last_reviewed_at && (
-                      <span className={`shrink-0 text-xs ${selectedId === section.id ? 'text-white/60' : 'text-black/40'}`}>
+                      <span
+                        className={`shrink-0 text-xs ${selectedId === section.id ? 'text-white/60' : 'text-black/40'}`}
+                      >
                         {section.last_reviewed_at}
                       </span>
                     )}
                   </div>
-                  <p className={`mt-2 line-clamp-2 text-sm leading-5 ${selectedId === section.id ? 'text-white/80' : 'text-black/60'}`}>
+                  <p
+                    className={`mt-2 line-clamp-2 text-sm leading-5 ${selectedId === section.id ? 'text-white/80' : 'text-black/60'}`}
+                  >
                     {section.content}
                   </p>
                 </button>
@@ -192,34 +212,76 @@ export default function DocumentoMaestroPage() {
           <div className="space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-xs uppercase tracking-[0.22em] text-black/40">Sección activa</div>
+                <div className="text-xs uppercase tracking-[0.22em] text-black/40">
+                  Sección activa
+                </div>
                 <h3 className="mt-1 text-xl font-semibold text-[#0C1F36]">{draft.title}</h3>
               </div>
               <div className="flex items-center gap-2">
                 <Badge tone={STATUS_TONE[draft.status]}>{draft.status}</Badge>
-                <button onClick={() => removeSection(draft.id)} className="text-xs text-red-400 hover:text-red-600">Eliminar</button>
+                <button
+                  onClick={() => removeSection(draft.id)}
+                  className="text-xs text-red-400 hover:text-red-600"
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Título">
-                <Input value={draft.title} onChange={e => setDraft(d => d ? { ...d, title: e.target.value } : d)} />
+                <Input
+                  value={draft.title}
+                  onChange={(e) => setDraft((d) => (d ? { ...d, title: e.target.value } : d))}
+                />
               </Field>
               <Field label="Estado">
-                <Select value={draft.status} onChange={e => setDraft(d => d ? { ...d, status: e.target.value as MasterSection['status'] } : d)}>
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                <Select
+                  value={draft.status}
+                  onChange={(e) =>
+                    setDraft((d) =>
+                      d ? { ...d, status: e.target.value as MasterSection['status'] } : d
+                    )
+                  }
+                >
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </Select>
               </Field>
               <Field label="Prioridad">
-                <Select value={draft.priority} onChange={e => setDraft(d => d ? { ...d, priority: e.target.value as MasterSection['priority'] } : d)}>
-                  {PRIORITY_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                <Select
+                  value={draft.priority}
+                  onChange={(e) =>
+                    setDraft((d) =>
+                      d ? { ...d, priority: e.target.value as MasterSection['priority'] } : d
+                    )
+                  }
+                >
+                  {PRIORITY_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
                 </Select>
               </Field>
               <Field label="Responsable">
-                <Input value={draft.responsible ?? ''} onChange={e => setDraft(d => d ? { ...d, responsible: e.target.value } : d)} placeholder="¿Quién gestiona esto?" />
+                <Input
+                  value={draft.responsible ?? ''}
+                  onChange={(e) => setDraft((d) => (d ? { ...d, responsible: e.target.value } : d))}
+                  placeholder="¿Quién gestiona esto?"
+                />
               </Field>
               <Field label="Última revisión">
-                <Input type="date" value={draft.last_reviewed_at ?? ''} onChange={e => setDraft(d => d ? { ...d, last_reviewed_at: e.target.value } : d)} />
+                <Input
+                  type="date"
+                  value={draft.last_reviewed_at ?? ''}
+                  onChange={(e) =>
+                    setDraft((d) => (d ? { ...d, last_reviewed_at: e.target.value } : d))
+                  }
+                />
               </Field>
             </div>
 
@@ -227,7 +289,7 @@ export default function DocumentoMaestroPage() {
               <Textarea
                 rows={14}
                 value={draft.content}
-                onChange={e => setDraft(d => d ? { ...d, content: e.target.value } : d)}
+                onChange={(e) => setDraft((d) => (d ? { ...d, content: e.target.value } : d))}
                 placeholder="Contenido de esta sección del documento maestro..."
               />
             </Field>
@@ -236,7 +298,7 @@ export default function DocumentoMaestroPage() {
               <Textarea
                 rows={3}
                 value={draft.notes ?? ''}
-                onChange={e => setDraft(d => d ? { ...d, notes: e.target.value } : d)}
+                onChange={(e) => setDraft((d) => (d ? { ...d, notes: e.target.value } : d))}
                 placeholder="Notas internas, contexto, próximas decisiones..."
               />
             </Field>
@@ -248,10 +310,13 @@ export default function DocumentoMaestroPage() {
               <Button variant="secondary" onClick={markReviewed} disabled={saving}>
                 Marcar revisada hoy
               </Button>
-              <Button variant="secondary" onClick={() => {
-                const orig = sections.find(s => s.id === draft.id);
-                if (orig) setDraft(orig);
-              }}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const orig = sections.find((s) => s.id === draft.id);
+                  if (orig) setDraft(orig);
+                }}
+              >
                 Revertir
               </Button>
             </div>
@@ -269,23 +334,62 @@ export default function DocumentoMaestroPage() {
           <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
             <h3 className="text-lg font-semibold text-[#0C1F36]">Nueva sección</h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field label="Título *"><Input value={newForm.title} onChange={e => setNew('title')(e.target.value)} placeholder="Nombre de la sección" /></Field>
+              <Field label="Título *">
+                <Input
+                  value={newForm.title}
+                  onChange={(e) => setNew('title')(e.target.value)}
+                  placeholder="Nombre de la sección"
+                />
+              </Field>
               <Field label="Estado">
-                <Select value={newForm.status} onChange={e => setNew('status')(e.target.value)}>
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                <Select value={newForm.status} onChange={(e) => setNew('status')(e.target.value)}>
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </Select>
               </Field>
               <Field label="Prioridad">
-                <Select value={newForm.priority} onChange={e => setNew('priority')(e.target.value)}>
-                  {PRIORITY_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                <Select
+                  value={newForm.priority}
+                  onChange={(e) => setNew('priority')(e.target.value)}
+                >
+                  {PRIORITY_OPTIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
                 </Select>
               </Field>
-              <Field label="Responsable"><Input value={newForm.responsible ?? ''} onChange={e => setNew('responsible')(e.target.value)} placeholder="Responsable de esta sección" /></Field>
-              <Field label="Contenido"><Textarea value={newForm.content} onChange={e => setNew('content')(e.target.value)} rows={5} placeholder="Contenido inicial..." /></Field>
+              <Field label="Responsable">
+                <Input
+                  value={newForm.responsible ?? ''}
+                  onChange={(e) => setNew('responsible')(e.target.value)}
+                  placeholder="Responsable de esta sección"
+                />
+              </Field>
+              <Field label="Contenido">
+                <Textarea
+                  value={newForm.content}
+                  onChange={(e) => setNew('content')(e.target.value)}
+                  rows={5}
+                  placeholder="Contenido inicial..."
+                />
+              </Field>
             </div>
             <div className="mt-5 flex justify-end gap-3">
-              <button onClick={() => setNewOpen(false)} className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors">Cancelar</button>
-              <button onClick={createNew} disabled={saving} className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50">
+              <button
+                onClick={() => setNewOpen(false)}
+                className="px-4 py-2 text-sm font-medium border border-black/10 rounded-xl hover:bg-black/5 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={createNew}
+                disabled={saving}
+                className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50"
+              >
                 {saving ? 'Creando...' : 'Crear sección'}
               </button>
             </div>

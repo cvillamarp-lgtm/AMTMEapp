@@ -49,7 +49,9 @@ export default function ConfiguracionPage() {
   );
   const [grokModel, setGrokModel] = useState(config.aiPreferredModelByProvider.grok);
   const [geminiModel, setGeminiModel] = useState(config.aiPreferredModelByProvider.gemini);
-  const [claudeModel, setClaudeModel] = useState(config.aiPreferredModelByProvider.claude ?? 'claude-sonnet-4-20250514');
+  const [claudeModel, setClaudeModel] = useState(
+    config.aiPreferredModelByProvider.claude ?? 'claude-sonnet-4-20250514'
+  );
   const [visibleGrokModels, setVisibleGrokModels] = useState(
     (config.aiVisibleModelsByProvider?.grok ?? [config.aiPreferredModelByProvider.grok]).join('\n')
   );

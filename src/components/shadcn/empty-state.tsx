@@ -1,12 +1,12 @@
-import type { ReactNode } from 'react'
-import { motion } from 'framer-motion'
-import type { Icon } from '@phosphor-icons/react'
+import type { ReactNode } from 'react';
+import { motion } from 'framer-motion';
+import type { Icon } from '@phosphor-icons/react';
 
 interface EmptyStateProps {
-  icon?: Icon
-  title: string
-  description?: string
-  action?: ReactNode
+  icon?: Icon;
+  title: string;
+  description?: string;
+  action?: ReactNode;
 }
 
 export function EmptyState({ icon: PhIcon, title, description, action }: EmptyStateProps) {
@@ -19,10 +19,8 @@ export function EmptyState({ icon: PhIcon, title, description, action }: EmptySt
     >
       {PhIcon && <PhIcon size={48} weight="thin" className="text-muted-foreground/30 mb-4" />}
       <p className="text-sm font-medium text-foreground">{title}</p>
-      {description && (
-        <p className="text-xs text-muted-foreground mt-1 max-w-xs">{description}</p>
-      )}
+      {description && <p className="text-xs text-muted-foreground mt-1 max-w-xs">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
     </motion.div>
-  )
+  );
 }
