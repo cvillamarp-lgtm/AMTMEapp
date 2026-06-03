@@ -320,17 +320,26 @@ export default function DashboardPage() {
           <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="font-semibold text-primary">Energía creativa</h2>
-                <p className="text-sm text-muted-foreground mt-1">Recomendación sostenible</p>
+                <h2 className="font-semibold text-primary">Energia y sostén</h2>
+                <p className="text-sm text-muted-foreground mt-1">Recomendacion sostenible de hoy</p>
               </div>
               <Leaf size={20} className="text-primary" />
             </div>
-            <div className="mt-4 p-4 rounded-lg bg-muted/30">
-              <p className="text-sm font-medium text-primary">Respira, descansa, produce.</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Hoy procesa el episodio anterior antes de iniciar uno nuevo. La consistencia vence
-                la velocidad.
-              </p>
+            <div className="mt-4 space-y-2">
+              <div className="p-3 rounded-lg bg-muted/30">
+                <p className="text-sm font-medium text-primary">Modo normal: produce.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Si tienes energia, avanza en el episodio actual. Si no, ve a Notas y activa el modo baja energia.
+                </p>
+              </div>
+              {activeLeads === 0 && (
+                <div className="p-3 rounded-lg bg-[#e8ff40]/10 border border-[#e8ff40]/30">
+                  <p className="text-sm font-medium text-primary">Sin leads activos en Monetizacion.</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Cuando alguien exprese interes, registralo. No hace falta buscarlo; el contenido lo atrae.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

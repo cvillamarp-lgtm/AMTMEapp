@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent } from '@/components/shadcn/card';
+import { Card } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import { Textarea } from '@/components/shadcn/textarea';
@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/shadcn/select';
-import { Pin, Trash2, Plus, Save, X } from 'lucide-react';
+import { Pin, Trash2, Plus, Save, X, Zap, BookOpen, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
@@ -28,11 +28,28 @@ type Note = {
   pinned: boolean;
 };
 
-const CATEGORIES = ['general', 'episodio', 'estrategia', 'monetizacion', 'técnico', 'reflexion'];
+const CATEGORIES = ['general', 'episodio', 'estrategia', 'monetizacion', 'tecnico', 'reflexion'];
 const STATUS_OPTIONS = ['activa', 'archivada', 'pendiente'];
 
+const MODOS_BAJA_ENERGIA = [
+  'Escucha un episodio propio. Anotalo sin presion.',
+  'Escribe tres lineas sobre lo que sientes. No tiene que ser contenido.',
+  'Revisa el ultimo guion. Solo leer, no editar.',
+  'Graba un memo de voz de 2 minutos. No lo edites.',
+];
+
+const PLAN_MINIMO_VIABLE = [
+  'Publica una sola frase en historia. Algo que sientas verdad hoy.',
+  'Responde un DM con atencion real. Uno solo.',
+  'Escribe el hook del proximo episodio. Solo el hook.',
+  'Registra una idea en Notas. Sin estructura.',
+];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseClient = any;
+
 async function getNotes(): Promise<Note[]> {
-  const sb = getSupabaseBrowserClient() as any;
+  const sb = getSupabaseBrowserClient() as SupabaseClient;
   if (!sb) return [];
   const { data, error } = await sb
     .from('notes')
@@ -44,17 +61,17 @@ async function getNotes(): Promise<Note[]> {
     console.error(error);
     return [];
   }
-  return (data || []).map((r: any) => ({
-    id: r.id,
-    user_id: r.user_id,
-    created_at: r.created_at,
-    updated_at: r.updated_at,
-    ...r.payload,
+  return (data || []).map((r: Record<string, unknown>) => ({
+    id: r.id as string,
+    user_id: r.user_id as string | null,
+    created_at: r.created_at as string,
+    updated_at: r.updated_at as string,
+    ...(r.payload as Omit<Note, 'id' | 'user_id' | 'created_at' | 'updated_at'>),
   }));
 }
 
 async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
-  const sb = getSupabaseBrowserClient() as any;
+  const sb = getSupabaseBrowserClient() as SupabaseClient;
   const payload = {
     title: data.title,
     content: data.content,
@@ -95,7 +112,7 @@ async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
 }
 
 async function deleteNote(id: string) {
-  const sb = getSupabaseBrowserClient() as any;
+  const sb = getSupabaseBrowserClient() as SupabaseClient;
   const { error } = await sb.from('notes').delete().eq('id', id);
   if (error) throw error;
 }
@@ -108,6 +125,7 @@ export default function NotasPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [energiaMode, setEnergiaMode] = useState(false);
   const [draft, setDraft] = useState({
     title: '',
     content: '',
@@ -220,6 +238,8 @@ export default function NotasPage() {
     }
   }
 
+  const diaIndex = new Date().getDay();
+
   const fmt = (s: string) =>
     new Date(s).toLocaleDateString('es-MX', {
       day: 'numeric',
@@ -232,6 +252,39 @@ export default function NotasPage() {
     <div className="flex h-[calc(100vh-120px)] gap-4 overflow-hidden pb-4 p-6 md:p-8">
       {/* Panel izquierdo */}
       <div className="flex w-72 shrink-0 flex-col gap-3">
+        {/* Modo energia */}
+        <div className="rounded-xl border border-[#e8ff40]/40 bg-[#e8ff40]/5 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5">
+              <Zap className="h-3.5 w-3.5 text-[#0c1f36]" />
+              <span className="text-xs font-semibold text-[#0c1f36]">Energia creativa</span>
+            </div>
+            <button
+              className={`text-xs px-2 py-0.5 rounded-full font-medium transition-colors ${
+                energiaMode
+                  ? 'bg-[#0c1f36] text-white'
+                  : 'bg-white border border-[#0c1f36]/20 text-[#0c1f36]'
+              }`}
+              onClick={() => setEnergiaMode((v) => !v)}
+            >
+              {energiaMode ? 'Baja' : 'Normal'}
+            </button>
+          </div>
+          {energiaMode ? (
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground font-medium">Modo baja energia:</p>
+              <p className="text-xs text-[#0c1f36] leading-relaxed">
+                {MODOS_BAJA_ENERGIA[diaIndex % MODOS_BAJA_ENERGIA.length]}
+              </p>
+              <p className="text-xs text-muted-foreground font-medium mt-2">Plan minimo viable:</p>
+              <p className="text-xs text-[#0c1f36] leading-relaxed">
+                {PLAN_MINIMO_VIABLE[diaIndex % PLAN_MINIMO_VIABLE.length]}
+              </p>
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">Activa si hoy tienes poca energia para producir.</p>
+          )}
+        </div>
         <div className="flex gap-2">
           <Input
             placeholder="Buscar notas..."
@@ -260,7 +313,7 @@ export default function NotasPage() {
             ))}
           </SelectContent>
         </Select>
-        <div className="flex-1 overflow-y-auto space-y-2">
+          <div className="flex-1 overflow-y-auto space-y-2">
           {loading ? (
             <p className="text-xs text-center text-muted-foreground py-4">Cargando...</p>
           ) : filtered.length === 0 ? (
@@ -276,9 +329,16 @@ export default function NotasPage() {
                   <span
                     className={`truncate text-sm font-semibold ${selected?.id === n.id ? 'text-white' : 'text-[#0c1f36]'}`}
                   >
-                    {n.title || 'Sin título'}
+                    {n.title || 'Sin titulo'}
                   </span>
-                  {n.pinned && <Pin className="h-3 w-3 shrink-0 mt-0.5" />}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {n.pinned && <Pin className="h-3 w-3 mt-0.5" />}
+                    {n.category === 'reflexion' ? (
+                      <Lock className="h-3 w-3 mt-0.5 text-muted-foreground" />
+                    ) : (
+                      <BookOpen className="h-3 w-3 mt-0.5 text-muted-foreground" />
+                    )}
+                  </div>
                 </div>
                 <p
                   className={`mt-1 truncate text-xs ${selected?.id === n.id ? 'text-white/60' : 'text-muted-foreground'}`}
@@ -288,7 +348,7 @@ export default function NotasPage() {
                 <p
                   className={`mt-1 text-xs ${selected?.id === n.id ? 'text-white/40' : 'text-muted-foreground/60'}`}
                 >
-                  {n.category} · {fmt(n.updated_at)}
+                  {n.category === 'reflexion' ? 'privada' : 'publicable'} · {fmt(n.updated_at)}
                 </p>
               </button>
             ))
@@ -301,7 +361,18 @@ export default function NotasPage() {
         {selected ? (
           <>
             <div className="flex items-center justify-between border-b px-5 py-3 gap-2">
-              <span className="text-xs text-muted-foreground">{fmt(selected.updated_at)}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{fmt(selected.updated_at)}</span>
+                {selected.category === 'reflexion' ? (
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground flex items-center gap-1">
+                    <Lock className="h-3 w-3" /> Privada
+                  </span>
+                ) : (
+                  <span className="text-xs bg-[#e8ff40]/20 px-2 py-0.5 rounded-full text-[#0c1f36] flex items-center gap-1">
+                    <BookOpen className="h-3 w-3" /> Publicable
+                  </span>
+                )}
+              </div>
               <div className="flex gap-1.5">
                 <Button size="sm" variant="ghost" onClick={() => togglePin(selected)}>
                   <Pin className={`h-4 w-4 ${selected.pinned ? 'fill-current' : ''}`} />

@@ -26,7 +26,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Plus, Pencil, Sparkles, Loader2, Copy } from 'lucide-react';
+import { Plus, Pencil, Sparkles, Loader2, Copy, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   getMonetizationLeads,
@@ -35,6 +35,28 @@ import {
 } from '@/lib/database';
 import type { MonetizationLead, LeadStatus } from '@/types/database';
 import { callAI } from '@/lib/ai-studio';
+
+const SERVICIOS_DISPONIBLES = [
+  {
+    nombre: 'Lectura de tarot simbolica',
+    descripcion: 'Sesion individual para explorar un area de vida — amor, identidad, transicion.',
+    precio: 'Definido por sesion',
+    canal: 'DM de Instagram',
+  },
+  {
+    nombre: 'Sesion de acompanamiento',
+    descripcion: 'Conversacion estructurada para clarificar un momento de confusion o cambio.',
+    precio: 'Definido por sesion',
+    canal: 'DM de Instagram',
+  },
+];
+
+const CTA_SUAVES = [
+  'Si esto resuena contigo, escríbeme por DM.',
+  'Puedo acompañarte en esto. Escríbeme cuando quieras.',
+  'Si quieres explorar esto más a fondo, podemos hablar.',
+  'Hay un espacio para esto. Escríbeme si te interesa.',
+];
 
 export default function MonetizacionPage() {
   const [leads, setLeads] = useState<MonetizationLead[]>([]);
@@ -161,8 +183,8 @@ Devuelve exactamente:
         await load();
       }
       toast.success('Mensaje generado');
-    } catch (e: any) {
-      toast.error(e.message || 'Error al generar');
+    } catch (e: unknown) {
+      toast.error((e as Error).message || 'Error al generar');
     } finally {
       setGeneratingId(null);
     }
@@ -172,6 +194,10 @@ Devuelve exactamente:
   const won = leads.filter((l) => ['pagado', 'entregado'].includes(l.status));
   const totalRevenue = won.reduce((s, l) => s + l.real_revenue, 0);
   const closeRate = leads.length > 0 ? ((won.length / leads.length) * 100).toFixed(1) : '0';
+  const pendingFollowUp = leads.filter(
+    (l) => !['pagado', 'entregado', 'perdido'].includes(l.status) && !l.next_action
+  );
+  const urgente = pendingFollowUp[0] || null;
 
   const statusColor: Record<string, string> = {
     pagado: 'bg-[#e8ff40] text-[#0c1f36]',
@@ -185,8 +211,8 @@ Devuelve exactamente:
     <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold">Monetización</h1>
-          <p className="text-sm text-muted-foreground mt-1">Pipeline comercial y leads</p>
+          <h1 className="text-2xl md:text-3xl font-semibold">Monetizacion</h1>
+          <p className="text-sm text-muted-foreground mt-1">Pipeline comercial y acompanamiento</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -309,6 +335,75 @@ Devuelve exactamente:
         </Dialog>
       </div>
 
+      {/* Panel de oportunidad de hoy */}
+      <div className="grid gap-4 md:grid-cols-2 mb-6">
+        {/* Oportunidad activa */}
+        <Card className="border-[#e8ff40]/40 bg-[#e8ff40]/5">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-[#0c1f36]" />
+              <CardTitle className="text-base">Oportunidad de hoy</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {urgente ? (
+              <>
+                <p className="text-sm font-medium text-[#0c1f36]">{urgente.name}</p>
+                <p className="text-xs text-muted-foreground">{urgente.offer} — sin proxima accion definida</p>
+                <Button
+                  size="sm"
+                  className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] text-xs mt-1"
+                  onClick={() => handleEdit(urgente)}
+                >
+                  Definir siguiente paso
+                </Button>
+              </>
+            ) : active.length > 0 ? (
+              <p className="text-sm text-muted-foreground">Todos los leads activos tienen siguiente paso. Buen ritmo.</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Sin leads activos. Cuando llegue un interes, registralo aqui.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* CTA suave recomendado */}
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-base">CTA suave para hoy</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-[#0c1f36] leading-relaxed">
+              {CTA_SUAVES[new Date().getDay() % CTA_SUAVES.length]}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">Rotacion diaria — para usar al cierre de contenido o en DM.</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Servicios disponibles */}
+      <div className="mb-6">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Servicios disponibles</h2>
+        <div className="grid gap-3 md:grid-cols-2">
+          {SERVICIOS_DISPONIBLES.map((s) => (
+            <Card key={s.nombre} className="border-border/50">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-sm font-semibold text-[#0c1f36]">{s.nombre}</p>
+                <p className="text-xs text-muted-foreground mt-1">{s.descripcion}</p>
+                <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
+                  <span>{s.precio}</span>
+                  <span>·</span>
+                  <span>{s.canal}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* KPIs */}
       <div className="grid gap-4 md:grid-cols-3 mb-8">
         <Card>
           <CardHeader className="pb-3">
@@ -330,18 +425,32 @@ Devuelve exactamente:
         </Card>
       </div>
 
+      {/* Seguimiento pendiente */}
+      {pendingFollowUp.length > 1 && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <span className="text-sm font-medium text-amber-800">{pendingFollowUp.length} leads sin siguiente paso</span>
+          </div>
+          <p className="text-xs text-amber-700">Define la proxima accion para cada uno. No hace falta apresurarse, pero si tener claridad.</p>
+        </div>
+      )}
+
+      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Pipeline de leads</h2>
+
       {loading ? (
         <div className="text-center py-12 text-muted-foreground">Cargando...</div>
       ) : leads.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">Sin leads registrados</p>
+            <p className="text-muted-foreground mb-2">Sin leads registrados</p>
+            <p className="text-xs text-muted-foreground mb-4">Cuando alguien exprese interes en un servicio, registralo aqui para darle seguimiento.</p>
             <Button
               className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
               onClick={() => setDialogOpen(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Crear primer lead
+              Registrar primer lead
             </Button>
           </CardContent>
         </Card>
@@ -378,9 +487,46 @@ Devuelve exactamente:
                     <span className="text-muted-foreground">Real: </span>${l.real_revenue}
                   </div>
                   <div className="col-span-2">
-                    <span className="text-muted-foreground">Next: </span>
-                    {l.next_action || '—'}
+                    <span className="text-muted-foreground">Siguiente paso: </span>
+                    {l.next_action ? (
+                      <span className="text-[#0c1f36]">{l.next_action}</span>
+                    ) : (
+                      <span className="text-amber-600 font-medium">Sin definir — requiere atencion</span>
+                    )}
                   </div>
+                </div>
+                {aiMessages[l.id] && (
+                  <div className="mt-3 p-3 rounded-lg bg-muted/40 text-sm">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Mensaje generado:</p>
+                    <p className="text-[#0c1f36] leading-relaxed">{aiMessages[l.id]}</p>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="mt-2 h-7 text-xs"
+                      onClick={() => {
+                        navigator.clipboard.writeText(aiMessages[l.id]);
+                        toast.success('Copiado');
+                      }}
+                    >
+                      <Copy className="h-3 w-3 mr-1" /> Copiar
+                    </Button>
+                  </div>
+                )}
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                    disabled={generatingId === l.id}
+                    onClick={() => generateFollowUp(l)}
+                  >
+                    {generatingId === l.id ? (
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3 w-3 mr-1" />
+                    )}
+                    Generar mensaje de seguimiento
+                  </Button>
                 </div>
               </CardContent>
             </Card>
