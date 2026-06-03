@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus } from '@phosphor-icons/react';
+import { Sparkle, Leaf, CheckCircle, Lightning } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
@@ -64,18 +64,14 @@ export default function DashboardPage() {
     ['publicado', 'distribuido', 'medido'].includes(e.status)
   ).length;
 
-  const contentPending = content.filter((c) =>
-    ['borrador', 'listo'].includes(c.status)
-  ).length;
+  const contentPending = content.filter((c) => ['borrador', 'listo'].includes(c.status)).length;
 
   const activeLeads = leads.filter(
     (l) => !['pagado', 'entregado', 'perdido'].includes(l.status)
   ).length;
 
   const criticalAlerts = episodes.filter(
-    (e) =>
-      ['publicado', 'distribuido'].includes(e.status) &&
-      (!e.cta || !e.spotify_description)
+    (e) => ['publicado', 'distribuido'].includes(e.status) && (!e.cta || !e.spotify_description)
   );
 
   const leadsNoAction = leads.filter(
@@ -95,7 +91,8 @@ export default function DashboardPage() {
           AMTME Studio OS
         </h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">
-          Sistema operativo editorial, documental y operativo para gestionar AMTME desde una sola fuente central.
+          Sistema operativo editorial, documental y operativo para gestionar AMTME desde una sola
+          fuente central.
         </p>
       </div>
 
@@ -113,62 +110,197 @@ export default function DashboardPage() {
             <StatCard label="Leads activos" value={activeLeads} />
           </div>
 
-          {/* Centro de control + Alertas */}
+          {/* Siguiente acción + Estado de producción */}
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <h2 className="font-semibold text-primary">Centro de control</h2>
-              <p className="text-sm text-muted-foreground mb-4">Acciones rápidas</p>
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  href="/episodios"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  <Plus size={16} /> Crear episodio
-                </Link>
-                <Link
-                  href="/contenido"
-                  className="inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90 transition-colors"
-                >
-                  <Plus size={16} /> Crear contenido
-                </Link>
-                <Link
-                  href="/metricas"
-                  className="inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/90 transition-colors"
-                >
-                  <Plus size={16} /> Registrar métrica
-                </Link>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="font-semibold text-primary">Siguiente acción recomendada</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Enfócate aquí primero</p>
+                </div>
+                <Lightning size={20} className="text-primary" />
+              </div>
+              <div className="mt-4 space-y-3">
+                {leadsNoAction.length > 0 ? (
+                  <Link
+                    href="/monetizacion"
+                    className="block p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+                  >
+                    <p className="text-sm font-medium text-primary">
+                      {leadsNoAction.length} lead(s) sin próxima acción
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Define el siguiente paso para mantener el flujo
+                    </p>
+                  </Link>
+                ) : null}
+                {criticalAlerts.length > 0 ? (
+                  <Link
+                    href="/episodios"
+                    className="block p-3 rounded-lg bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                  >
+                    <p className="text-sm font-medium text-destructive">
+                      {criticalAlerts.length} episodio(s) incompleto(s)
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Faltan CTA o descripción Spotify
+                    </p>
+                  </Link>
+                ) : null}
+                {leadsNoAction.length === 0 && criticalAlerts.length === 0 && (
+                  <p className="text-sm text-muted-foreground py-2">
+                    Sin acciones críticas. Buen ritmo de trabajo.
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <h2 className="font-semibold text-primary">Alertas críticas</h2>
-              <p className="text-sm text-muted-foreground mb-4">Requieren atención</p>
-              <div className="space-y-2">
-                {criticalAlerts.length === 0 && leadsNoAction.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No hay alertas críticas</p>
-                ) : (
-                  <>
-                    {criticalAlerts.map((ep) => (
-                      <div key={ep.id} className="flex items-center justify-between text-sm">
-                        <span>
-                          EP #{ep.episode_number} {!ep.cta ? 'sin CTA' : 'sin descripción Spotify'}
-                        </span>
-                        <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
-                          Acción requerida
-                        </span>
-                      </div>
-                    ))}
-                    {leadsNoAction.length > 0 && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span>{leadsNoAction.length} leads sin próxima acción</span>
-                        <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-semibold text-destructive">
-                          Acción requerida
-                        </span>
-                      </div>
-                    )}
-                  </>
-                )}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="font-semibold text-primary">Estado de producción</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Resumen del flujo</p>
+                </div>
+                <CheckCircle size={20} className="text-primary" />
               </div>
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">En desarrollo</span>
+                  <span className="font-semibold text-primary">{inProgress}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Publicados</span>
+                  <span className="font-semibold text-primary">{published}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Contenido pendiente</span>
+                  <span className="font-semibold text-primary">{contentPending}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Leads activos</span>
+                  <span className="font-semibold text-primary">{activeLeads}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Listo para publicar */}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-semibold text-primary">Listo para publicar</h2>
+                <p className="text-sm text-muted-foreground">
+                  Episodios que pueden distribuirse ahora
+                </p>
+              </div>
+              <CheckCircle size={20} className="text-primary" />
+            </div>
+            <div className="space-y-2">
+              {episodes.filter((e) => e.status === 'listo').length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">
+                  No hay episodios listos para publicar
+                </p>
+              ) : (
+                episodes
+                  .filter((e) => e.status === 'listo')
+                  .slice(0, 3)
+                  .map((ep) => (
+                    <div
+                      key={ep.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/60 transition-colors"
+                    >
+                      <span className="text-sm font-medium text-primary">
+                        #{ep.episode_number}: {ep.title}
+                      </span>
+                      <Link href="/episodios" className="text-xs text-primary hover:underline">
+                        Publicar
+                      </Link>
+                    </div>
+                  ))
+              )}
+            </div>
+          </div>
+
+          {/* Centro de control + Acciones rápidas */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <h2 className="font-semibold text-primary">Acciones rápidas</h2>
+              <p className="text-sm text-muted-foreground mb-4">Navega a donde necesitas</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/documento-maestro"
+                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
+                >
+                  Documento maestro
+                </Link>
+                <Link
+                  href="/episodios"
+                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
+                >
+                  Episodios
+                </Link>
+                <Link
+                  href="/guiones"
+                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
+                >
+                  Guiones
+                </Link>
+                <Link
+                  href="/contenido"
+                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
+                >
+                  Contenido
+                </Link>
+                <Link
+                  href="/calendario"
+                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
+                >
+                  Calendario
+                </Link>
+                <Link
+                  href="/checklists"
+                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
+                >
+                  Checklists
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-amtme-lemon/40 bg-amtme-cream p-5 shadow-sm">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h2 className="font-semibold text-primary">IA útil ahora</h2>
+                  <p className="text-sm text-muted-foreground">Genera contenido con asistencia</p>
+                </div>
+                <Sparkle size={20} className="text-amtme-lemon" />
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Editor de IA, guiones, descripciones y más
+              </p>
+              <Link
+                href="/ia/editor"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <Sparkle size={16} /> Abrir editor IA
+              </Link>
+            </div>
+          </div>
+
+          {/* Energía creativa */}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="font-semibold text-primary">Energía creativa</h2>
+                <p className="text-sm text-muted-foreground mt-1">Recomendación sostenible</p>
+              </div>
+              <Leaf size={20} className="text-primary" />
+            </div>
+            <div className="mt-4 p-4 rounded-lg bg-muted/30">
+              <p className="text-sm font-medium text-primary">Respira, descansa, produce.</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Hoy procesa el episodio anterior antes de iniciar uno nuevo. La consistencia vence
+                la velocidad.
+              </p>
             </div>
           </div>
 
