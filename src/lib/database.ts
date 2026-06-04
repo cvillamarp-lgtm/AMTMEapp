@@ -4,7 +4,6 @@
  * Los campos de negocio van dentro de payload.
  */
 
-import { getSupabaseBrowserClient } from './supabase/client';
 import { getSupabaseAuthBrowserClient } from './supabase/auth-browser';
 import type {
   Episode,
@@ -44,7 +43,7 @@ async function getActiveUserId(): Promise<string | null> {
 }
 
 function getClient() {
-  return getSupabaseBrowserClient() as any;
+  return getSupabaseAuthBrowserClient() as any;
 }
 
 // ---- helpers ----
