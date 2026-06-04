@@ -21,12 +21,14 @@ import {
   InstagramLogo,
   Gear,
   ListChecks,
-  MagnifyingGlass,
+  SignOut,
+  Warning,
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { useStudio } from '@/components/studio-provider';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
+import { useIdleLogout } from '@/hooks/use-idle-logout';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: House },
@@ -42,7 +44,6 @@ const navItems = [
   { href: '/checklists', label: 'Checklists', icon: CheckSquare },
   { href: '/notas', label: 'Notas', icon: NotePencil },
   { href: '/automatizacion', label: 'Automatización', icon: Lightning },
-  { href: '/estrategia', label: 'Estrategia', icon: 'TrendingUp' },
   { href: '/historico', label: 'Histórico', icon: Archive },
   { href: '/ia', label: 'IA', icon: Robot },
   { href: '/instagram', label: 'Instagram', icon: InstagramLogo },
@@ -73,8 +74,58 @@ export function StudioShell({ children }: { children: ReactNode }) {
     }
   };
 
+  const { showWarning, keepSession, signOutNow, remainingSeconds } = useIdleLogout({
+    enabled: authRequired,
+    idleMs: 5 * 60 * 1000,
+    warningMs: 4 * 60 * 1000,
+  });
+
   return (
     <div className="flex min-h-screen bg-background font-sans">
+      {/* ── Banner de inactividad ────────────────────────────────────────── */}
+      {showWarning && (
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="idle-title"
+          aria-describedby="idle-desc"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+        >
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <Warning size={22} weight="fill" className="mt-0.5 shrink-0 text-amber-500" />
+              <div>
+                <p id="idle-title" className="text-sm font-semibold text-[#0c1f36]">
+                  Sesión por cerrarse
+                </p>
+                <p id="idle-desc" className="mt-1 text-sm text-[#6b7b8c]">
+                  Por seguridad, tu sesión se cerrará por inactividad.
+                  {remainingSeconds > 0 && (
+                    <span className="ml-1 font-medium text-[#0c1f36]">
+                      ({remainingSeconds}s)
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={keepSession}
+                className="flex-1 rounded-xl bg-[#0c1f36] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#09182a]"
+              >
+                Mantener sesión
+              </button>
+              <button
+                onClick={() => void signOutNow()}
+                className="rounded-xl border border-[#e0211e]/30 px-4 py-2.5 text-sm font-semibold text-[#e0211e] transition hover:bg-[#e0211e]/8"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-[#0c1f36] z-30">
         <div className="flex flex-col flex-1 overflow-y-auto">
@@ -106,18 +157,16 @@ export function StudioShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          {/* Footer */}
-          <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between">
-            <p className="text-xs text-white/30">
-              <kbd className="font-sans">⌘K</kbd> para buscar
-            </p>
+          {/* Footer con logout visible */}
+          <div className="px-4 py-4 border-t border-white/10">
             {authRequired && (
               <button
-                onClick={signOut}
+                onClick={() => void signOut()}
                 disabled={signingOut}
-                className="text-xs text-white/40 hover:text-white/70 transition-colors"
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
               >
-                {signingOut ? 'Saliendo…' : 'Salir'}
+                <SignOut size={18} weight="regular" />
+                {signingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
               </button>
             )}
           </div>

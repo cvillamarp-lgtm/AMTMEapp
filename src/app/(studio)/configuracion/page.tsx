@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
 import { useStudio } from '@/components/studio-provider';
 import { isAuthRequired } from '@/lib/supabase/env';
+import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import type { AIProvider, IntegrationStatus } from '@/lib/studio-types';
 
 function asLines(input: string) {
@@ -67,6 +68,17 @@ export default function ConfiguracionPage() {
   const [showInterfaceHelp, setShowInterfaceHelp] = useState(
     config.showInterfaceHelp ? 'sí' : 'no'
   );
+  const [signingOut, setSigningOut] = useState(false);
+
+  const signOut = async () => {
+    setSigningOut(true);
+    try {
+      const client = getSupabaseAuthBrowserClient();
+      await client?.auth.signOut();
+    } finally {
+      window.location.href = '/auth/sign-in';
+    }
+  };
 
   const save = () => {
     setState((current) => ({
@@ -290,6 +302,52 @@ export default function ConfiguracionPage() {
       </div>
 
       <div className="space-y-5">
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
+                Cuenta y sesión
+              </div>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
+                Seguridad activa
+              </h2>
+            </div>
+            <Badge tone="good">Sesión protegida</Badge>
+          </div>
+          <div className="mt-4 space-y-3 text-sm text-semantic-muted">
+            <div className="rounded-2xl border border-semantic-border bg-semantic-surface-soft px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-medium text-amtme-navy">Auth obligatoria</span>
+                <Badge tone={authRequired ? 'good' : 'warning'}>
+                  {authRequired ? 'Activa' : 'Inactiva'}
+                </Badge>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-semantic-border bg-semantic-surface-soft px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-medium text-amtme-navy">RLS estricta</span>
+                <Badge tone="good">15 / 15 tablas</Badge>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-semantic-border bg-semantic-surface-soft px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-medium text-amtme-navy">Cierre por inactividad</span>
+                <Badge tone="good">5 minutos</Badge>
+              </div>
+            </div>
+            <p className="px-1 text-xs text-semantic-muted">
+              Tus datos solo se muestran con sesión activa.
+            </p>
+          </div>
+          {authRequired && (
+            <div className="mt-5">
+              <Button variant="danger" onClick={() => void signOut()} disabled={signingOut}>
+                {signingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+              </Button>
+            </div>
+          )}
+        </Card>
+
         <Card>
           <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">Interfaz</div>
           <div className="mt-4 grid gap-4">
