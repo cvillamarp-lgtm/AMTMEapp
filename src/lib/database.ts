@@ -17,20 +17,7 @@ import type {
   AutomationRule,
 } from '@/types/database';
 
-const OWNER_ID = 'public';
-const WORKSPACE = 'primary';
-
-// FASE 8C.1 — Compatibilidad de lectura dual
-// Permite leer datos con user_id IS NULL (pre-migración)
-// y user_id = CHRISTIAN_UUID (post-migración) simultáneamente.
-// Retirar CHRISTIAN_UUID y CHRISTIAN_UUID_FILTER en FASE 8E cuando RLS esté activa.
-const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
-const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
-
-// FASE 8D — Helper de sesión real controlada
-// Intenta obtener el user_id de la sesión activa de Supabase Auth.
-// Si no hay sesión (modo público), devuelve null → compatibilidad dual se mantiene.
-// No rompe producción sin login. No requiere NEXT_PUBLIC_REQUIRE_AUTH.
+// FASE 8E — Auth obligatoria. RLS estricta en 15 tablas. Solo auth.uid() = user_id.
 async function getActiveUserId(): Promise<string | null> {
   try {
     const authClient = getSupabaseAuthBrowserClient();
@@ -48,9 +35,7 @@ function getClient() {
 
 // ---- helpers ----
 
-// FASE 8D: toRow acepta userId opcional.
-// Si hay sesión activa, user_id = UUID real.
-// Si no hay sesión, user_id = null → compatibilidad dual activa.
+// FASE 8E: toRow requiere userId de sesión activa. Sin sesión: falla seguro.
 function toRow(payload: object, userId: string | null = null) {
   return { user_id: userId, payload };
 }
@@ -71,26 +56,22 @@ function fromRow<T>(row: any): T {
   return { ...base, ...rest } as T;
 }
 
-// FASE 8D: getAll usa sesión real si existe; si no, mantiene compatibilidad dual.
-// Con sesión → filtra por user_id = UUID real del usuario autenticado.
-// Sin sesión → filtra por CHRISTIAN_UUID_FILTER (dual: null OR uuid fijo).
+// FASE 8E: getAll filtra solo por user_id = auth.uid(). Sin sesión: devuelve vacío.
 async function getAll<T>(table: string): Promise<T[]> {
   const sb = getClient();
   if (!sb) return [];
   const activeUserId = await getActiveUserId();
-  const filter = activeUserId
-    ? `user_id.eq.${activeUserId}`
-    : CHRISTIAN_UUID_FILTER;
+  if (!activeUserId) return [];
   const { data, error } = await sb
     .from(table)
     .select('*')
-    .or(filter)
+    .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 
-// FASE 8D: insertOne usa user_id real si hay sesión; null si no.
+// FASE 8E: insertOne usa user_id de sesión activa. Sin sesión: falla seguro.
 async function insertOne<T>(table: string, payload: object): Promise<T> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
@@ -214,13 +195,11 @@ export async function getCalendarEvents(): Promise<CalendarEvent[]> {
   const sb = getClient();
   if (!sb) return [];
   const activeUserId = await getActiveUserId();
-  const filter = activeUserId
-    ? `user_id.eq.${activeUserId}`
-    : CHRISTIAN_UUID_FILTER;
+  if (!activeUserId) return [];
   const { data, error } = await sb
     .from('calendar_events')
     .select('*')
-    .or(filter)
+    .eq('user_id', activeUserId)
     .order('created_at', { ascending: true });
   if (error) throw error;
   return (data || []).map((r: any) => fromRow<CalendarEvent>(r));
@@ -246,13 +225,11 @@ export async function getScripts(): Promise<Script[]> {
   const sb = getClient();
   if (!sb) return [];
   const activeUserId = await getActiveUserId();
-  const filter = activeUserId
-    ? `user_id.eq.${activeUserId}`
-    : CHRISTIAN_UUID_FILTER;
+  if (!activeUserId) return [];
   const { data, error } = await sb
     .from('scripts')
     .select('*')
-    .or(filter)
+    .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data || []).map((r: any) => {
