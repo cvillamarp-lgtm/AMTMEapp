@@ -227,6 +227,13 @@ export interface FutureIntegration {
   detail: string;
 }
 
+export interface NavPreferences {
+  order: string[];
+  hidden: string[];
+  mobileItems: string[];
+  lastModified: string;
+}
+
 export interface AppConfig {
   projectName: string;
   projectDescriptor: string;
@@ -263,6 +270,7 @@ export interface AppConfig {
   uiDensity: InterfaceDensity;
   compactCards: boolean;
   showInterfaceHelp: boolean;
+  navPreferences?: NavPreferences;
 }
 
 export interface StudioState {

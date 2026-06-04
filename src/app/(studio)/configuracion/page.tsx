@@ -5,12 +5,7 @@ import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/component
 import { useStudio } from '@/components/studio-provider';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
-import {
-  getAppearanceTheme,
-  resetAppearanceToDefault,
-  THEME_PRESETS,
-  DEFAULT_AMTME_PALETTE,
-} from '@/lib/appearance';
+import { getAppearanceTheme, resetAppearanceToDefault, THEME_PRESETS } from '@/lib/appearance';
 import type { AIProvider, IntegrationStatus } from '@/lib/studio-types';
 
 function asLines(input: string) {
@@ -476,6 +471,71 @@ export default function ConfiguracionPage() {
                 {persistence.error}
               </div>
             ) : null}
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
+                Interfaz
+              </div>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
+                Navegación
+              </h2>
+            </div>
+          </div>
+          <div className="mt-5 space-y-4 text-sm">
+            <div>
+              <p className="font-medium text-amtme-navy">Módulos activos en desktop</p>
+              <p className="mt-1 text-semantic-muted">
+                {config.navPreferences?.order?.length ?? 17} módulos disponibles
+              </p>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setState((current) => ({
+                    ...current,
+                    config: {
+                      ...current.config,
+                      navPreferences: {
+                        order: [
+                          '/dashboard',
+                          '/documento-maestro',
+                          '/episodios',
+                          '/revision-episodios',
+                          '/guiones',
+                          '/contenido',
+                          '/creador-visual',
+                          '/calendario',
+                          '/metricas',
+                          '/monetizacion',
+                          '/checklists',
+                          '/notas',
+                          '/automatizacion',
+                          '/historico',
+                          '/ia',
+                          '/instagram',
+                          '/configuracion',
+                        ],
+                        hidden: [],
+                        mobileItems: ['/dashboard', '/episodios', '/contenido', '/metricas', '/ia'],
+                        lastModified: new Date().toISOString(),
+                      },
+                    },
+                  }));
+                }}
+                className="mt-3"
+              >
+                Restaurar orden original
+              </Button>
+            </div>
+            <div>
+              <p className="font-medium text-amtme-navy">Módulos en mobile</p>
+              <p className="mt-1 text-sm text-semantic-muted">
+                {config.navPreferences?.mobileItems?.length ?? 5} módulos (máximo 5)
+              </p>
+            </div>
           </div>
         </Card>
 

@@ -30,7 +30,7 @@ import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { useIdleLogout } from '@/hooks/use-idle-logout';
 
-const navItems = [
+const ALL_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: House },
   { href: '/documento-maestro', label: 'Documento maestro', icon: FileText },
   { href: '/episodios', label: 'Episodios', icon: Microphone },
@@ -50,19 +50,28 @@ const navItems = [
   { href: '/configuracion', label: 'Configuración', icon: Gear },
 ];
 
-const mobileItems = [
-  navItems[0], // Dashboard
-  navItems[2], // Episodios
-  navItems[5], // Contenido
-  navItems[8], // Métricas
-  navItems[14], // IA
-];
+const DEFAULT_NAV_ORDER = ALL_NAV_ITEMS.map((item) => item.href);
+const DEFAULT_MOBILE_ITEMS = ['/dashboard', '/episodios', '/contenido', '/metricas', '/ia'];
 
 export function StudioShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { state } = useStudio();
   const authRequired = isAuthRequired();
   const [signingOut, setSigningOut] = useState(false);
+
+  const navPrefs = state.config.navPreferences;
+  const navOrder = navPrefs?.order ?? DEFAULT_NAV_ORDER;
+  const hiddenItems = navPrefs?.hidden ?? [];
+  const mobileItemHrefs = navPrefs?.mobileItems ?? DEFAULT_MOBILE_ITEMS;
+
+  const navItems = navOrder
+    .map((href) => ALL_NAV_ITEMS.find((item) => item.href === href))
+    .filter((item) => item && !hiddenItems.includes(item.href)) as typeof ALL_NAV_ITEMS;
+
+  const mobileItems = mobileItemHrefs
+    .map((href) => ALL_NAV_ITEMS.find((item) => item.href === href))
+    .filter((item) => !!item)
+    .slice(0, 5) as typeof ALL_NAV_ITEMS;
 
   const signOut = async () => {
     setSigningOut(true);
@@ -136,7 +145,9 @@ export function StudioShell({ children }: { children: ReactNode }) {
           <nav className="flex-1 px-3 py-4 space-y-0.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+              const isActive =
+                pathname === item.href ||
+                (pathname.startsWith(item.href + '/') && item.href !== '/');
               return (
                 <Link
                   key={item.href}
@@ -177,27 +188,38 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </main>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-white/10 z-50">
-        <div className="grid grid-cols-5 gap-1 p-2">
-          {mobileItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
-                  isActive ? 'bg-amtme-lemon text-amtme-navy' : 'text-white/70'
-                )}
-              >
-                <Icon size={20} weight="regular" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      {mobileItems.length > 0 && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-white/10 z-50">
+          <div
+            className={cn('gap-1 p-2', {
+              'grid grid-cols-5': mobileItems.length === 5,
+              'grid grid-cols-4': mobileItems.length === 4,
+              'grid grid-cols-3': mobileItems.length === 3,
+              'grid grid-cols-2': mobileItems.length === 2,
+            })}
+          >
+            {mobileItems.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                pathname === item.href ||
+                (pathname.startsWith(item.href + '/') && item.href !== '/');
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
+                    isActive ? 'bg-amtme-lemon text-amtme-navy' : 'text-white/70'
+                  )}
+                >
+                  <Icon size={20} weight="regular" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </div>
   );
 }
