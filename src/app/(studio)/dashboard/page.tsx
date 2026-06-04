@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Sparkle, Leaf, CheckCircle, Lightning } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 
 type Episode = {
   id: string;
@@ -37,7 +37,7 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const supabase = getSupabaseBrowserClient();
+        const supabase = getSupabaseAuthBrowserClient();
         if (!supabase) return;
         const [ep, ct, ld] = await Promise.all([
           supabase.from('episodes').select('*').order('created_at', { ascending: false }),
