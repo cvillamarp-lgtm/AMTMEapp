@@ -95,15 +95,13 @@ export function StudioShell({ children }: { children: ReactNode }) {
             <div className="flex items-start gap-3">
               <Warning size={22} weight="fill" className="mt-0.5 shrink-0 text-amber-500" />
               <div>
-                <p id="idle-title" className="text-sm font-semibold text-[#0c1f36]">
+                <p id="idle-title" className="text-sm font-semibold text-amtme-navy">
                   Sesión por cerrarse
                 </p>
-                <p id="idle-desc" className="mt-1 text-sm text-[#6b7b8c]">
+                <p id="idle-desc" className="mt-1 text-sm text-amtme-slate">
                   Por seguridad, tu sesión se cerrará por inactividad.
                   {remainingSeconds > 0 && (
-                    <span className="ml-1 font-medium text-[#0c1f36]">
-                      ({remainingSeconds}s)
-                    </span>
+                    <span className="ml-1 font-medium text-amtme-navy">({remainingSeconds}s)</span>
                   )}
                 </p>
               </div>
@@ -111,13 +109,13 @@ export function StudioShell({ children }: { children: ReactNode }) {
             <div className="mt-5 flex gap-3">
               <button
                 onClick={keepSession}
-                className="flex-1 rounded-xl bg-[#0c1f36] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#09182a]"
+                className="flex-1 rounded-xl bg-amtme-navy px-4 py-2.5 text-sm font-semibold text-amtme-white transition hover:bg-opacity-90"
               >
                 Mantener sesión
               </button>
               <button
                 onClick={() => void signOutNow()}
-                className="rounded-xl border border-[#e0211e]/30 px-4 py-2.5 text-sm font-semibold text-[#e0211e] transition hover:bg-[#e0211e]/8"
+                className="rounded-xl border border-amtme-red/30 px-4 py-2.5 text-sm font-semibold text-amtme-red transition hover:bg-amtme-red/8"
               >
                 Cerrar sesión
               </button>
@@ -127,7 +125,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
       )}
 
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-[#0c1f36] z-30">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-30">
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
@@ -146,7 +144,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
                     isActive
-                      ? 'bg-[#e8ff40] text-[#0c1f36]'
+                      ? 'bg-amtme-lemon text-amtme-navy'
                       : 'text-white/70 hover:bg-white/10 hover:text-white'
                   )}
                 >
@@ -179,7 +177,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </main>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0c1f36] border-t border-white/10 z-50">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-white/10 z-50">
         <div className="grid grid-cols-5 gap-1 p-2">
           {mobileItems.map((item) => {
             const Icon = item.icon;
@@ -190,7 +188,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
-                  isActive ? 'bg-[#e8ff40] text-[#0c1f36]' : 'text-white/70'
+                  isActive ? 'bg-amtme-lemon text-amtme-navy' : 'text-white/70'
                 )}
               >
                 <Icon size={20} weight="regular" />

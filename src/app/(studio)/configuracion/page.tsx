@@ -5,6 +5,12 @@ import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/component
 import { useStudio } from '@/components/studio-provider';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
+import {
+  getAppearanceTheme,
+  resetAppearanceToDefault,
+  THEME_PRESETS,
+  DEFAULT_AMTME_PALETTE,
+} from '@/lib/appearance';
 import type { AIProvider, IntegrationStatus } from '@/lib/studio-types';
 
 function asLines(input: string) {
@@ -68,6 +74,7 @@ export default function ConfiguracionPage() {
   const [showInterfaceHelp, setShowInterfaceHelp] = useState(
     config.showInterfaceHelp ? 'sí' : 'no'
   );
+  const [appearanceTheme] = useState(getAppearanceTheme());
   const [signingOut, setSigningOut] = useState(false);
 
   const signOut = async () => {
@@ -381,6 +388,62 @@ export default function ConfiguracionPage() {
           </div>
           <div className="mt-5">
             <Button onClick={save}>Guardar configuración operativa</Button>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
+                Apariencia
+              </div>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
+                Paleta visual
+              </h2>
+            </div>
+            <Badge tone="good">{THEME_PRESETS[appearanceTheme].name}</Badge>
+          </div>
+          <div className="mt-5">
+            <div className="mb-5">
+              <p className="mb-3 text-sm text-semantic-muted">
+                Paleta AMTME oficial activa. La identidad visual de tu estudio mantiene:
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg border border-semantic-border p-3">
+                  <div className="mb-2 flex h-12 w-full rounded-md bg-amtme-navy" />
+                  <p className="text-xs font-medium text-amtme-navy">Navy</p>
+                  <p className="text-xs text-semantic-muted">#0c1f36</p>
+                </div>
+                <div className="rounded-lg border border-semantic-border p-3">
+                  <div className="mb-2 flex h-12 w-full rounded-md bg-amtme-lemon" />
+                  <p className="text-xs font-medium text-amtme-navy">Lemon</p>
+                  <p className="text-xs text-semantic-muted">#e8ff40</p>
+                </div>
+                <div className="rounded-lg border border-semantic-border p-3">
+                  <div className="mb-2 flex h-12 w-full rounded-md bg-amtme-cream" />
+                  <p className="text-xs font-medium text-amtme-navy">Cream</p>
+                  <p className="text-xs text-semantic-muted">#f5f1e8</p>
+                </div>
+                <div className="rounded-lg border border-semantic-border p-3">
+                  <div className="mb-2 flex h-12 w-full rounded-md bg-amtme-slate" />
+                  <p className="text-xs font-medium text-amtme-navy">Slate</p>
+                  <p className="text-xs text-semantic-muted">#6b7b8c</p>
+                </div>
+                <div className="rounded-lg border border-semantic-border p-3">
+                  <div className="mb-2 flex h-12 w-full rounded-md bg-amtme-red" />
+                  <p className="text-xs font-medium text-amtme-navy">Red</p>
+                  <p className="text-xs text-semantic-muted">#e0211e</p>
+                </div>
+                <div className="rounded-lg border border-semantic-border p-3">
+                  <div className="mb-2 flex h-12 w-full rounded-md border-2 border-semantic-border bg-amtme-white" />
+                  <p className="text-xs font-medium text-amtme-navy">White</p>
+                  <p className="text-xs text-semantic-muted">#ffffff</p>
+                </div>
+              </div>
+            </div>
+            <Button variant="secondary" onClick={() => resetAppearanceToDefault()}>
+              Restaurar paleta AMTME
+            </Button>
           </div>
         </Card>
 
