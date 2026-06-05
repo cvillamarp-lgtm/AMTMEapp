@@ -441,5 +441,7 @@ export const initialStudioState: StudioState = {
       mobileItems: ['/dashboard', '/episodios', '/contenido', '/metricas', '/ia'],
       lastModified: '2026-06-04T17:15:00Z',
     },
+    nextBestActionsEnabled: true,
+    nextBestActionsLimit: 3,
   },
 };

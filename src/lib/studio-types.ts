@@ -234,6 +234,24 @@ export interface NavPreferences {
   lastModified: string;
 }
 
+export type NextBestActionSeverity = 'high' | 'medium' | 'low';
+export type NextBestActionStatus = 'pending' | 'completed' | 'dismissed';
+export type NextBestActionCategory = 'contenido' | 'produccion' | 'distribucion' | 'metricas' | 'energia' | 'sistema';
+
+export interface NextBestAction {
+  id: string;
+  title: string;
+  detail: string;
+  severity: NextBestActionSeverity;
+  category: NextBestActionCategory;
+  sourceType: string;
+  sourceId?: string;
+  href: string;
+  reason: string;
+  status: NextBestActionStatus;
+  createdAt: string;
+}
+
 export interface AppConfig {
   projectName: string;
   projectDescriptor: string;
@@ -271,6 +289,8 @@ export interface AppConfig {
   compactCards: boolean;
   showInterfaceHelp: boolean;
   navPreferences?: NavPreferences;
+  nextBestActionsEnabled?: boolean;
+  nextBestActionsLimit?: number;
 }
 
 export interface StudioState {

@@ -70,6 +70,12 @@ export default function ConfiguracionPage() {
     config.showInterfaceHelp ? 'sí' : 'no'
   );
   const [appearanceTheme] = useState(getAppearanceTheme());
+  const [nextBestActionsEnabled, setNextBestActionsEnabled] = useState(
+    config.nextBestActionsEnabled ? 'activado' : 'desactivado'
+  );
+  const [nextBestActionsLimit, setNextBestActionsLimit] = useState(
+    String(config.nextBestActionsLimit ?? 3)
+  );
   const [signingOut, setSigningOut] = useState(false);
 
   const signOut = async () => {
@@ -121,6 +127,8 @@ export default function ConfiguracionPage() {
         uiDensity,
         compactCards: compactCards === 'sí',
         showInterfaceHelp: showInterfaceHelp === 'sí',
+        nextBestActionsEnabled: nextBestActionsEnabled === 'activado',
+        nextBestActionsLimit: parseInt(nextBestActionsLimit, 10),
       },
     }));
   };
@@ -536,6 +544,38 @@ export default function ConfiguracionPage() {
                 {config.navPreferences?.mobileItems?.length ?? 5} módulos (máximo 5)
               </p>
             </div>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="text-xs uppercase tracking-[0.22em] text-semantic-muted">
+            Automatización y recomendaciones
+          </div>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
+            Siguiente mejor acción
+          </h2>
+          <div className="mt-5 space-y-4 text-sm">
+            <Field label="Estado">
+              <Select
+                value={nextBestActionsEnabled}
+                onChange={(event) => setNextBestActionsEnabled(event.target.value)}
+              >
+                <option value="activado">Activado</option>
+                <option value="desactivado">Desactivado</option>
+              </Select>
+            </Field>
+            <Field label="Límite de acciones">
+              <Select
+                value={nextBestActionsLimit}
+                onChange={(event) => setNextBestActionsLimit(event.target.value)}
+              >
+                <option value="1">1 acción</option>
+                <option value="2">2 acciones</option>
+                <option value="3">3 acciones</option>
+                <option value="4">4 acciones</option>
+                <option value="5">5 acciones (máximo)</option>
+              </Select>
+            </Field>
           </div>
         </Card>
 
