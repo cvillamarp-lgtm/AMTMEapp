@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Sparkle, Leaf, CheckCircle, Lightning } from '@phosphor-icons/react';
+import { Sparkle, Leaf } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
+import { useNextBestActions } from '@/hooks/use-next-best-actions';
+import { NextBestActionWidget } from '@/components/next-best-action-widget';
 
 type Episode = {
   id: string;
@@ -56,9 +58,6 @@ export default function DashboardPage() {
     load();
   }, []);
 
-  const episodesPendingMeasure = episodes.filter(
-    (e) => e.status === 'publicado' || e.status === 'distribuido'
-  ).length;
 
   const inProgress = episodes.filter(
     (e) => !['publicado', 'distribuido', 'medido', 'archivado'].includes(e.status)
@@ -74,15 +73,10 @@ export default function DashboardPage() {
     (l) => !['pagado', 'entregado', 'perdido'].includes(l.status)
   ).length;
 
-  const criticalAlerts = episodes.filter(
-    (e) => ['publicado', 'distribuido'].includes(e.status) && (!e.cta || !e.spotify_description)
-  );
 
-  const leadsNoAction = leads.filter(
-    (l) => !['pagado', 'perdido'].includes(l.status) && !l.next_action
-  );
 
   const recent = episodes.slice(0, 5);
+  const nextBestActions = useNextBestActions();
 
   return (
     <div className="space-y-6 pb-10">
@@ -116,143 +110,8 @@ export default function DashboardPage() {
 
           {/* Siguiente acción + Estado de producción */}
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="font-semibold text-primary">Siguiente acción recomendada</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Enfócate aquí primero</p>
-                </div>
-                <Lightning size={20} className="text-primary" />
-              </div>
-              <div className="mt-4 space-y-3">
-                {episodesPendingMeasure > 0 ? (
-                  <Link
-                    href="/metricas"
-                    className="block p-3 rounded-lg bg-teal-50 hover:bg-teal-100 transition-colors border border-teal-200"
-                  >
-                    <p className="text-sm font-medium text-teal-800">
-                      {episodesPendingMeasure} episodio(s) listos para medir
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Registra las metricas para cerrar el ciclo de produccion
-                    </p>
-                  </Link>
-                ) : null}
-                {leadsNoAction.length > 0 ? (
-                  <Link
-                    href="/monetizacion"
-                    className="block p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
-                  >
-                    <p className="text-sm font-medium text-primary">
-                      {leadsNoAction.length} lead(s) sin proxima accion
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Define el siguiente paso para mantener el flujo
-                    </p>
-                  </Link>
-                ) : null}
-                {contentPending > 0 ? (
-                  <Link
-                    href="/calendario"
-                    className="block p-3 rounded-lg bg-[#e8ff40]/20 hover:bg-[#e8ff40]/30 transition-colors border border-[#e8ff40]/40"
-                  >
-                    <p className="text-sm font-medium text-primary">
-                      {contentPending} pieza(s) lista(s) sin agendar
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Ve al calendario y agenda la distribucion
-                    </p>
-                  </Link>
-                ) : null}
-                {criticalAlerts.length > 0 ? (
-                  <Link
-                    href="/episodios"
-                    className="block p-3 rounded-lg bg-destructive/10 hover:bg-destructive/20 transition-colors"
-                  >
-                    <p className="text-sm font-medium text-destructive">
-                      {criticalAlerts.length} episodio(s) incompleto(s)
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Faltan CTA o descripción Spotify
-                    </p>
-                  </Link>
-                ) : null}
-                {leadsNoAction.length === 0 && criticalAlerts.length === 0 && (
-                  <p className="text-sm text-muted-foreground py-2">
-                    Sin acciones críticas. Buen ritmo de trabajo.
-                  </p>
-                )}
-              </div>
-            </div>
+<NextBestActionWidget actions={nextBestActions} />
 
-            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="font-semibold text-primary">Estado de producción</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Resumen del flujo</p>
-                </div>
-                <CheckCircle size={20} className="text-primary" />
-              </div>
-              <div className="mt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">En desarrollo</span>
-                  <span className="font-semibold text-primary">{inProgress}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Publicados</span>
-                  <span className="font-semibold text-primary">{published}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Contenido pendiente</span>
-                  <span className="font-semibold text-primary">{contentPending}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Leads activos</span>
-                  <span className="font-semibold text-primary">{activeLeads}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Listo para publicar */}
-          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="font-semibold text-primary">Listo para publicar</h2>
-                <p className="text-sm text-muted-foreground">
-                  Episodios que pueden distribuirse ahora
-                </p>
-              </div>
-              <CheckCircle size={20} className="text-primary" />
-            </div>
-            <div className="space-y-2">
-              {episodes.filter((e) => e.status === 'listo').length === 0 ? (
-                <p className="text-sm text-muted-foreground py-2">
-                  No hay episodios listos para publicar
-                </p>
-              ) : (
-                episodes
-                  .filter((e) => e.status === 'listo')
-                  .slice(0, 3)
-                  .map((ep) => (
-                    <div
-                      key={ep.id}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/60 transition-colors"
-                    >
-                      <span className="text-sm font-medium text-primary">
-                        #{ep.episode_number}: {ep.title}
-                      </span>
-                      <Link href="/episodios" className="text-xs text-primary hover:underline">
-                        Publicar
-                      </Link>
-                    </div>
-                  ))
-              )}
-            </div>
-          </div>
-
-          {/* Centro de control + Acciones rápidas */}
-          <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <h2 className="font-semibold text-primary">Acciones rápidas</h2>
               <p className="text-sm text-muted-foreground mb-4">Navega a donde necesitas</p>
