@@ -29,6 +29,7 @@ import { useStudio } from '@/components/studio-provider';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { useIdleLogout } from '@/hooks/use-idle-logout';
+import { GlobalCommandPalette } from '@/components/global-command-palette';
 
 const ALL_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: House },
@@ -220,6 +221,8 @@ export function StudioShell({ children }: { children: ReactNode }) {
           </div>
         </nav>
       )}
+
+      <GlobalCommandPalette />
     </div>
   );
 }
