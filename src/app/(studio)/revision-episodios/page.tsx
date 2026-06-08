@@ -99,7 +99,6 @@ export default function RevisionEpisodiosPage() {
 
   const incomplete = analyses.filter((a) => a.pct < 100);
   const critical = analyses.filter((a) => a.criticalFailed > 0);
-  const _complete = analyses.filter((a) => a.pct === 100);
 
   async function handleComplete(ep: Episode) {
     setCompleting(ep.id);
