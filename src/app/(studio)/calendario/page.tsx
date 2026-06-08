@@ -1,11 +1,10 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-  CardDescription,
 } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
@@ -38,6 +37,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   getCalendarEvents,
   createCalendarEvent,
@@ -60,11 +60,31 @@ function weekLabel(date: string) {
   return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' });
 }
 
+const TYPE_COLOR: Record<string, string> = {
+  publicacion: 'bg-[#e8ff40] text-[#0c1f36]',
+  distribucion: 'bg-green-100 text-green-700',
+  produccion: 'bg-blue-50 text-blue-700',
+  grabacion: 'bg-purple-100 text-purple-700',
+  edicion: 'bg-orange-100 text-orange-700',
+  medicion: 'bg-teal-100 text-teal-700',
+  revision: 'bg-gray-100 text-gray-600',
+  monetizacion: 'bg-pink-100 text-pink-700',
+};
+
+const DAYS_ES = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+
+function padDate(n: number) {
+  return String(n).padStart(2, '0');
+}
+
 export default function CalendarioPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [view, setView] = useState<'operativo' | 'mes'>('operativo');
+  const now = new Date();
+  const [calMonth, setCalMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: '',
     type: 'produccion' as EventType,
@@ -208,16 +228,55 @@ export default function CalendarioPage() {
     if (!diasConContenido.has(d)) huecos.push(d);
   }
 
-  // agrupacion por mes para vista de mes
-  const grouped = events.reduce(
-    (acc, ev) => {
-      const m = ev.date.slice(0, 7);
-      if (!acc[m]) acc[m] = [];
-      acc[m].push(ev);
-      return acc;
+
+  // grid mensual real
+  const calGrid = useMemo(() => {
+    const { year, month } = calMonth;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    // Convert Sunday=0 to Monday-first: Sun becomes 6
+    const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+    const cells: (number | null)[] = Array.from({ length: totalCells }, (_, i) => {
+      const d = i - startOffset + 1;
+      return d >= 1 && d <= daysInMonth ? d : null;
+    });
+    return cells;
+  }, [calMonth]);
+
+  const eventsByDay = useCallback(
+    (day: number) => {
+      const { year, month } = calMonth;
+      const key = `${year}-${padDate(month + 1)}-${padDate(day)}`;
+      return events.filter((e) => e.date === key);
     },
-    {} as Record<string, CalendarEvent[]>
+    [events, calMonth]
   );
+
+  const monthLabel = useMemo(() => {
+    const d = new Date(calMonth.year, calMonth.month, 1);
+    return d.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+  }, [calMonth]);
+
+  function prevMonth() {
+    setCalMonth(({ year, month }) =>
+      month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 }
+    );
+    setSelectedDay(null);
+  }
+
+  function nextMonth() {
+    setCalMonth(({ year, month }) =>
+      month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 }
+    );
+    setSelectedDay(null);
+  }
+
+  function goToday() {
+    const n = new Date();
+    setCalMonth({ year: n.getFullYear(), month: n.getMonth() });
+    setSelectedDay(null);
+  }
 
   const statusColor: Record<string, string> = {
     pendiente: 'bg-gray-100 text-gray-600',
@@ -443,7 +502,11 @@ export default function CalendarioPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-xl" />
+          ))}
+        </div>
       ) : view === 'operativo' ? (
         <div className="space-y-8">
           {/* SIGUIENTE ACCION */}
@@ -657,75 +720,141 @@ export default function CalendarioPage() {
           )}
         </div>
       ) : (
-        // VISTA POR MES
-        <div className="space-y-8">
-          {Object.keys(grouped).length === 0 ? (
-            <div className="text-center py-16">
-              <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Sin eventos</p>
+        // VISTA POR MES — grid real 7 columnas
+        <div className="space-y-4">
+          {/* Navegación */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" onClick={prevMonth} className="h-8 w-8 p-0">
+                ‹
+              </Button>
+              <span className="text-sm font-semibold capitalize min-w-[160px] text-center">
+                {monthLabel}
+              </span>
+              <Button size="sm" variant="outline" onClick={nextMonth} className="h-8 w-8 p-0">
+                ›
+              </Button>
+            </div>
+            <Button size="sm" variant="ghost" onClick={goToday} className="text-xs">
+              Hoy
+            </Button>
+          </div>
+
+          {/* Grid */}
+          <div className="rounded-xl border border-border overflow-hidden">
+            {/* Cabecera días */}
+            <div className="grid grid-cols-7 border-b border-border">
+              {DAYS_ES.map((d) => (
+                <div
+                  key={d}
+                  className="py-2 text-center text-xs font-semibold text-muted-foreground"
+                >
+                  {d}
+                </div>
+              ))}
+            </div>
+            {/* Celdas */}
+            <div className="grid grid-cols-7">
+              {calGrid.map((day, i) => {
+                if (day === null) {
+                  return <div key={`empty-${i}`} className="min-h-[80px] border-b border-r border-border/50 bg-muted/20" />;
+                }
+                const dateStr = `${calMonth.year}-${padDate(calMonth.month + 1)}-${padDate(day)}`;
+                const dayEvents = eventsByDay(day);
+                const isToday = dateStr === todayStr();
+                const isSelected = selectedDay === dateStr;
+                const isPast = dateStr < todayStr();
+                return (
+                  <div
+                    key={day}
+                    onClick={() => setSelectedDay(isSelected ? null : dateStr)}
+                    className={`min-h-[80px] border-b border-r border-border/50 p-1.5 cursor-pointer transition-colors ${
+                      isSelected
+                        ? 'bg-[#0c1f36]/5'
+                        : isPast
+                          ? 'bg-muted/10 hover:bg-muted/20'
+                          : 'hover:bg-muted/30'
+                    }`}
+                  >
+                    <div
+                      className={`text-xs font-semibold mb-1 h-5 w-5 flex items-center justify-center rounded-full ${
+                        isToday
+                          ? 'bg-[#0c1f36] text-white'
+                          : isPast
+                            ? 'text-muted-foreground'
+                            : 'text-foreground'
+                      }`}
+                    >
+                      {day}
+                    </div>
+                    <div className="space-y-0.5">
+                      {dayEvents.slice(0, 2).map((ev) => (
+                        <div
+                          key={ev.id}
+                          className={`truncate text-[10px] px-1 py-0.5 rounded font-medium ${TYPE_COLOR[ev.type] || 'bg-gray-100 text-gray-600'}`}
+                        >
+                          {ev.title}
+                        </div>
+                      ))}
+                      {dayEvents.length > 2 && (
+                        <div className="text-[10px] text-muted-foreground px-1">
+                          +{dayEvents.length - 2} más
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Panel del día seleccionado */}
+          {selectedDay && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">
+                  {weekLabel(selectedDay)}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {eventsByDay(parseInt(selectedDay.slice(8))).length === 0 ? (
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">Sin eventos este día</p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setForm((f) => ({ ...f, date: selectedDay }));
+                        setDialogOpen(true);
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> Agendar
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid gap-2">
+                    {eventsByDay(parseInt(selectedDay.slice(8))).map((ev) => (
+                      <EventCard key={ev.id} ev={ev} />
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Empty state si no hay eventos en el mes */}
+          {events.length === 0 && (
+            <div className="text-center py-12">
+              <CalendarDays className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-30" />
+              <p className="text-sm text-muted-foreground mb-3">Sin eventos registrados</p>
               <Button
-                className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
                 onClick={() => setDialogOpen(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Agendar
               </Button>
             </div>
-          ) : (
-            Object.keys(grouped)
-              .sort()
-              .map((month) => (
-                <div key={month}>
-                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                    {month}
-                  </h2>
-                  <div className="grid gap-2">
-                    {grouped[month].map((ev) => (
-                      <Card key={ev.id}>
-                        <CardHeader className="pb-2">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <CardTitle className="text-base">{ev.title}</CardTitle>
-                                <span
-                                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[ev.status] || 'bg-gray-100 text-gray-600'}`}
-                                >
-                                  {ev.status}
-                                </span>
-                              </div>
-                              <CardDescription className="mt-0.5">
-                                {weekLabel(ev.date)}
-                                {ev.time ? ` · ${ev.time}` : ''} · {ev.type}
-                                {ev.channel ? ` · ${ev.channel}` : ''}
-                              </CardDescription>
-                            </div>
-                            <div className="flex gap-1">
-                              {ev.status !== 'publicado' && (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8"
-                                  onClick={() => handleMarkPublished(ev.id)}
-                                >
-                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                </Button>
-                              )}
-                              <Button size="sm" variant="ghost" onClick={() => handleDelete(ev.id)}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        {ev.notes && (
-                          <CardContent className="pt-0">
-                            <p className="text-sm text-muted-foreground">{ev.notes}</p>
-                          </CardContent>
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              ))
           )}
         </div>
       )}

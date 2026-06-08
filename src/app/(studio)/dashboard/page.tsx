@@ -108,6 +108,41 @@ export default function DashboardPage() {
             <StatCard label="Leads activos" value={activeLeads} />
           </div>
 
+          {/* Pipeline de producción */}
+          {episodes.length > 0 && (
+            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+              <h2 className="font-semibold text-primary mb-1">Pipeline editorial</h2>
+              <p className="text-sm text-muted-foreground mb-4">Episodios por etapa</p>
+              <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                {(
+                  [
+                    { key: 'idea', label: 'Idea', color: 'bg-gray-100 text-gray-700' },
+                    { key: 'investigacion', label: 'Invest.', color: 'bg-orange-100 text-orange-700' },
+                    { key: 'guion', label: 'Guion', color: 'bg-yellow-100 text-yellow-800' },
+                    { key: 'grabacion', label: 'Grab.', color: 'bg-blue-100 text-blue-700' },
+                    { key: 'edicion', label: 'Edic.', color: 'bg-purple-100 text-purple-700' },
+                    { key: 'publicado', label: 'Pub.', color: 'bg-[#e8ff40] text-[#0c1f36]' },
+                    { key: 'distribuido', label: 'Dist.', color: 'bg-green-100 text-green-700' },
+                  ] as const
+                ).map(({ key, label, color }) => {
+                  const count = episodes.filter((e) => e.status === key).length;
+                  return (
+                    <div key={key} className="flex flex-col items-center gap-1.5">
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold ${color}`}
+                      >
+                        {count}
+                      </div>
+                      <span className="text-[10px] text-center text-muted-foreground leading-tight">
+                        {label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Siguiente acción + Estado de producción */}
           <div className="grid gap-4 lg:grid-cols-2">
 <NextBestActionWidget actions={nextBestActions} />

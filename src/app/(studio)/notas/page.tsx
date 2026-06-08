@@ -30,6 +30,7 @@ type Note = {
   category: string;
   status: string;
   pinned: boolean;
+  tags?: string[];
 };
 
 const CATEGORIES = ['general', 'episodio', 'estrategia', 'monetizacion', 'tecnico', 'reflexion'];
@@ -82,6 +83,7 @@ async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
     category: data.category,
     status: data.status,
     pinned: data.pinned ?? false,
+    tags: data.tags ?? [],
   };
   if (id) {
     const { data: row, error } = await sb
@@ -136,7 +138,9 @@ export default function NotasPage() {
     category: 'general',
     status: 'activa',
     pinned: false,
+    tags: [] as string[],
   });
+  const [tagInput, setTagInput] = useState('');
 
   useEffect(() => {
     load();
@@ -174,7 +178,9 @@ export default function NotasPage() {
       category: n.category || 'general',
       status: n.status || 'activa',
       pinned: n.pinned || false,
+      tags: n.tags || [],
     });
+    setTagInput('');
     setEditing(false);
   }
 
@@ -185,6 +191,7 @@ export default function NotasPage() {
       category: 'general',
       status: 'activa',
       pinned: false,
+      tags: [] as string[],
     };
     setSaving(true);
     try {
@@ -351,6 +358,18 @@ export default function NotasPage() {
                 >
                   {n.content || 'Sin contenido'}
                 </p>
+                {n.tags && n.tags.length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {n.tags.slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full ${selected?.id === n.id ? 'bg-white/20 text-white/80' : 'bg-[#0c1f36]/8 text-[#0c1f36]'}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <p
                   className={`mt-1 text-xs ${selected?.id === n.id ? 'text-white/40' : 'text-muted-foreground/60'}`}
                 >
@@ -460,6 +479,45 @@ export default function NotasPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1.5 items-center">
+                    {draft.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 text-xs bg-[#0c1f36]/8 text-[#0c1f36] px-2 py-0.5 rounded-full"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setDraft((d) => ({ ...d, tags: d.tags.filter((t) => t !== tag) }))
+                          }
+                          className="hover:text-red-500 transition-colors"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+                          e.preventDefault();
+                          const tag = tagInput.trim().toLowerCase();
+                          if (!draft.tags.includes(tag)) {
+                            setDraft((d) => ({ ...d, tags: [...d.tags, tag] }));
+                          }
+                          setTagInput('');
+                        } else if (e.key === 'Backspace' && !tagInput && draft.tags.length > 0) {
+                          setDraft((d) => ({ ...d, tags: d.tags.slice(0, -1) }));
+                        }
+                      }}
+                      placeholder="+ etiqueta"
+                      className="text-xs outline-none bg-transparent text-[#0c1f36] placeholder:text-muted-foreground/50 min-w-[80px]"
+                    />
+                  </div>
                   <Textarea
                     value={draft.content}
                     onChange={(e) => setDraft((d) => ({ ...d, content: e.target.value }))}
@@ -477,6 +535,18 @@ export default function NotasPage() {
                     <span>·</span>
                     <span>{selected.status}</span>
                   </div>
+                  {selected.tags && selected.tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {selected.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-[#0c1f36]/8 text-[#0c1f36] px-2 py-0.5 rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <div className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[#0c1f36]">
                     {selected.content || (
                       <span className="italic text-muted-foreground">Haz clic para editar</span>
