@@ -208,11 +208,22 @@ export default function ConfiguracionPage() {
               />
             </Field>
             <Field label="Frecuencia por defecto">
-              <Input
-                value={defaultFrequency}
-                onChange={(event) => setDefaultFrequency(event.target.value)}
-                placeholder="Semanal"
-              />
+              <div className="flex flex-wrap gap-2 pt-1">
+                {['Diaria', 'Semanal', 'Quincenal', 'Mensual', 'Irregular'].map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setDefaultFrequency(f)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-all ${
+                      defaultFrequency === f
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background text-foreground border-border hover:border-primary'
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
             </Field>
             <Field label="Franjas horarias (una por línea)" hint="Formato recomendado: HH:MM">
               <Textarea

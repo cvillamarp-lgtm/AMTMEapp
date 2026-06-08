@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   ChartContainer,
   ChartTooltip,
@@ -586,7 +587,11 @@ Solo JSON. Espanol neutro.`;
         {/* ======== TAB: CENTRO DE DECISIONES ======== */}
         <TabsContent value="decisiones">
           {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-40 rounded-xl" />
+              ))}
+            </div>
           ) : (
             <div className="space-y-5">
               {/* 1. EPISODIOS PENDIENTES DE MEDIR */}
@@ -857,7 +862,14 @@ Solo JSON. Espanol neutro.`;
         {/* ======== TAB: METRICAS MENSUALES ======== */}
         <TabsContent value="mensual">
           {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+            <div className="space-y-4">
+              <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-24 rounded-xl" />
+                ))}
+              </div>
+              <Skeleton className="h-72 rounded-xl" />
+            </div>
           ) : metrics.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center">
@@ -982,7 +994,11 @@ Solo JSON. Espanol neutro.`;
               </Button>
             </div>
             {loading ? (
-              <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+              <div className="grid gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-28 rounded-xl" />
+                ))}
+              </div>
             ) : metricsEpisode.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">

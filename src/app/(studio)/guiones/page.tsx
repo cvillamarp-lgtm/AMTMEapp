@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import Link from 'next/link';
 import {
   Card,
@@ -409,7 +410,11 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-48 rounded-xl" />
+          ))}
+        </div>
       ) : scripts.length === 0 ? (
         <div className="text-center py-16">
           <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

@@ -26,6 +26,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   Plus,
   Pencil,
@@ -465,7 +466,11 @@ Devuelve exactamente:
       </h2>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+        <div className="grid gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 rounded-xl" />
+          ))}
+        </div>
       ) : leads.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
