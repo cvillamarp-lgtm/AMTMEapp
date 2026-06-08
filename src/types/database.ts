@@ -380,6 +380,38 @@ export type AppConfig = {
   updated_at: string;
 };
 
+export type Idea = {
+  id: string;
+  user_id: string;
+  title: string;
+  category: IdeaCategory;
+  priority: 'alta' | 'media' | 'baja';
+  emotional_state: string | null;
+  theme: string | null;
+  episode_id: string | null;
+  viral_potential: number | null;
+  therapeutic_potential: number | null;
+  notes: string | null;
+  status: IdeaStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export type IdeaCategory =
+  | 'amor-propio'
+  | 'relaciones'
+  | 'ruptura'
+  | 'apego'
+  | 'limites'
+  | 'tarot-terapeutico'
+  | 'sanacion-emocional'
+  | 'identidad'
+  | 'proposito'
+  | 'sombra'
+  | 'renacimiento';
+
+export type IdeaStatus = 'nueva' | 'en-desarrollo' | 'lista' | 'usada' | 'archivada';
+
 export type Database = {
   public: {
     Tables: {
@@ -457,6 +489,11 @@ export type Database = {
         Row: AppConfig;
         Insert: Omit<AppConfig, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<AppConfig, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      ideas: {
+        Row: Idea;
+        Insert: Omit<Idea, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Idea, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
   };

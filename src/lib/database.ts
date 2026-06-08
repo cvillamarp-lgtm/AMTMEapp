@@ -15,6 +15,7 @@ import type {
   Script,
   VisualAsset,
   AutomationRule,
+  Idea,
 } from '@/types/database';
 
 // FASE 8E — Auth obligatoria. RLS estricta en 15 tablas. Solo auth.uid() = user_id.
@@ -353,6 +354,22 @@ export async function updateMetricEpisode(
   updates: Partial<import('@/types/database').MetricEpisode>
 ): Promise<import('@/types/database').MetricEpisode> {
   return updateOne<import('@/types/database').MetricEpisode>('metrics_episode', id, updates);
+}
+
+// ---- IDEAS ----
+export async function getIdeas(): Promise<Idea[]> {
+  return getAll<Idea>('ideas');
+}
+export async function createIdea(
+  idea: Omit<Idea, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+): Promise<Idea> {
+  return insertOne<Idea>('ideas', idea);
+}
+export async function updateIdea(id: string, updates: Partial<Idea>): Promise<Idea> {
+  return updateOne<Idea>('ideas', id, updates);
+}
+export async function deleteIdea(id: string): Promise<void> {
+  return deleteOne('ideas', id);
 }
 
 // ---- MASTER SECTIONS ----
