@@ -161,7 +161,6 @@ export default function ChecklistsPage() {
     const items = lines.map((text) => ({ id: crypto.randomUUID(), text, completed: false }));
     setCreating(true);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const created = await createChecklist({
         name: newName.trim(),
         area: newArea.trim() || 'General',
@@ -169,7 +168,7 @@ export default function ChecklistsPage() {
         status: 'Pendiente',
         ready_criteria: null,
         errors_to_avoid: null,
-        items: items as any,
+        items,
         related_episode_id: null,
         related_content_id: null,
       });
