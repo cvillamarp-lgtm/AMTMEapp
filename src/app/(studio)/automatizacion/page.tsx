@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   getAutomationRules,
   createAutomationRule,
@@ -126,7 +127,11 @@ export default function AutomatizacionPage() {
         </div>
 
         {loading ? (
-          <p className="mt-6 text-sm text-black/40">Cargando reglas...</p>
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 rounded-3xl" />
+            ))}
+          </div>
         ) : rules.length === 0 ? (
           <div className="mt-8 text-center text-sm text-black/40">
             <p>No hay reglas de automatización.</p>
