@@ -23,6 +23,7 @@ import {
   ListChecks,
   SignOut,
   Warning,
+  Lightbulb,
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { useStudio } from '@/components/studio-provider';
@@ -43,6 +44,7 @@ const ALL_NAV_ITEMS = [
   { href: '/metricas', label: 'Métricas', icon: ChartLine },
   { href: '/monetizacion', label: 'Monetización', icon: CurrencyDollar },
   { href: '/checklists', label: 'Checklists', icon: CheckSquare },
+  { href: '/ideas', label: 'Ideas', icon: Lightbulb },
   { href: '/notas', label: 'Notas', icon: NotePencil },
   { href: '/automatizacion', label: 'Automatización', icon: Lightning },
   { href: '/historico', label: 'Histórico', icon: Archive },

@@ -106,7 +106,6 @@ export function useIdleLogout({
         window.removeEventListener(event, handleActivity);
       });
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled]);
 
   return { showWarning, keepSession, signOutNow, remainingSeconds };

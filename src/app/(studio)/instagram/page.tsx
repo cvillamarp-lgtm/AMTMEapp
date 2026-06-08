@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Badge, Button, Input, Textarea, Field } from '@/components/ui';
+import { Card, Badge, Button, Input, Field } from '@/components/ui';
 
 export default function InstagramPage() {
   return (

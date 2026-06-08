@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
-import { Badge } from '@/components/shadcn/badge';
 import { Progress } from '@/components/shadcn/progress';
 import { RefreshCw, CheckCircle2, Circle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -57,6 +56,7 @@ export default function ChecklistsPage() {
     );
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await updateChecklist(checklist.id, { items: updatedItems as any, status: newStatus });
     } catch {
       toast.error('Error al guardar');
@@ -72,6 +72,7 @@ export default function ChecklistsPage() {
       )
     );
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await updateChecklist(checklist.id, { items: resetItems as any, status: 'Pendiente' });
       toast.success('Checklist reiniciado');
     } catch {

@@ -16,6 +16,7 @@ async function getRecentEpisodes() {
       .order('created_at', { ascending: false })
       .limit(3);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (data || []).map((r: any) => r.payload);
   } catch {
     return [];
@@ -77,6 +78,7 @@ export default async function HomePage() {
             Episodios recientes
           </h2>
           <div className="space-y-4">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {episodes.map((ep: any, i: number) => (
               <div
                 key={i}
