@@ -31,6 +31,7 @@ async function getActiveUserId(): Promise<string | null> {
 }
 
 function getClient() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return getSupabaseAuthBrowserClient() as any;
 }
 
@@ -41,6 +42,7 @@ function toRow(payload: object, userId: string | null = null) {
   return { user_id: userId, payload };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function fromRow<T>(row: any): T {
   // Si tiene payload jsonb, expandirlo; si no, usar las columnas directas
   const base = {
@@ -53,7 +55,8 @@ function fromRow<T>(row: any): T {
     return { ...base, ...row.payload } as T;
   }
   // Schema con columnas directas — omitir id/timestamps ya incluidos
-  const { id, created_at, updated_at, user_id, owner_id, workspace_key, payload, ...rest } = row;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id: _id, created_at: _ca, updated_at: _ua, user_id: _uid, owner_id: _oid, workspace_key: _wk, payload: _payload, ...rest } = row;
   return { ...base, ...rest } as T;
 }
 
@@ -69,6 +72,7 @@ async function getAll<T>(table: string): Promise<T[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 
@@ -203,6 +207,7 @@ export async function getCalendarEvents(): Promise<CalendarEvent[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: true });
   if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<CalendarEvent>(r));
 }
 export async function createCalendarEvent(
@@ -233,6 +238,7 @@ export async function getScripts(): Promise<Script[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => {
     if (r.payload && typeof r.payload === 'object') return fromRow<Script>(r);
     return { ...r } as Script;
@@ -247,6 +253,7 @@ export async function createScript(
   const { data, error } = await sb
     .from('scripts')
     .insert([
+      /* eslint-disable @typescript-eslint/no-explicit-any */
       {
         user_id: activeUserId,
         episode_id: (s as any).episode_id,
@@ -264,6 +271,7 @@ export async function createScript(
         cta: (s as any).cta || null,
         voice_notes: (s as any).voice_notes || null,
       },
+      /* eslint-enable @typescript-eslint/no-explicit-any */
     ])
     .select()
     .single();
@@ -312,6 +320,7 @@ export async function deleteAutomationRule(id: string): Promise<void> {
 }
 
 // ---- ARCHIVE ITEMS ----
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function getArchiveItems(): Promise<any[]> {
   return getAll<any>('archive_items');
 }
@@ -321,6 +330,7 @@ export async function createArchiveItem(item: object): Promise<any> {
 export async function updateArchiveItem(id: string, updates: object): Promise<any> {
   return updateOne<any>('archive_items', id, updates);
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 export async function deleteArchiveItem(id: string): Promise<void> {
   return deleteOne('archive_items', id);
 }
@@ -373,6 +383,7 @@ export async function deleteIdea(id: string): Promise<void> {
 }
 
 // ---- MASTER SECTIONS ----
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function getMasterSections(): Promise<any[]> {
   return getAll<any>('master_sections');
 }
@@ -382,6 +393,7 @@ export async function createMasterSection(section: object): Promise<any> {
 export async function updateMasterSection(id: string, updates: object): Promise<any> {
   return updateOne<any>('master_sections', id, updates);
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 export async function deleteMasterSection(id: string): Promise<void> {
   return deleteOne('master_sections', id);
 }
