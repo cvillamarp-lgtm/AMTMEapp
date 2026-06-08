@@ -362,13 +362,15 @@ export default function IdeasPage() {
               {editing ? 'Editar idea' : 'Nueva idea'}
             </h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <Field label="Título *" className="sm:col-span-2">
-                <Input
-                  value={form.title}
-                  onChange={(e) => set('title')(e.target.value)}
-                  placeholder="¿Cuál es la idea?"
-                />
-              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Título *">
+                  <Input
+                    value={form.title}
+                    onChange={(e) => set('title')(e.target.value)}
+                    placeholder="¿Cuál es la idea?"
+                  />
+                </Field>
+              </div>
               <Field label="Categoría">
                 <Select
                   value={form.category}
@@ -451,14 +453,16 @@ export default function IdeasPage() {
                   ))}
                 </Select>
               </Field>
-              <Field label="Notas" className="sm:col-span-2">
-                <Textarea
-                  value={form.notes ?? ''}
-                  onChange={(e) => set('notes')(e.target.value)}
-                  placeholder="Notas, contexto, desarrollo inicial..."
-                  rows={3}
-                />
-              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Notas">
+                  <Textarea
+                    value={form.notes ?? ''}
+                    onChange={(e) => set('notes')(e.target.value)}
+                    placeholder="Notas, contexto, desarrollo inicial..."
+                    rows={3}
+                  />
+                </Field>
+              </div>
             </div>
             <div className="mt-5 flex justify-end gap-3">
               <button
