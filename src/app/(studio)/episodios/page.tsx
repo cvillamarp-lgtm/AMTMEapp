@@ -29,6 +29,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import { Plus, Pencil, Trash2, Search, Sparkles, Mic, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEpisodes, createEpisode, updateEpisode, deleteEpisode } from '@/lib/database';
@@ -467,7 +468,11 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando episodios...</div>
+        <div className="grid gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 rounded-xl" />
+          ))}
+        </div>
       ) : filteredEpisodes.length === 0 ? (
         <div className="text-center py-16">
           <Mic className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -492,7 +497,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.15 }}
               >
-                <Card>
+                <Card className="group">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -513,7 +518,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                         </div>
                         <CardDescription>{ep.theme}</CardDescription>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button size="sm" variant="ghost" onClick={() => handleEdit(ep)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
