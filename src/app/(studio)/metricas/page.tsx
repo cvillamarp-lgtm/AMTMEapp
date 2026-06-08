@@ -1,6 +1,15 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegendContent,
+  ChartLegend,
+} from '@/components/shadcn/chart';
+import type { ChartConfig } from '@/components/shadcn/chart';
 import {
   Card,
   CardHeader,
@@ -286,6 +295,15 @@ Solo JSON. Espanol neutro.`;
       setGenerating(false);
     }
   }
+
+  const chartConfig: ChartConfig = {
+    plays: { label: 'Reproducciones', color: '#0c1f36' },
+    reach: { label: 'Alcance', color: '#e8ff40' },
+  };
+
+  const chartData = [...metrics]
+    .sort((a, b) => a.month.localeCompare(b.month))
+    .map((m) => ({ date: m.month.slice(0, 7), plays: m.plays, reach: m.reach }));
 
   function calcKPIs(m: MetricMonthly) {
     return {
@@ -855,6 +873,33 @@ Solo JSON. Espanol neutro.`;
             </Card>
           ) : (
             <div className="grid gap-4">
+              {chartData.length >= 2 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Evolución mensual</CardTitle>
+                    <CardDescription>Reproducciones y alcance por mes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartContainer config={chartConfig} className="h-[220px] w-full">
+                      <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="date"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          tickFormatter={(v) => v.slice(5)}
+                        />
+                        <YAxis tickLine={false} axisLine={false} width={40} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Bar dataKey="plays" fill="var(--color-plays)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="reach" fill="var(--color-reach)" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ChartContainer>
+                  </CardContent>
+                </Card>
+              )}
               {metrics.map((m) => {
                 const kpis = calcKPIs(m);
                 return (

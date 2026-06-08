@@ -28,6 +28,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   Plus,
   Pencil,
@@ -619,7 +620,11 @@ Devuelve exactamente en este formato:
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+            <div className="grid gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-28 rounded-xl" />
+              ))}
+            </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-16">
               <Image className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -653,7 +658,7 @@ Devuelve exactamente en este formato:
                     exit={{ opacity: 0, scale: 0.97 }}
                     transition={{ duration: 0.15 }}
                   >
-                    <Card>
+                    <Card className="group">
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
@@ -671,9 +676,9 @@ Devuelve exactamente en este formato:
                                 {c.status}
                               </span>
                             </div>
-                            <CardDescription>{c.hook}</CardDescription>
+                            <CardDescription className="line-clamp-2">{c.hook}</CardDescription>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button size="sm" variant="ghost" onClick={() => handleEdit(c)}>
                               <Pencil className="h-4 w-4" />
                             </Button>
