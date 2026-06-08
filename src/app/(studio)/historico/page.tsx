@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Textarea } from '@/components/ui';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   getArchiveItems,
   createArchiveItem,
@@ -114,7 +115,11 @@ export default function HistoricoPage() {
         </div>
 
         {loading ? (
-          <p className="mt-6 text-sm text-black/40">Cargando histórico...</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-28 rounded-3xl" />
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <div className="mt-8 text-center text-sm text-black/40">
             <p>{search ? 'Sin resultados para esa búsqueda.' : 'No hay material archivado.'}</p>

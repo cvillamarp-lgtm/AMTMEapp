@@ -33,7 +33,17 @@ type Note = {
   tags?: string[];
 };
 
-const CATEGORIES = ['general', 'episodio', 'estrategia', 'monetizacion', 'tecnico', 'reflexion'];
+const CATEGORIES = [
+  'general',
+  'reflexion',
+  'episodio',
+  'frase',
+  'aprendizaje',
+  'simbolo',
+  'sueno',
+  'insight',
+  'pendiente',
+];
 const STATUS_OPTIONS = ['activa', 'archivada', 'pendiente'];
 
 const MODOS_BAJA_ENERGIA = [

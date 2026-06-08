@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   getMasterSections,
   createMasterSection,
@@ -171,7 +172,11 @@ export default function DocumentoMaestroPage() {
           />
 
           {loading ? (
-            <p className="text-sm text-black/40">Cargando secciones...</p>
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 rounded-3xl" />
+              ))}
+            </div>
           ) : filtered.length === 0 ? (
             <p className="text-center text-sm text-black/40 py-8">
               {query ? 'Sin resultados.' : 'No hay secciones. Crea la primera.'}

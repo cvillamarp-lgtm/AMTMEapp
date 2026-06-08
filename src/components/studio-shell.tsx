@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import {
   House,
   FileText,
@@ -24,6 +24,8 @@ import {
   SignOut,
   Warning,
   Lightbulb,
+  CaretRight,
+  CaretLeft,
 } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { useStudio } from '@/components/studio-provider';
@@ -61,6 +63,27 @@ export function StudioShell({ children }: { children: ReactNode }) {
   const { state } = useStudio();
   const authRequired = isAuthRequired();
   const [signingOut, setSigningOut] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('sidebar-collapsed');
+    if (stored !== null) setCollapsed(stored === 'true');
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('sidebar-collapsed', String(collapsed));
+  }, [collapsed]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        e.preventDefault();
+        setCollapsed((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const navPrefs = state.config.navPreferences;
   const navOrder = navPrefs?.order ?? DEFAULT_NAV_ORDER;
@@ -137,15 +160,31 @@ export function StudioShell({ children }: { children: ReactNode }) {
       )}
 
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-30">
-        <div className="flex flex-col flex-1 overflow-y-auto">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
-            <h1 className="text-base font-semibold text-white tracking-tight">AMTME Studio OS</h1>
+      <aside
+        className={cn(
+          'hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-30 transition-all duration-200',
+          collapsed ? 'md:w-16' : 'md:w-64'
+        )}
+      >
+        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+          {/* Logo + toggle */}
+          <div className="flex items-center justify-between h-16 px-3 border-b border-white/10 shrink-0">
+            {!collapsed && (
+              <h1 className="text-base font-semibold text-white tracking-tight truncate px-2">
+                AMTME Studio OS
+              </h1>
+            )}
+            <button
+              onClick={() => setCollapsed((prev) => !prev)}
+              className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white transition-colors"
+              title={collapsed ? 'Expandir sidebar (Ctrl+B)' : 'Colapsar sidebar (Ctrl+B)'}
+            >
+              {collapsed ? <CaretRight size={16} /> : <CaretLeft size={16} />}
+            </button>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-3 py-4 space-y-0.5">
+          <nav className="flex-1 px-2 py-4 space-y-0.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -155,30 +194,37 @@ export function StudioShell({ children }: { children: ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  title={collapsed ? item.label : undefined}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
+                    'flex items-center gap-3 rounded-md transition-colors',
+                    collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5',
+                    'text-sm font-medium',
                     isActive
                       ? 'bg-amtme-lemon text-amtme-navy'
                       : 'text-white/70 hover:bg-white/10 hover:text-white'
                   )}
                 >
-                  <Icon size={20} weight="regular" />
-                  {item.label}
+                  <Icon size={20} weight="regular" className="shrink-0" />
+                  {!collapsed && item.label}
                 </Link>
               );
             })}
           </nav>
 
           {/* Footer con logout visible */}
-          <div className="px-4 py-4 border-t border-white/10">
+          <div className="px-2 py-4 border-t border-white/10 shrink-0">
             {authRequired && (
               <button
                 onClick={() => void signOut()}
                 disabled={signingOut}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+                title={collapsed ? (signingOut ? 'Cerrando sesión…' : 'Cerrar sesión') : undefined}
+                className={cn(
+                  'flex w-full items-center gap-2.5 rounded-lg py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40',
+                  collapsed ? 'justify-center px-2' : 'px-3'
+                )}
               >
-                <SignOut size={18} weight="regular" />
-                {signingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+                <SignOut size={18} weight="regular" className="shrink-0" />
+                {!collapsed && (signingOut ? 'Cerrando sesión…' : 'Cerrar sesión')}
               </button>
             )}
           </div>
@@ -186,7 +232,12 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="flex-1 md:pl-64 min-h-screen">
+      <main
+        className={cn(
+          'flex-1 min-h-screen transition-all duration-200',
+          collapsed ? 'md:pl-16' : 'md:pl-64'
+        )}
+      >
         <div className="h-full p-6 pb-24 md:pb-6">{children}</div>
       </main>
 
