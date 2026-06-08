@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/shadcn/alert';
 import { Sparkles, CheckCircle2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEpisodes, updateEpisode } from '@/lib/database';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import type { Episode } from '@/types/database';
 
 type FieldCheck = { label: string; ok: boolean; critical: boolean };
@@ -194,7 +195,11 @@ export default function RevisionEpisodiosPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando episodios...</div>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 rounded-xl" />
+          ))}
+        </div>
       ) : analyses.length === 0 ? (
         <Alert>
           <AlertDescription>
