@@ -134,6 +134,78 @@ export async function deleteEpisode(id: string): Promise<void> {
   return deleteOne('episodes', id);
 }
 
+export async function getEpisodeById(id: string): Promise<Episode | null> {
+  const all = await getEpisodes();
+  return all.find((e) => e.id === id) ?? null;
+}
+
+export async function getScriptsByEpisode(episodeId: string): Promise<Script[]> {
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+  const { data, error } = await sb
+    .from('scripts')
+    .select('*')
+    .eq('user_id', activeUserId)
+    .eq('episode_id', episodeId)
+    .order('created_at', { ascending: false });
+  if (error) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => {
+    if (r.payload && typeof r.payload === 'object') return fromRow<Script>(r);
+    return { ...r } as Script;
+  });
+}
+
+export async function getContentPiecesByEpisode(episodeId: string): Promise<ContentPiece[]> {
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+  const { data, error } = await sb
+    .from('content_pieces')
+    .select('*')
+    .eq('user_id', activeUserId)
+    .eq('payload->>episode_id', episodeId)
+    .order('created_at', { ascending: false });
+  if (error) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<ContentPiece>(r));
+}
+
+export async function getChecklistsByEpisode(episodeId: string): Promise<Checklist[]> {
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+  const { data, error } = await sb
+    .from('checklists')
+    .select('*')
+    .eq('user_id', activeUserId)
+    .eq('payload->>related_episode_id', episodeId)
+    .order('created_at', { ascending: false });
+  if (error) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<Checklist>(r));
+}
+
+export async function getLeadsByEpisode(episodeId: string): Promise<MonetizationLead[]> {
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+  const { data, error } = await sb
+    .from('monetization_leads')
+    .select('*')
+    .eq('user_id', activeUserId)
+    .eq('payload->>episode_id', episodeId)
+    .order('created_at', { ascending: false });
+  if (error) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<MonetizationLead>(r));
+}
+
 // ---- CONTENT PIECES ----
 export async function getContentPieces(): Promise<ContentPiece[]> {
   return getAll<ContentPiece>('content_pieces');

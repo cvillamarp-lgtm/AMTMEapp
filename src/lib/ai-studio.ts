@@ -1,12 +1,10 @@
 /**
- * ai-studio.ts — Helper cliente para llamar al API route de IA desde el browser
- * Usa el endpoint /api/ia/generar que ya existe en el repo
+ * ai-studio.ts — Helper cliente para llamar al API route de IA desde el browser.
+ * Sistema editorial centralizado. El system prompt viene de /src/prompts/amtme-editorial.ts.
  */
 
-const SYSTEM_PROMPT = `Eres el asistente editorial de AMTME (A Mí Tampoco Me Explicaron), podcast en español para hombres hispanos 28-44 sobre amor, apego e identidad.
-Voz: compañero, no guru. Tono sobrio, directo, sin autoayuda genérica.
-Estructura narrativa: umbral → herida → símbolo → verdad → puente.
-Responde siempre en español neutro latinoamericano. Sin asteriscos ni markdown en el output final.`;
+import { AMTME_SYSTEM_PROMPT } from '@/prompts/amtme-editorial';
+import type { EditorialOutput } from '@/app/api/ia/editorial/route';
 
 export async function callAI(prompt: string, mode: string = 'Episodio'): Promise<string> {
   const res = await fetch('/api/ia/generar', {
@@ -15,8 +13,8 @@ export async function callAI(prompt: string, mode: string = 'Episodio'): Promise
     body: JSON.stringify({
       prompt,
       mode,
-      provider: 'gemini',
-      systemPrompt: SYSTEM_PROMPT,
+      provider: 'groq',
+      systemPrompt: AMTME_SYSTEM_PROMPT,
     }),
   });
   if (!res.ok) {
@@ -38,11 +36,6 @@ export type PublicationPackage = {
   checklist: string[];
   nextAction: string;
 };
-
-const PACKAGE_SYSTEM_PROMPT = `Eres el asistente editorial de AMTME (A Mí Tampoco Me Explicaron).
-Voz: compañero honesto, no guru. Tono sobrio, directo, sin autoayuda genérica.
-Español neutro latinoamericano. Sin asteriscos ni markdown.
-El oyente objetivo: hombre hispano 28-44 años navegando amor, apego, identidad.`;
 
 const PACKAGE_PROMPT = (
   text: string
@@ -83,7 +76,7 @@ export async function generatePublicationPackage(text: string): Promise<Publicat
       prompt: PACKAGE_PROMPT(text),
       mode: 'Copy',
       provider: 'groq',
-      systemPrompt: PACKAGE_SYSTEM_PROMPT,
+      systemPrompt: AMTME_SYSTEM_PROMPT,
     }),
   });
   if (!res.ok) {
@@ -98,4 +91,27 @@ export async function generatePublicationPackage(text: string): Promise<Publicat
   } catch {
     throw new Error('La IA no devolvio JSON valido. Intenta de nuevo.');
   }
+}
+
+/**
+ * Motor editorial completo: genera → valida → corrige automáticamente.
+ * Usa el endpoint /api/ia/editorial que ejecuta el pipeline de 3 capas en el servidor.
+ */
+export async function runEditorialEngine(input: {
+  topic: string;
+  wound?: string;
+  symbol?: string;
+  cta?: string;
+  duration?: string;
+}): Promise<EditorialOutput> {
+  const res = await fetch('/api/ia/editorial', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { error?: string }).error || 'Error en el motor editorial');
+  }
+  return res.json() as Promise<EditorialOutput>;
 }

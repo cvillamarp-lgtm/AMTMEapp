@@ -21,6 +21,8 @@ export type MasterSection = {
   updated_at: string;
 };
 
+export type TitleOptimizationStatus = 'generated' | 'approved' | 'rejected' | 'regenerated';
+
 export type Episode = {
   id: string;
   user_id: string;
@@ -41,6 +43,12 @@ export type Episode = {
   publish_date: string | null;
   notes: string | null;
   next_action: string | null;
+  // Title optimization fields — stored in payload JSONB, no migration needed
+  original_title: string | null;
+  ai_optimized_title: string | null;
+  title_optimization_status: TitleOptimizationStatus | null;
+  title_optimized_at: string | null;
+  title_optimization_source: 'ai' | 'manual' | null;
   created_at: string;
   updated_at: string;
 };

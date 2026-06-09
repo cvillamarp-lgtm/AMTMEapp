@@ -31,7 +31,7 @@ import {
   DialogFooter,
 } from '@/components/shadcn/dialog';
 import { Skeleton } from '@/components/shadcn/skeleton';
-import { Plus, Pencil, Trash2, Search, Sparkles, Mic, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Sparkles, Mic, Loader2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEpisodes, createEpisode, updateEpisode, deleteEpisode } from '@/lib/database';
 import type { Episode, EpisodeStatus, NarrativeStructure } from '@/types/database';
@@ -207,6 +207,11 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
       objective: formData.objective || null,
       cta: formData.cta || null,
       notes: formData.notes || null,
+      original_title: null,
+      ai_optimized_title: null,
+      title_optimization_status: null,
+      title_optimized_at: null,
+      title_optimization_source: null,
     };
     setDialogOpen(false);
     resetForm();
@@ -522,9 +527,14 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <CardTitle className="text-lg">
-                            #{ep.episode_number}: {ep.title}
-                          </CardTitle>
+                          <Link
+                            href={`/episodios/${ep.id}`}
+                            className="hover:underline underline-offset-2"
+                          >
+                            <CardTitle className="text-lg">
+                              #{ep.episode_number}: {ep.title}
+                            </CardTitle>
+                          </Link>
                           <span
                             className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColors[ep.status] || 'bg-gray-100 text-gray-700'}`}
                           >
@@ -535,10 +545,35 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                           >
                             {ep.script ? 'Con guion' : 'Sin guion'}
                           </span>
+                          {ep.title_optimization_status === 'approved' && (
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-[#e8ff40]/30 text-[#0c1f36]">
+                              IA optimizado
+                            </span>
+                          )}
+                          {ep.title_optimization_status === 'generated' && (
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700">
+                              Sugerencia IA
+                            </span>
+                          )}
+                          {ep.title_optimization_status === 'rejected' && (
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-50 text-red-600">
+                              Rechazado
+                            </span>
+                          )}
+                          {!ep.title_optimization_status && (
+                            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-50 text-gray-400">
+                              Sin optimizar
+                            </span>
+                          )}
                         </div>
                         <CardDescription>{ep.theme}</CardDescription>
                       </div>
                       <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Link href={`/episodios/${ep.id}`}>
+                          <Button size="sm" variant="ghost" title="Ver detalle">
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </Link>
                         <Button size="sm" variant="ghost" onClick={() => handleEdit(ep)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
