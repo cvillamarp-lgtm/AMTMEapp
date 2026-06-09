@@ -3,13 +3,12 @@
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Upload, FileText, CheckCircle, XCircle, AlertCircle, Loader2, Eye, Download, Trash2, BarChart3, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Upload, FileText, CheckCircle, XCircle, AlertCircle, Loader2, Eye, Trash2, BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/shadcn/card';
 import { Badge } from '@/components/shadcn/badge';
 import { parseSpotifyFile, type ParsedSpotifyFile } from '@/lib/spotify-parser';
 import {
-  createSpotifyImport,
   updateSpotifyImport,
   getSpotifyImports,
   deleteSpotifyImport,
@@ -112,7 +111,7 @@ export default function SpotifyImportPage() {
       setStep('done');
 
       // Generar análisis estratégico con IA
-      generateStrategyAnalysis(data.summary.importId, parsedFile, userId);
+      generateStrategyAnalysis(data.summary.importId, parsedFile);
 
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Error al importar');
@@ -120,7 +119,7 @@ export default function SpotifyImportPage() {
     }
   }
 
-  async function generateStrategyAnalysis(importId: string, file: ParsedSpotifyFile, userId: string) {
+  async function generateStrategyAnalysis(importId: string, file: ParsedSpotifyFile) {
     setGeneratingAnalysis(true);
     try {
       const metricsForAI = file.normalizedMetrics
