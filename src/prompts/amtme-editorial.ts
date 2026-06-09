@@ -207,3 +207,61 @@ export function extractScriptBlocks(raw: string): ScriptBlocks {
     closing: extract('CIERRE'),
   };
 }
+
+// ── TITLE OPTIMIZATION ──────────────────────────────────────────────────────
+
+export type TitleOptimizationInput = {
+  currentTitle: string;
+  episodeDescription?: string;
+  episodeTheme?: string;
+};
+
+export type TitleOptimizationOutput = {
+  originalTitle: string;
+  optimizedTitle: string;
+  primaryKeyword: string;
+  emotionalHook: string;
+  reasoning: string;
+  seoScore: number;
+};
+
+export function buildTitleOptimizationPrompt(input: TitleOptimizationInput): string {
+  return `Actúa como estratega editorial senior especializado en podcasts de crecimiento personal, relaciones, duelo amoroso, psicología emocional, SEO para Spotify y contenido short-form.
+
+Tu tarea es mejorar el título de un episodio del podcast "A Mí Tampoco Me Explicaron" de Christian Villamar.
+
+El podcast tiene un tono directo, emocional, humano, simbólico y profundo. No debe sonar como autoayuda genérica, coaching vacío ni clickbait exagerado.
+
+Fórmula editorial: [Palabra clave principal] + [Beneficio o dolor específico] + [Gancho emocional]
+
+Título actual: ${input.currentTitle}
+${input.episodeDescription ? `Descripción del episodio: ${input.episodeDescription}` : ''}
+${input.episodeTheme ? `Tema: ${input.episodeTheme}` : ''}
+
+Genera un nuevo título optimizado que cumpla TODAS estas reglas:
+1. Máximo 80 caracteres si es posible
+2. Keyword clara en los primeros 60 caracteres
+3. Alto potencial de búsqueda en Spotify
+4. Tono emocional y directo
+5. Lenguaje claro para audiencia sobre relaciones, duelo, apego y reconstrucción personal
+6. Sin emojis ni signos excesivos
+7. Sin promesas absolutas ("sana para siempre", "olvida en 3 días")
+8. Sin frases genéricas de autoayuda
+9. Sin perder la identidad AMTME
+10. Debe entenderse sin conocer previamente el podcast
+11. Compatible con Spotify, YouTube, TikTok y Reels
+
+Keywords prioritarias: apego ansioso, duelo amoroso, cómo soltar, amor propio, relaciones tóxicas, rol del salvador, rechazo, dependencia emocional, límites, autoestima, heridas emocionales.
+
+Devuelve ÚNICAMENTE JSON válido sin markdown:
+{
+  "originalTitle": "${input.currentTitle.replace(/"/g, '\\"')}",
+  "optimizedTitle": "...",
+  "primaryKeyword": "...",
+  "emotionalHook": "...",
+  "reasoning": "...",
+  "seoScore": 0
+}
+
+El campo seoScore debe ser un número entero del 1 al 10.`;
+}
