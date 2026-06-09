@@ -207,6 +207,11 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
       objective: formData.objective || null,
       cta: formData.cta || null,
       notes: formData.notes || null,
+      original_title: null,
+      ai_optimized_title: null,
+      title_optimization_status: null,
+      title_optimized_at: null,
+      title_optimization_source: null,
     };
     setDialogOpen(false);
     resetForm();
@@ -221,11 +226,6 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
         user_id: 'temp',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        original_title: null,
-        ai_optimized_title: null,
-        title_optimization_status: null,
-        title_optimized_at: null,
-        title_optimization_source: null,
         ...episodeData,
       };
       await optimisticCreate(temp, () => createEpisode(episodeData));

@@ -170,7 +170,8 @@ export async function getContentPiecesByEpisode(episodeId: string): Promise<Cont
     .eq('payload->>episode_id', episodeId)
     .order('created_at', { ascending: false });
   if (error) return [];
-  return (data || []).map((r) => fromRow<ContentPiece>(r));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<ContentPiece>(r));
 }
 
 export async function getChecklistsByEpisode(episodeId: string): Promise<Checklist[]> {
@@ -185,7 +186,8 @@ export async function getChecklistsByEpisode(episodeId: string): Promise<Checkli
     .eq('payload->>related_episode_id', episodeId)
     .order('created_at', { ascending: false });
   if (error) return [];
-  return (data || []).map((r) => fromRow<Checklist>(r));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<Checklist>(r));
 }
 
 export async function getLeadsByEpisode(episodeId: string): Promise<MonetizationLead[]> {
@@ -200,7 +202,8 @@ export async function getLeadsByEpisode(episodeId: string): Promise<Monetization
     .eq('payload->>episode_id', episodeId)
     .order('created_at', { ascending: false });
   if (error) return [];
-  return (data || []).map((r) => fromRow<MonetizationLead>(r));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<MonetizationLead>(r));
 }
 
 // ---- CONTENT PIECES ----
