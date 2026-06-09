@@ -406,6 +406,90 @@ export type Idea = {
   updated_at: string;
 };
 
+// ---- SPOTIFY ANALYTICS ----
+
+export type ImportStatus = 'uploaded' | 'validated' | 'processed' | 'failed' | 'partial';
+
+export interface SpotifyMetricImport {
+  id: string;
+  user_id: string | null;
+  created_at: string;
+  updated_at: string;
+  file_name: string;
+  file_type: string;
+  file_size: number;
+  uploaded_at: string;
+  status: ImportStatus;
+  detected_report_type: string | null;
+  period_start: string | null;
+  period_end: string | null;
+  total_rows: number | null;
+  processed_rows: number | null;
+  failed_rows: number | null;
+  error_log: Record<string, unknown> | null;
+  raw_metadata: Record<string, unknown> | null;
+  file_hash: string | null;
+}
+
+export interface SpotifyEpisodeMetric {
+  id: string;
+  user_id: string | null;
+  created_at: string;
+  updated_at: string;
+  import_id: string;
+  episode_id: string | null;
+  spotify_episode_title: string;
+  normalized_episode_title: string;
+  metric_date: string | null;
+  period_start: string | null;
+  period_end: string | null;
+  plays: number | null;
+  streams: number | null;
+  starts: number | null;
+  listeners: number | null;
+  followers_gained: number | null;
+  completion_rate: number | null;
+  average_consumption: number | null;
+  minutes_listened: number | null;
+  impressions: number | null;
+  clicks: number | null;
+  country: string | null;
+  city: string | null;
+  age_range: string | null;
+  gender: string | null;
+  platform: string | null;
+  traffic_source: string | null;
+  raw_row: Record<string, unknown> | null;
+}
+
+export interface StrategyRecommendedActions {
+  immediate: string[];
+  next7Days: string[];
+  next30Days: string[];
+}
+
+export interface PodcastStrategySnapshot {
+  id: string;
+  user_id: string | null;
+  created_at: string;
+  updated_at: string;
+  import_id: string | null;
+  period_start: string;
+  period_end: string;
+  summary: string;
+  key_findings: string[];
+  growth_signals: string[];
+  risk_signals: string[];
+  best_performing_episodes: string[];
+  underperforming_episodes: string[];
+  title_insights: string[];
+  audience_insights: string[];
+  distribution_insights: string[];
+  recommended_actions: StrategyRecommendedActions;
+  content_strategy_updates: string[];
+  generated_by: 'ai' | 'manual';
+}
+
 export type IdeaCategory =
   | 'amor-propio'
   | 'relaciones'
@@ -503,6 +587,21 @@ export type Database = {
         Row: Idea;
         Insert: Omit<Idea, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Idea, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      spotify_metric_imports: {
+        Row: SpotifyMetricImport;
+        Insert: Omit<SpotifyMetricImport, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<SpotifyMetricImport, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      spotify_episode_metrics: {
+        Row: SpotifyEpisodeMetric;
+        Insert: Omit<SpotifyEpisodeMetric, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<SpotifyEpisodeMetric, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      podcast_strategy_snapshots: {
+        Row: PodcastStrategySnapshot;
+        Insert: Omit<PodcastStrategySnapshot, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<PodcastStrategySnapshot, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
   };

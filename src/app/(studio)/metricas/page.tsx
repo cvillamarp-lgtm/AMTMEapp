@@ -43,6 +43,7 @@ import {
   ArrowRight,
   BarChart2,
   Mic,
+  Upload,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -343,6 +344,12 @@ Solo JSON. Espanol neutro.`;
           <p className="text-sm text-muted-foreground mt-1">Registro y decisiones editoriales</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/metricas/spotify">
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Upload className="h-4 w-4" />
+              Importar Spotify
+            </Button>
+          </Link>
           {metrics.length > 0 && (
             <Button variant="outline" size="sm" onClick={exportCSV}>
               <Download className="mr-1 h-4 w-4" />
