@@ -635,7 +635,8 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
         onOpenChange={setGuiaOpen}
         nextNumber={nextNumber}
         onSave={async (episodeData) => {
-          await optimisticCreate(episodeData as Episode, () => createEpisode(episodeData));
+          const ep = episodeData as Episode;
+          await optimisticCreate(ep, () => createEpisode(ep));
         }}
       />
     </div>
