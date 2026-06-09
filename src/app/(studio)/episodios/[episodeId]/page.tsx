@@ -16,6 +16,7 @@ import {
   CheckSquare,
   DollarSign,
   ChevronRight,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import {
@@ -33,6 +34,7 @@ import {
   getContentPiecesByEpisode,
   getChecklistsByEpisode,
   getLeadsByEpisode,
+  getSpotifyMetricsByEpisode,
   updateEpisode,
 } from '@/lib/database';
 import type {
@@ -42,6 +44,7 @@ import type {
   Checklist,
   MonetizationLead,
   EpisodeStatus,
+  SpotifyEpisodeMetric,
 } from '@/types/database';
 
 type TitleOptimizationOutput = {
@@ -321,23 +324,26 @@ export default function EpisodePage({ params }: EpisodePageProps) {
   const [content, setContent] = useState<ContentPiece[]>([]);
   const [checklists, setChecklists] = useState<Checklist[]>([]);
   const [leads, setLeads] = useState<MonetizationLead[]>([]);
+  const [spotifyMetrics, setSpotifyMetrics] = useState<SpotifyEpisodeMetric[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadAll() {
       try {
-        const [ep, sc, co, ch, le] = await Promise.all([
+        const [ep, sc, co, ch, le, sm] = await Promise.all([
           getEpisodeById(episodeId),
           getScriptsByEpisode(episodeId),
           getContentPiecesByEpisode(episodeId),
           getChecklistsByEpisode(episodeId),
           getLeadsByEpisode(episodeId),
+          getSpotifyMetricsByEpisode(episodeId),
         ]);
         setEpisode(ep);
         setScripts(sc);
         setContent(co);
         setChecklists(ch);
         setLeads(le);
+        setSpotifyMetrics(sm);
       } catch {
         toast.error('Error al cargar el episodio');
       } finally {
@@ -474,6 +480,9 @@ export default function EpisodePage({ params }: EpisodePageProps) {
           </TabsTrigger>
           <TabsTrigger value="leads" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
             Leads {leads.length > 0 ? `(${leads.length})` : ''}
+          </TabsTrigger>
+          <TabsTrigger value="spotify" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+            Spotify {spotifyMetrics.length > 0 ? `(${spotifyMetrics.length})` : ''}
           </TabsTrigger>
         </TabsList>
 
@@ -760,6 +769,59 @@ export default function EpisodePage({ params }: EpisodePageProps) {
                 </CardContent>
               </Card>
             ))
+          )}
+        </TabsContent>
+
+        {/* SPOTIFY METRICS */}
+        <TabsContent value="spotify" className="space-y-3">
+          {spotifyMetrics.length === 0 ? (
+            <div className="text-center py-12">
+              <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
+              <p className="text-sm text-muted-foreground">Sin métricas de Spotify importadas para este episodio</p>
+              <Link href="/metricas/spotify">
+                <Button size="sm" className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]">
+                  Importar métricas de Spotify
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* KPIs agregados */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { label: 'Total plays', value: spotifyMetrics.reduce((s, m) => s + (m.plays ?? 0), 0).toLocaleString() },
+                  { label: 'Oyentes únicos', value: spotifyMetrics.reduce((s, m) => s + (m.listeners ?? 0), 0).toLocaleString() },
+                  { label: 'Retención prom.', value: (() => { const v = spotifyMetrics.filter(m => m.completion_rate != null); return v.length ? Math.round(v.reduce((s, m) => s + (m.completion_rate ?? 0), 0) / v.length) + '%' : '—'; })() },
+                  { label: 'Min. escuchados', value: spotifyMetrics.reduce((s, m) => s + (m.minutes_listened ?? 0), 0).toLocaleString() },
+                ].map((kpi) => (
+                  <Card key={kpi.label}>
+                    <CardContent className="pt-4 pb-3">
+                      <p className="text-2xl font-bold text-[#0c1f36]">{kpi.value}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{kpi.label}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              {/* Tabla por importación */}
+              {spotifyMetrics.map((m) => (
+                <Card key={m.id}>
+                  <CardContent className="pt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-muted-foreground">{m.metric_date || m.period_start || 'Fecha desconocida'}</p>
+                      {m.traffic_source && <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{m.traffic_source}</span>}
+                    </div>
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
+                      {m.plays != null && <div><p className="font-bold">{m.plays.toLocaleString()}</p><p className="text-xs text-muted-foreground">Plays</p></div>}
+                      {m.listeners != null && <div><p className="font-bold">{m.listeners.toLocaleString()}</p><p className="text-xs text-muted-foreground">Oyentes</p></div>}
+                      {m.completion_rate != null && <div><p className="font-bold">{m.completion_rate}%</p><p className="text-xs text-muted-foreground">Retención</p></div>}
+                      {m.minutes_listened != null && <div><p className="font-bold">{m.minutes_listened.toLocaleString()}</p><p className="text-xs text-muted-foreground">Minutos</p></div>}
+                      {m.country && <div><p className="font-bold">{m.country}</p><p className="text-xs text-muted-foreground">País</p></div>}
+                      {m.platform && <div><p className="font-bold">{m.platform}</p><p className="text-xs text-muted-foreground">Plataforma</p></div>}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
         </TabsContent>
       </Tabs>

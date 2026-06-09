@@ -265,3 +265,77 @@ Devuelve ÚNICAMENTE JSON válido sin markdown:
 
 El campo seoScore debe ser un número entero del 1 al 10.`;
 }
+
+
+export interface SpotifyAnalysisInput {
+  periodStart: string;
+  periodEnd: string;
+  totalEpisodes: number;
+  metrics: Array<{
+    title: string;
+    plays: number | null;
+    listeners: number | null;
+    completionRate: number | null;
+    minutesListened: number | null;
+    date: string | null;
+  }>;
+  previousPeriodMetrics?: Array<{
+    title: string;
+    plays: number | null;
+    listeners: number | null;
+  }>;
+}
+
+export function buildSpotifyAnalysisPrompt(input: SpotifyAnalysisInput): string {
+  const metricsJson = JSON.stringify(input.metrics, null, 2);
+  const previousJson = input.previousPeriodMetrics
+    ? JSON.stringify(input.previousPeriodMetrics, null, 2)
+    : 'No disponible';
+
+  return `Actúa como estratega senior de crecimiento para podcasts, especialista en Spotify analytics, SEO editorial, retención de audiencia, distribución orgánica y monetización.
+
+Estás analizando el podcast "A MI TAMPOCO ME EXPLICARON" de Christian Villamar.
+
+El podcast trata sobre relaciones, duelo amoroso, conciencia emocional, apego, límites, reconstrucción personal y tarot como herramienta simbólica de autoconocimiento. Audiencia: hombres hispanos 28-44.
+
+PERIODO ANALIZADO: ${input.periodStart} al ${input.periodEnd}
+EPISODIOS EN EL PERIODO: ${input.totalEpisodes}
+
+MÉTRICAS DEL PERIODO:
+${metricsJson}
+
+MÉTRICAS PERIODO ANTERIOR (para comparación):
+${previousJson}
+
+Tu tarea es analizar estas métricas y entregar una estrategia accionable, clara y priorizada.
+
+No des consejos genéricos. Relaciona cada recomendación con los datos observados.
+
+Analiza:
+1. Qué episodios crecieron vs cayeron
+2. Qué títulos funcionaron mejor (relacionado con retención y plays)
+3. Qué duración retiene mejor
+4. Qué fuentes de tráfico tienen mayor potencial
+5. Qué temas conviene repetir, expandir o convertir en serie
+6. Qué episodios merecen clips, reels o shorts
+7. Qué acciones ejecutar en próximos 7 y 30 días
+
+Devuelve ÚNICAMENTE JSON válido sin markdown:
+{
+  "executiveSummary": "",
+  "keyFindings": [],
+  "growthSignals": [],
+  "riskSignals": [],
+  "bestPerformingEpisodes": [],
+  "underperformingEpisodes": [],
+  "titleInsights": [],
+  "audienceInsights": [],
+  "distributionInsights": [],
+  "recommendedActions": {
+    "immediate": [],
+    "next7Days": [],
+    "next30Days": []
+  },
+  "contentStrategyUpdates": []
+}`;
+}

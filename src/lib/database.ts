@@ -16,6 +16,9 @@ import type {
   VisualAsset,
   AutomationRule,
   Idea,
+  SpotifyMetricImport,
+  SpotifyEpisodeMetric,
+  PodcastStrategySnapshot,
 } from '@/types/database';
 
 // FASE 8E — Auth obligatoria. RLS estricta en 15 tablas. Solo auth.uid() = user_id.
@@ -468,4 +471,98 @@ export async function updateMasterSection(id: string, updates: object): Promise<
 /* eslint-enable @typescript-eslint/no-explicit-any */
 export async function deleteMasterSection(id: string): Promise<void> {
   return deleteOne('master_sections', id);
+}
+
+// ---- SPOTIFY ANALYTICS ----
+
+export async function createSpotifyImport(
+  data: Omit<SpotifyMetricImport, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+): Promise<SpotifyMetricImport> {
+  return insertOne<SpotifyMetricImport>('spotify_metric_imports', data);
+}
+
+export async function updateSpotifyImport(
+  id: string,
+  updates: Partial<SpotifyMetricImport>
+): Promise<SpotifyMetricImport> {
+  return updateOne<SpotifyMetricImport>('spotify_metric_imports', id, updates);
+}
+
+export async function getSpotifyImports(): Promise<SpotifyMetricImport[]> {
+  return getAll<SpotifyMetricImport>('spotify_metric_imports');
+}
+
+export async function getSpotifyImportById(id: string): Promise<SpotifyMetricImport | null> {
+  const all = await getSpotifyImports();
+  return all.find((i) => i.id === id) ?? null;
+}
+
+export async function deleteSpotifyImport(id: string): Promise<void> {
+  return deleteOne('spotify_metric_imports', id);
+}
+
+export async function createSpotifyEpisodeMetrics(
+  metrics: Omit<SpotifyEpisodeMetric, 'id' | 'created_at' | 'updated_at' | 'user_id'>[]
+): Promise<SpotifyEpisodeMetric[]> {
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
+  const { data, error } = await sb
+    .from('spotify_episode_metrics')
+    .insert(rows)
+    .select();
+  if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
+}
+
+export async function getSpotifyMetricsByImport(importId: string): Promise<SpotifyEpisodeMetric[]> {
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+  const { data, error } = await sb
+    .from('spotify_episode_metrics')
+    .select('*')
+    .eq('user_id', activeUserId)
+    .eq('payload->>import_id', importId)
+    .order('created_at', { ascending: false });
+  if (error) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
+}
+
+export async function getSpotifyMetricsByEpisode(episodeId: string): Promise<SpotifyEpisodeMetric[]> {
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+  const { data, error } = await sb
+    .from('spotify_episode_metrics')
+    .select('*')
+    .eq('user_id', activeUserId)
+    .eq('payload->>episode_id', episodeId)
+    .order('created_at', { ascending: false });
+  if (error) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
+}
+
+export async function getAllSpotifyMetrics(): Promise<SpotifyEpisodeMetric[]> {
+  return getAll<SpotifyEpisodeMetric>('spotify_episode_metrics');
+}
+
+export async function createStrategySnapshot(
+  data: Omit<PodcastStrategySnapshot, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+): Promise<PodcastStrategySnapshot> {
+  return insertOne<PodcastStrategySnapshot>('podcast_strategy_snapshots', data);
+}
+
+export async function getStrategySnapshots(): Promise<PodcastStrategySnapshot[]> {
+  return getAll<PodcastStrategySnapshot>('podcast_strategy_snapshots');
+}
+
+export async function deleteStrategySnapshot(id: string): Promise<void> {
+  return deleteOne('podcast_strategy_snapshots', id);
 }
