@@ -32,7 +32,7 @@ export default function ConfiguracionPage() {
   const [timeZone, setTimeZone] = useState(config.timeZone ?? 'America/Bogota');
   const [currency, setCurrency] = useState(config.currency ?? 'USD');
   const [operationalContext, setOperationalContext] = useState(config.operationalContext ?? '');
-  const [channels, setChannels] = useState(config.activeChannels.join('\n'));
+  const [channels, setChannels] = useState<string[]>(config.activeChannels);
   const [formats, setFormats] = useState(config.activeFormats.join('\n'));
   const [defaultChannel, setDefaultChannel] = useState(config.defaultChannel ?? '');
   const [defaultFrequency, setDefaultFrequency] = useState(config.defaultFrequency ?? 'Semanal');
@@ -99,7 +99,7 @@ export default function ConfiguracionPage() {
         timeZone,
         currency,
         operationalContext,
-        activeChannels: asLines(channels),
+        activeChannels: channels,
         activeFormats: asLines(formats),
         defaultChannel,
         defaultFrequency,
@@ -186,12 +186,27 @@ export default function ConfiguracionPage() {
             Operación editorial y publicación
           </div>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <Field label="Canales activos">
-              <Textarea
-                rows={4}
-                value={channels}
-                onChange={(event) => setChannels(event.target.value)}
-              />
+            <Field label="Plataformas activas">
+              <div className="flex flex-wrap gap-2 pt-1">
+                {['Spotify', 'Apple Podcasts', 'Instagram', 'TikTok', 'YouTube', 'YouTube Shorts', 'Threads', 'WhatsApp', 'Newsletter'].map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() =>
+                      setChannels((prev) =>
+                        prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]
+                      )
+                    }
+                    className={`rounded-full px-3 py-1.5 text-xs font-medium border transition-all ${
+                      channels.includes(p)
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background text-foreground border-border hover:border-primary'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
             </Field>
             <Field label="Formatos activos">
               <Textarea

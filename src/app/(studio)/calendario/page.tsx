@@ -35,6 +35,8 @@ import {
   CalendarCheck,
   Layers,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/shadcn/skeleton';
@@ -59,6 +61,17 @@ function weekLabel(date: string) {
   const d = new Date(date + 'T00:00:00');
   return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' });
 }
+function dayMonthLabel(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' });
+}
+function getMondayOfWeek(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
 
 const TYPE_COLOR: Record<string, string> = {
   publicacion: 'bg-[#e8ff40] text-[#0c1f36]',
@@ -81,7 +94,8 @@ export default function CalendarioPage() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [view, setView] = useState<'operativo' | 'mes'>('operativo');
+  const [view, setView] = useState<'operativo' | 'semanal' | 'mes'>('operativo');
+  const [weekStart, setWeekStart] = useState<string>(() => getMondayOfWeek(todayStr()));
   const now = new Date();
   const [calMonth, setCalMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -208,6 +222,18 @@ export default function CalendarioPage() {
       });
     return map;
   }, [events, today, in7]);
+
+  // semana seleccionada (7 dias desde weekStart)
+  const weekDays = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
+    [weekStart]
+  );
+  const weekEvsByDate = useMemo(() => {
+    const map: Record<string, CalendarEvent[]> = {};
+    weekDays.forEach((d) => { map[d] = []; });
+    events.forEach((ev) => { if (ev.date in map) map[ev.date].push(ev); });
+    return map;
+  }, [events, weekDays]);
 
   // siguiente accion: primer evento pendiente o atrasado
   const siguienteAccion = useMemo(() => {
@@ -359,6 +385,12 @@ export default function CalendarioPage() {
               className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'operativo' ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-background text-muted-foreground hover:bg-muted'}`}
             >
               Operativo
+            </button>
+            <button
+              onClick={() => setView('semanal')}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors border-x border-border ${view === 'semanal' ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-background text-muted-foreground hover:bg-muted'}`}
+            >
+              Semanal
             </button>
             <button
               onClick={() => setView('mes')}
@@ -718,6 +750,110 @@ export default function CalendarioPage() {
               </Button>
             </div>
           )}
+        </div>
+      ) : view === 'semanal' ? (
+        // VISTA SEMANAL — grid 7 columnas por día
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+                onClick={() => setWeekStart(addDays(weekStart, -7))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-xs px-3"
+                onClick={() => setWeekStart(getMondayOfWeek(todayStr()))}
+              >
+                Hoy
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 w-8 p-0"
+                onClick={() => setWeekStart(addDays(weekStart, 7))}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">
+              {dayMonthLabel(weekStart)} – {dayMonthLabel(addDays(weekStart, 6))}
+            </p>
+          </div>
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <div className="grid grid-cols-7 gap-1.5 min-w-[560px]">
+              {weekDays.map((date, i) => {
+                const dayNum = parseInt(date.slice(8, 10));
+                const isToday = date === today;
+                const dayEvs = weekEvsByDate[date] ?? [];
+                return (
+                  <div
+                    key={date}
+                    className={`rounded-xl border flex flex-col ${isToday ? 'border-[#e8ff40] bg-[#e8ff40]/5' : 'border-border bg-card'}`}
+                  >
+                    <div
+                      className={`text-center py-2 border-b ${isToday ? 'border-[#e8ff40]/40' : 'border-border'}`}
+                    >
+                      <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {DAYS_ES[i]}
+                      </span>
+                      <span
+                        className={`block text-lg font-bold leading-tight ${isToday ? 'text-[#0c1f36]' : 'text-foreground'}`}
+                      >
+                        {dayNum}
+                      </span>
+                    </div>
+                    <div className="flex-1 p-1.5 space-y-1.5 min-h-[140px]">
+                      {dayEvs.map((ev) => (
+                        <div
+                          key={ev.id}
+                          className={`group relative rounded-lg p-1.5 ${TYPE_COLOR[ev.type] || 'bg-gray-100 text-gray-600'}`}
+                        >
+                          <p className="text-[11px] font-medium leading-tight line-clamp-2 pr-5">
+                            {ev.title}
+                          </p>
+                          {ev.time && <p className="text-[10px] opacity-60 mt-0.5">{ev.time}</p>}
+                          {ev.channel && <p className="text-[10px] opacity-60">{ev.channel}</p>}
+                          <div className="absolute top-1 right-1 flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {ev.status !== 'publicado' && (
+                              <button
+                                onClick={() => handleMarkPublished(ev.id)}
+                                title="Marcar publicado"
+                                className="rounded p-0.5 bg-white/50 hover:bg-white/80 text-green-700"
+                              >
+                                <CheckCircle2 className="h-2.5 w-2.5" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDelete(ev.id)}
+                              title="Eliminar"
+                              className="rounded p-0.5 bg-white/50 hover:bg-white/80 text-red-500"
+                            >
+                              <Trash2 className="h-2.5 w-2.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          setForm((f) => ({ ...f, date }));
+                          setDialogOpen(true);
+                        }}
+                        className="w-full flex items-center justify-center h-6 rounded-lg border border-dashed border-border hover:border-primary hover:bg-muted/40 text-muted-foreground hover:text-primary transition-all"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       ) : (
         // VISTA POR MES — grid real 7 columnas
