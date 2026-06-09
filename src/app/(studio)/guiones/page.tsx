@@ -28,11 +28,13 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Plus, Pencil, Trash2, FileText, Sparkles, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, FileText, Sparkles, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { getScripts, createScript, updateScript, deleteScript } from '@/lib/database';
-import { callAI } from '@/lib/ai-studio';
+import { callAI, runEditorialEngine } from '@/lib/ai-studio';
 import type { Script, ScriptStatus } from '@/types/database';
+import type { EditorialOutput } from '@/app/api/ia/editorial/route';
+import { VALIDATION_CRITERIA } from '@/prompts/amtme-editorial';
 
 type ScriptBlock =
   | 'opening'
@@ -55,6 +57,12 @@ const blocks: { key: ScriptBlock; label: string }[] = [
   { key: 'closing', label: 'Cierre' },
 ];
 
+const EDITORIAL_STAGES = [
+  'Generando guión...',
+  'Validando calidad editorial...',
+  'Aplicando correcciones...',
+] as const;
+
 export default function GuionesPage() {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +70,8 @@ export default function GuionesPage() {
   const [viewing, setViewing] = useState<Script | null>(null);
   const [editing, setEditing] = useState<Script | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [editorialStage, setEditorialStage] = useState(0);
+  const [editorialResult, setEditorialResult] = useState<EditorialOutput | null>(null);
   const [form, setForm] = useState({
     episode_id: '',
     title: '',
@@ -129,6 +139,53 @@ export default function GuionesPage() {
     setDialogOpen(true);
   }
 
+  async function generateWithEditorialEngine() {
+    if (!form.title && !form.wound) {
+      toast.error('Completa al menos título o herida emocional para generar');
+      return;
+    }
+    setGenerating(true);
+    setEditorialStage(0);
+    setEditorialResult(null);
+    try {
+      // Stage 1: generating
+      setEditorialStage(0);
+      const result = await runEditorialEngine({
+        topic: form.title || form.wound,
+        wound: form.wound || undefined,
+        symbol: form.symbol || undefined,
+        cta: form.cta || undefined,
+      });
+
+      setEditorialResult(result);
+      const s = result.script;
+      setForm((f) => ({
+        ...f,
+        opening: s.opening || f.opening,
+        threshold: s.threshold || f.threshold,
+        wound: s.wound || f.wound,
+        symbol: s.symbol || f.symbol,
+        truth: s.truth || f.truth,
+        bridge: s.bridge || f.bridge,
+        action: s.action || f.action,
+        closing: s.closing || f.closing,
+      }));
+
+      if (result.wasRewritten) {
+        toast.success('Guión generado y corregido automáticamente');
+      } else if (result.approved) {
+        toast.success('Guión generado — Aprobado por el motor editorial');
+      } else {
+        toast.success('Guión generado');
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Error en el motor editorial');
+    } finally {
+      setGenerating(false);
+      setEditorialStage(0);
+    }
+  }
+
   async function generateWithAI() {
     if (!form.title || !form.wound || !form.symbol) {
       toast.error('Completa título, herida y símbolo para generar');
@@ -156,7 +213,6 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       const result = await callAI(prompt, 'Episodio');
 
       const extract = (tag: string) => {
-        // Ignora asteriscos de markdown antes/despues del tag
         const regex = new RegExp(
           '[*]*\\[' + tag + '\\][*]*[\\s\\-]*([\\s\\S]*?)(?=[*]*\\[|$)',
           'i'
@@ -312,21 +368,92 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                 />
               </div>
 
+              {/* Motor Editorial — genera + valida + corrige automáticamente */}
               <Button
                 type="button"
-                onClick={generateWithAI}
+                onClick={generateWithEditorialEngine}
                 disabled={generating}
-                className="w-full bg-[#0c1f36] text-white hover:bg-[#1a3a5c]"
+                className="w-full bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
               >
                 {generating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generando con IA...
+                    {EDITORIAL_STAGES[editorialStage]}
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    Generar guion completo con IA
+                    Motor Editorial AMTME
+                  </>
+                )}
+              </Button>
+
+              {/* Panel de validación — aparece después de usar el motor editorial */}
+              {editorialResult && (
+                <div className={`rounded-xl border p-4 space-y-3 ${editorialResult.approved ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+                  <div className="flex items-center gap-2">
+                    {editorialResult.approved ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    )}
+                    <span className={`text-sm font-semibold ${editorialResult.approved ? 'text-green-800' : 'text-amber-800'}`}>
+                      {editorialResult.wasRewritten
+                        ? 'Corregido automáticamente'
+                        : editorialResult.approved
+                          ? 'Aprobado por el motor editorial'
+                          : 'Revisión pendiente'}
+                    </span>
+                  </div>
+
+                  {editorialResult.validation.diagnosis && (
+                    <p className="text-xs text-black/60 italic">{editorialResult.validation.diagnosis}</p>
+                  )}
+
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {VALIDATION_CRITERIA.map((c) => {
+                      const score = editorialResult.validation.scores[c.key] ?? 0;
+                      const pass = score >= c.min;
+                      return (
+                        <div key={c.key} className={`rounded-lg px-2 py-1.5 text-center ${pass ? 'bg-white/60' : 'bg-red-100'}`}>
+                          <p className="text-[10px] text-black/50 leading-tight">{c.label}</p>
+                          <p className={`text-sm font-bold ${pass ? 'text-green-700' : 'text-red-600'}`}>{score}/10</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {editorialResult.validation.strong_phrases.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-black/40 mb-1">Frases para reels</p>
+                      <ul className="space-y-1">
+                        {editorialResult.validation.strong_phrases.map((phrase, i) => (
+                          <li key={i} className="text-xs text-[#0c1f36] bg-white/70 rounded-lg px-3 py-1.5 border border-[#e8ff40]/40">
+                            "{phrase}"
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <Button
+                type="button"
+                onClick={generateWithAI}
+                disabled={generating}
+                variant="outline"
+                className="w-full text-sm"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generar rápido (sin validación)
                   </>
                 )}
               </Button>
