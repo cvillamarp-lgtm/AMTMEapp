@@ -204,6 +204,54 @@ export default function AutomatizacionPage() {
         )}
       </Card>
 
+      {/* Integraciones planeadas */}
+      <Card>
+        <div className="text-xs uppercase tracking-[0.22em] text-black/40">Próximamente</div>
+        <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#0C1F36]">
+          Integraciones planeadas
+        </h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {[
+            { name: 'Google Calendar', desc: 'Exporta eventos del calendario editorial a Google Calendar.' },
+            { name: 'Make / Zapier', desc: 'Conecta con más de 1,000 apps vía webhooks y automatizaciones.' },
+            { name: 'Instagram Graph API', desc: 'Importa métricas de Instagram automáticamente.' },
+            { name: 'Spotify for Podcasters', desc: 'Sincroniza estadísticas de reproducción directamente.' },
+            { name: 'Mailchimp / Brevo', desc: 'Gestiona tu lista y automatiza emails de lanzamiento.' },
+            { name: 'Notion', desc: 'Sincroniza episodios y guiones con tu workspace de Notion.' },
+          ].map((integration) => (
+            <div
+              key={integration.name}
+              className="rounded-2xl border border-black/8 bg-[#F5F2EA] p-4 flex flex-col gap-1"
+            >
+              <span className="text-sm font-semibold text-[#0C1F36]">{integration.name}</span>
+              <span className="text-xs text-black/50 leading-relaxed">{integration.desc}</span>
+              <span className="mt-1 inline-block self-start rounded-full bg-black/6 px-2 py-0.5 text-[10px] font-medium text-black/40">
+                Próximamente
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5">
+          <div className="text-xs uppercase tracking-[0.22em] text-black/40 mb-3">Flujos de trabajo planeados</div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { name: 'Publicación automática', desc: 'Publica un episodio y dispara la creación de contenido derivado en todas las plataformas.' },
+              { name: 'Reporte semanal', desc: 'Recibe un resumen de métricas cada lunes en tu correo.' },
+              { name: 'Notificación de leads', desc: 'Alerta instantánea cuando un lead cambia a estado Agendado.' },
+              { name: 'Recordatorio de grabación', desc: '24 horas antes de un evento de grabación, recibe un recordatorio.' },
+            ].map((flow) => (
+              <div
+                key={flow.name}
+                className="rounded-2xl border border-black/8 bg-white p-4 flex flex-col gap-1"
+              >
+                <span className="text-sm font-semibold text-[#0C1F36]">{flow.name}</span>
+                <span className="text-xs text-black/50 leading-relaxed">{flow.desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
