@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import { Label } from '@/components/shadcn/label';
+import { EpisodioGuiadoDialog } from './guia-dialog';
 import { Textarea } from '@/components/shadcn/textarea';
 import {
   Select,
@@ -51,6 +52,7 @@ export default function EpisodiosPage() {
   const [statusFilter, setStatusFilter] = useState<EpisodeStatus | 'all'>('all');
   const [generatingHooks, setGeneratingHooks] = useState(false);
   const [suggestedHooks, setSuggestedHooks] = useState<string[]>([]);
+  const [guiaOpen, setGuiaOpen] = useState(false);
   const [formData, setFormData] = useState({
     episode_number: '',
     title: '',
@@ -116,6 +118,14 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
       }),
     [episodes, searchQuery, statusFilter]
   );
+
+  const nextNumber = useMemo(() => {
+    const nums = episodes
+      .map((ep) => parseInt(ep.episode_number))
+      .filter((n) => !isNaN(n))
+      .sort((a, b) => b - a);
+    return nums.length > 0 ? String(nums[0] + 1) : '1';
+  }, [episodes]);
 
   useEffect(() => {
     loadEpisodes();
@@ -270,7 +280,16 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground">Episodios</h1>
           <p className="text-sm text-muted-foreground mt-1">Ciclo completo de producción</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setGuiaOpen(true)}
+            className="text-xs gap-1.5"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Crear con guía IA
+          </Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button
               onClick={resetForm}
@@ -427,6 +446,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="mb-6 grid md:grid-cols-[1fr_auto] gap-4">
@@ -609,6 +629,15 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
           </AnimatePresence>
         </div>
       )}
+
+      <EpisodioGuiadoDialog
+        open={guiaOpen}
+        onOpenChange={setGuiaOpen}
+        nextNumber={nextNumber}
+        onSave={async (episodeData) => {
+          await optimisticCreate(episodeData as Episode, () => createEpisode(episodeData));
+        }}
+      />
     </div>
   );
 }
