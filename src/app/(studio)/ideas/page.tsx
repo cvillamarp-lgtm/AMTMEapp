@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import { getIdeas, createIdea, updateIdea, deleteIdea } from '@/lib/database';
 import type { Idea, IdeaCategory, IdeaStatus } from '@/types/database';
 import { toast } from 'sonner';
@@ -255,7 +256,11 @@ export default function IdeasPage() {
 
         {/* Lista */}
         {loading ? (
-          <p className="mt-8 text-sm text-black/40">Cargando ideas...</p>
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-44 rounded-2xl" />
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <div className="mt-10 text-center">
             <p className="text-sm text-black/40">

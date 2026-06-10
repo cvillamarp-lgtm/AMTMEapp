@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { useNextBestActions } from '@/hooks/use-next-best-actions';
 import { NextBestActionWidget } from '@/components/next-best-action-widget';
+import { Skeleton } from '@/components/shadcn/skeleton';
 
 type Episode = {
   id: string;
@@ -95,8 +96,17 @@ export default function DashboardPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Cargando datos desde Supabase...
+        <div className="space-y-4">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-24 rounded-xl" />
+            ))}
+          </div>
+          <Skeleton className="h-40 rounded-xl" />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Skeleton className="h-48 rounded-xl" />
+            <Skeleton className="h-48 rounded-xl" />
+          </div>
         </div>
       ) : (
         <>
