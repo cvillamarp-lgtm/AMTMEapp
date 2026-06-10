@@ -18,6 +18,9 @@ import type {
   Idea,
   SpotifyMetricImport,
   SpotifyEpisodeMetric,
+  SpotifyDailyMetric,
+  SpotifyDistributionMetric,
+  AmtmeManualMetric,
   PodcastStrategySnapshot,
 } from '@/types/database';
 
@@ -551,6 +554,72 @@ export async function getSpotifyMetricsByEpisode(episodeId: string): Promise<Spo
 
 export async function getAllSpotifyMetrics(): Promise<SpotifyEpisodeMetric[]> {
   return getAll<SpotifyEpisodeMetric>('spotify_episode_metrics');
+}
+
+// ---- SPOTIFY DAILY METRICS (series diarias) ----
+
+export async function createSpotifyDailyMetrics(
+  metrics: Omit<SpotifyDailyMetric, 'id' | 'created_at' | 'updated_at' | 'user_id'>[]
+): Promise<SpotifyDailyMetric[]> {
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
+  const { data, error } = await sb
+    .from('spotify_daily_metrics')
+    .insert(rows)
+    .select();
+  if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<SpotifyDailyMetric>(r));
+}
+
+export async function getAllSpotifyDailyMetrics(): Promise<SpotifyDailyMetric[]> {
+  return getAll<SpotifyDailyMetric>('spotify_daily_metrics');
+}
+
+// ---- SPOTIFY DISTRIBUTION METRICS (apps / geografía) ----
+
+export async function createSpotifyDistributionMetrics(
+  metrics: Omit<SpotifyDistributionMetric, 'id' | 'created_at' | 'updated_at' | 'user_id'>[]
+): Promise<SpotifyDistributionMetric[]> {
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
+  const { data, error } = await sb
+    .from('spotify_distribution_metrics')
+    .insert(rows)
+    .select();
+  if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<SpotifyDistributionMetric>(r));
+}
+
+export async function getAllSpotifyDistributionMetrics(): Promise<SpotifyDistributionMetric[]> {
+  return getAll<SpotifyDistributionMetric>('spotify_distribution_metrics');
+}
+
+// ---- AMTME MANUAL METRICS (consolidado mensual por plataforma) ----
+
+export async function createAmtmeManualMetrics(
+  metrics: Omit<AmtmeManualMetric, 'id' | 'created_at' | 'updated_at' | 'user_id'>[]
+): Promise<AmtmeManualMetric[]> {
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
+  const { data, error } = await sb
+    .from('amtme_manual_metrics')
+    .insert(rows)
+    .select();
+  if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data || []).map((r: any) => fromRow<AmtmeManualMetric>(r));
+}
+
+export async function getAllAmtmeManualMetrics(): Promise<AmtmeManualMetric[]> {
+  return getAll<AmtmeManualMetric>('amtme_manual_metrics');
 }
 
 export async function createStrategySnapshot(

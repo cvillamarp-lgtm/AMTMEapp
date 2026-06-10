@@ -4,16 +4,16 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
 import {
-  buildColumnMap,
-  detectReportType,
+  buildColumnMapForType,
+  detectPeriodForRows,
+  detectSpotifyReportType,
   hashFileContent,
-  mapRowToNormalized,
-  normalizeTitle,
-  parseDate,
-  parseNumber,
-  parsePercent,
+  mapSpotifyRow,
+  validateReportType,
+  type NormalizedSpotifyRow,
+  type SpotifyReportType,
+  type ValidationStatus,
 } from './spotify-normalizer';
-import type { SpotifyEpisodeMetric } from '@/types/database';
 
 export interface ParsedSpotifyFile {
   fileName: string;
@@ -22,13 +22,15 @@ export interface ParsedSpotifyFile {
   fileHash: string;
   headers: string[];
   columnMap: Record<string, string>;
-  detectedReportType: string;
+  reportType: SpotifyReportType;
+  validationStatus: ValidationStatus;
+  validationMessage: string;
+  missingRecommended: string[];
   totalRows: number;
   previewRows: Record<string, string>[];
   periodStart: string | null;
   periodEnd: string | null;
-  normalizedMetrics: Omit<SpotifyEpisodeMetric, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'import_id' | 'episode_id'>[];
-  warnings: string[];
+  rows: NormalizedSpotifyRow[];
 }
 
 async function parseCSVContent(content: string): Promise<{ headers: string[]; rows: Record<string, string>[] }> {
@@ -54,55 +56,6 @@ function parseXLSXBuffer(buffer: ArrayBuffer): { headers: string[]; rows: Record
     Object.fromEntries(Object.entries(r).map(([k, v]) => [k, String(v ?? '')]))
   );
   return { headers, rows };
-}
-
-function rowsToMetrics(
-  rows: Record<string, string>[],
-  columnMap: Record<string, string>
-): Omit<SpotifyEpisodeMetric, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'import_id' | 'episode_id'>[] {
-  return rows.map((row) => {
-    const normalized = mapRowToNormalized(row, columnMap);
-    const title = (normalized.episodeTitle || '').trim();
-    return {
-      spotify_episode_title: title,
-      normalized_episode_title: normalizeTitle(title),
-      metric_date: parseDate(normalized.date ?? normalized.periodStart),
-      period_start: parseDate(normalized.periodStart ?? normalized.date),
-      period_end: parseDate(normalized.periodEnd),
-      plays: parseNumber(normalized.plays),
-      streams: parseNumber(normalized.streams ?? normalized.plays),
-      starts: parseNumber(normalized.starts),
-      listeners: parseNumber(normalized.listeners),
-      followers_gained: parseNumber(normalized.followers),
-      completion_rate: parsePercent(normalized.completionRate),
-      average_consumption: parsePercent(normalized.completionRate),
-      minutes_listened: parseNumber(normalized.minutesListened),
-      impressions: parseNumber(normalized.impressions),
-      clicks: parseNumber(normalized.clicks),
-      country: normalized.country || null,
-      city: normalized.city || null,
-      age_range: normalized.ageRange || null,
-      gender: normalized.gender || null,
-      platform: normalized.platform || null,
-      traffic_source: normalized.trafficSource || null,
-      raw_row: row as Record<string, unknown>,
-    };
-  });
-}
-
-function detectPeriod(
-  rows: Record<string, string>[],
-  columnMap: Record<string, string>
-): { start: string | null; end: string | null } {
-  const dates: string[] = [];
-  for (const row of rows) {
-    const normalized = mapRowToNormalized(row, columnMap);
-    const d = parseDate(normalized.date ?? normalized.periodStart);
-    if (d) dates.push(d);
-  }
-  if (dates.length === 0) return { start: null, end: null };
-  dates.sort();
-  return { start: dates[0], end: dates[dates.length - 1] };
 }
 
 export async function parseSpotifyFile(file: File): Promise<ParsedSpotifyFile> {
@@ -153,15 +106,15 @@ export async function parseSpotifyFile(file: File): Promise<ParsedSpotifyFile> {
     }
   }
 
-  const columnMap = buildColumnMap(headers);
-  const detectedReportType = detectReportType(headers);
+  const reportType = detectSpotifyReportType(headers);
+  const columnMap = buildColumnMapForType(headers, reportType);
+  const validation = validateReportType(reportType, columnMap);
 
-  if (!columnMap.episodeTitle && !columnMap.date) {
-    warnings.push('No se detectaron columnas de episodio ni fecha — el archivo puede no ser compatible');
-  }
+  const normalizedRows = rows
+    .map((row) => mapSpotifyRow(row, columnMap, reportType))
+    .filter((r): r is NormalizedSpotifyRow => r !== null);
 
-  const period = detectPeriod(rows, columnMap);
-  const normalizedMetrics = rowsToMetrics(rows, columnMap);
+  const period = detectPeriodForRows(normalizedRows);
 
   // Hash para deduplicación
   const sampleText = headers.join(',') + rows.slice(0, 5).map((r) => Object.values(r).join(',')).join('\n');
@@ -174,12 +127,14 @@ export async function parseSpotifyFile(file: File): Promise<ParsedSpotifyFile> {
     fileHash,
     headers,
     columnMap,
-    detectedReportType,
+    reportType,
+    validationStatus: validation.status,
+    validationMessage: validation.message,
+    missingRecommended: validation.missingRecommended,
     totalRows: rows.length,
     previewRows: rows.slice(0, 10),
     periodStart: period.start,
     periodEnd: period.end,
-    normalizedMetrics,
-    warnings,
+    rows: normalizedRows,
   };
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { normalizeTitle } from '@/lib/spotify-normalizer';
-import type { SpotifyEpisodeMetric, Episode } from '@/types/database';
+import type { NormalizedSpotifyRow, SpotifyReportType } from '@/lib/spotify-normalizer';
+import type { Episode } from '@/types/database';
 
 // Server-side Supabase con service role para operaciones batch
 function getServerClient() {
@@ -18,19 +19,19 @@ type ImportPayload = {
     file_size: number;
     file_hash: string;
     uploaded_at: string;
-    detected_report_type: string;
+    detected_report_type: SpotifyReportType;
     period_start: string | null;
     period_end: string | null;
     total_rows: number;
   };
-  metrics: Omit<SpotifyEpisodeMetric, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'import_id' | 'episode_id'>[];
+  rows: NormalizedSpotifyRow[];
   userId: string;
 };
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json() as ImportPayload;
-    const { importRecord, metrics, userId } = body;
+    const { importRecord, rows, userId } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
@@ -71,117 +72,61 @@ export async function POST(req: NextRequest) {
     }
 
     const importId = importRow.id;
+    const importedAt = new Date().toISOString();
+    const sourceFileName = importRecord.file_name;
 
-    // 3. Obtener episodios existentes del usuario para matching
-    const { data: episodesData } = await sb
-      .from('episodes')
-      .select('id, payload')
-      .eq('user_id', userId);
-
-    type EpisodeRow = { id: string; payload: Partial<Episode> };
-    const episodes: EpisodeRow[] = (episodesData || []) as EpisodeRow[];
-
-    // 4. Procesar métricas: deduplicar y mapear episodios
     let processedRows = 0;
     let failedRows = 0;
     let newEpisodesCreated = 0;
     let episodesUpdated = 0;
-    const episodeCache: Record<string, string> = {}; // normalizedTitle → episodeId
 
-    // Construir cache de episodios existentes
-    for (const ep of episodes) {
-      const title = ep.payload?.title ?? '';
-      const normalized = normalizeTitle(title);
-      if (normalized) episodeCache[normalized] = ep.id;
-    }
-
-    // Verificar duplicados por import_id + normalized_title + metric_date
-    const metricsToInsert: object[] = [];
-    const seenKeys = new Set<string>();
-
-    for (const metric of metrics) {
-      const key = `${metric.normalized_episode_title}|${metric.metric_date}|${metric.period_start}`;
-
-      // Saltar duplicados dentro del mismo archivo
-      if (seenKeys.has(key)) continue;
-      seenKeys.add(key);
-
-      // Verificar duplicados en BD para este usuario
-      const { data: existing } = await sb
-        .from('spotify_episode_metrics')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('payload->>normalized_episode_title', metric.normalized_episode_title)
-        .eq('payload->>metric_date', metric.metric_date || '')
-        .limit(1);
-
-      if (existing && existing.length > 0) {
-        failedRows++;
-        continue;
-      }
-
-      // Buscar episodio existente por título normalizado
-      let episodeId = episodeCache[metric.normalized_episode_title] ?? null;
-
-      // Si no existe, crear episodio importado
-      if (!episodeId && metric.spotify_episode_title) {
-        const { data: newEp } = await sb
-          .from('episodes')
-          .insert([{
-            user_id: userId,
-            payload: {
-              title: metric.spotify_episode_title,
-              episode_number: '',
-              theme: 'Importado desde Spotify',
-              emotional_wound: '',
-              central_symbol: '',
-              status: 'medido',
-              script: null,
-              hooks: null,
-              next_action: null,
-              original_title: null,
-              ai_optimized_title: null,
-              title_optimization_status: null,
-              title_optimized_at: null,
-              title_optimization_source: null,
-              narrative_structure: null,
-            },
-          }])
-          .select()
-          .single();
-
-        if (newEp) {
-          episodeId = newEp.id;
-          episodeCache[metric.normalized_episode_title] = episodeId;
-          newEpisodesCreated++;
+    try {
+      switch (importRecord.detected_report_type) {
+        case 'episode_rankings': {
+          const result = await importEpisodeRankings(sb, userId, importId, sourceFileName, importedAt, rows);
+          processedRows = result.processedRows;
+          failedRows = result.failedRows;
+          newEpisodesCreated = result.newEpisodesCreated;
+          episodesUpdated = result.episodesUpdated;
+          break;
         }
-      } else if (episodeId) {
-        episodesUpdated++;
+        case 'streams_downloads_timeseries':
+        case 'spotify_overview_timeseries': {
+          const result = await importDailyMetrics(sb, userId, importId, sourceFileName, importedAt, rows);
+          processedRows = result.processedRows;
+          failedRows = result.failedRows;
+          break;
+        }
+        case 'apps_distribution':
+        case 'geo_distribution': {
+          const result = await importDistributionMetrics(sb, userId, importId, sourceFileName, importedAt, rows);
+          processedRows = result.processedRows;
+          failedRows = result.failedRows;
+          break;
+        }
+        case 'amtme_manual_metrics': {
+          const result = await importManualMetrics(sb, userId, importId, sourceFileName, importedAt, rows);
+          processedRows = result.processedRows;
+          failedRows = result.failedRows;
+          break;
+        }
+        default: {
+          await sb
+            .from('spotify_metric_imports')
+            .update({ payload: { ...importRecord, status: 'failed' }, updated_at: importedAt })
+            .eq('id', importId);
+          return NextResponse.json({ error: 'Tipo de reporte no compatible' }, { status: 400 });
+        }
       }
-
-      metricsToInsert.push({
-        user_id: userId,
-        payload: { ...metric, import_id: importId, episode_id: episodeId },
-      });
-      processedRows++;
+    } catch {
+      await sb
+        .from('spotify_metric_imports')
+        .update({ payload: { ...importRecord, status: 'failed' }, updated_at: importedAt })
+        .eq('id', importId);
+      return NextResponse.json({ error: 'Error al guardar métricas' }, { status: 500 });
     }
 
-    // 5. Insertar métricas en batch
-    if (metricsToInsert.length > 0) {
-      const { error: metricsError } = await sb
-        .from('spotify_episode_metrics')
-        .insert(metricsToInsert);
-
-      if (metricsError) {
-        await sb
-          .from('spotify_metric_imports')
-          .update({ payload: { ...importRecord, status: 'failed', import_id: importId } })
-          .eq('id', importId);
-        return NextResponse.json({ error: 'Error al guardar métricas' }, { status: 500 });
-      }
-    }
-
-    // 6. Actualizar estado de importación a 'processed'
+    // Actualizar estado de importación a 'processed'
     await sb
       .from('spotify_metric_imports')
       .update({
@@ -191,7 +136,7 @@ export async function POST(req: NextRequest) {
           processed_rows: processedRows,
           failed_rows: failedRows,
         },
-        updated_at: new Date().toISOString(),
+        updated_at: importedAt,
       })
       .eq('id', importId);
 
@@ -199,17 +144,333 @@ export async function POST(req: NextRequest) {
       success: true,
       importId,
       summary: {
-        totalRows: metrics.length,
+        totalRows: rows.length,
         processedRows,
         duplicatesSkipped: failedRows,
         newEpisodesCreated,
         episodesUpdated,
         periodStart: importRecord.period_start,
         periodEnd: importRecord.period_end,
+        reportType: importRecord.detected_report_type,
       },
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseClientAny = any;
+
+async function importEpisodeRankings(
+  sb: SupabaseClientAny,
+  userId: string,
+  importId: string,
+  sourceFileName: string,
+  importedAt: string,
+  rows: NormalizedSpotifyRow[]
+): Promise<{ processedRows: number; failedRows: number; newEpisodesCreated: number; episodesUpdated: number }> {
+  let processedRows = 0;
+  let failedRows = 0;
+  let newEpisodesCreated = 0;
+  let episodesUpdated = 0;
+
+  // Obtener episodios existentes del usuario para matching
+  const { data: episodesData } = await sb
+    .from('episodes')
+    .select('id, payload')
+    .eq('user_id', userId);
+
+  type EpisodeRow = { id: string; payload: Partial<Episode> };
+  const episodes: EpisodeRow[] = (episodesData || []) as EpisodeRow[];
+
+  const episodeCache: Record<string, string> = {};
+  for (const ep of episodes) {
+    const title = ep.payload?.title ?? '';
+    const normalized = normalizeTitle(title);
+    if (normalized) episodeCache[normalized] = ep.id;
+  }
+
+  const seenKeys = new Set<string>();
+  const metricsToInsert: object[] = [];
+
+  for (const row of rows) {
+    if (row.type !== 'episode_rankings') continue;
+    if (!row.episodeTitle) {
+      failedRows++;
+      continue;
+    }
+
+    const key = `${row.normalizedEpisodeTitle}|${row.publishedAt}`;
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+
+    // Verificar duplicados en BD
+    const { data: existing } = await sb
+      .from('spotify_episode_metrics')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('payload->>normalized_episode_title', row.normalizedEpisodeTitle)
+      .eq('payload->>metric_date', row.publishedAt || '')
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      failedRows++;
+      continue;
+    }
+
+    // Buscar/crear episodio
+    let episodeId = episodeCache[row.normalizedEpisodeTitle] ?? null;
+    if (!episodeId) {
+      const { data: newEp } = await sb
+        .from('episodes')
+        .insert([{
+          user_id: userId,
+          payload: {
+            title: row.episodeTitle,
+            episode_number: '',
+            theme: 'Importado desde Spotify',
+            emotional_wound: '',
+            central_symbol: '',
+            status: 'medido',
+            script: null,
+            hooks: null,
+            next_action: null,
+            original_title: null,
+            ai_optimized_title: null,
+            title_optimization_status: null,
+            title_optimized_at: null,
+            title_optimization_source: null,
+            narrative_structure: null,
+          },
+        }])
+        .select()
+        .single();
+
+      if (newEp) {
+        episodeId = newEp.id;
+        episodeCache[row.normalizedEpisodeTitle] = episodeId;
+        newEpisodesCreated++;
+      }
+    } else {
+      episodesUpdated++;
+    }
+
+    metricsToInsert.push({
+      user_id: userId,
+      payload: {
+        import_id: importId,
+        episode_id: episodeId,
+        spotify_episode_title: row.episodeTitle,
+        normalized_episode_title: row.normalizedEpisodeTitle,
+        metric_date: row.publishedAt,
+        period_start: row.publishedAt,
+        period_end: row.publishedAt,
+        plays: row.playsDownloads,
+        streams: row.playsDownloads,
+        starts: null,
+        listeners: null,
+        followers_gained: null,
+        completion_rate: null,
+        average_consumption: null,
+        minutes_listened: null,
+        impressions: null,
+        clicks: null,
+        country: null,
+        city: null,
+        age_range: null,
+        gender: null,
+        platform: 'spotify',
+        traffic_source: null,
+        raw_row: null,
+        episode_title: row.episodeTitle,
+        episode_uri: row.episodeUri,
+        published_at: row.publishedAt,
+        plays_downloads: row.playsDownloads,
+        ranking: row.ranking,
+        source_file_name: sourceFileName,
+        imported_at: importedAt,
+      },
+    });
+    processedRows++;
+  }
+
+  if (metricsToInsert.length > 0) {
+    const { error } = await sb.from('spotify_episode_metrics').insert(metricsToInsert);
+    if (error) throw error;
+  }
+
+  return { processedRows, failedRows, newEpisodesCreated, episodesUpdated };
+}
+
+async function importDailyMetrics(
+  sb: SupabaseClientAny,
+  userId: string,
+  importId: string,
+  sourceFileName: string,
+  importedAt: string,
+  rows: NormalizedSpotifyRow[]
+): Promise<{ processedRows: number; failedRows: number }> {
+  let processedRows = 0;
+  let failedRows = 0;
+
+  for (const row of rows) {
+    if (row.type !== 'streams_downloads_timeseries' && row.type !== 'spotify_overview_timeseries') continue;
+    if (!row.date) {
+      failedRows++;
+      continue;
+    }
+
+    const { data: existing } = await sb
+      .from('spotify_daily_metrics')
+      .select('id, payload')
+      .eq('user_id', userId)
+      .eq('payload->>date', row.date)
+      .limit(1);
+
+    const newPayload = {
+      import_id: importId,
+      date: row.date,
+      plays_downloads: row.playsDownloads,
+      listens: row.listens,
+      listening_hours: row.listeningHours,
+      followers: row.followers,
+      source_file_name: sourceFileName,
+      imported_at: importedAt,
+    };
+
+    if (existing && existing.length > 0) {
+      const current = existing[0].payload || {};
+      const merged = {
+        ...current,
+        ...Object.fromEntries(
+          Object.entries(newPayload).filter(([, v]) => v !== null && v !== undefined)
+        ),
+      };
+      const { error } = await sb
+        .from('spotify_daily_metrics')
+        .update({ payload: merged, updated_at: importedAt })
+        .eq('id', existing[0].id);
+      if (error) throw error;
+    } else {
+      const { error } = await sb
+        .from('spotify_daily_metrics')
+        .insert([{ user_id: userId, payload: newPayload }]);
+      if (error) throw error;
+    }
+    processedRows++;
+  }
+
+  return { processedRows, failedRows };
+}
+
+async function importDistributionMetrics(
+  sb: SupabaseClientAny,
+  userId: string,
+  importId: string,
+  sourceFileName: string,
+  importedAt: string,
+  rows: NormalizedSpotifyRow[]
+): Promise<{ processedRows: number; failedRows: number }> {
+  let processedRows = 0;
+  let failedRows = 0;
+
+  for (const row of rows) {
+    if (row.type !== 'apps_distribution' && row.type !== 'geo_distribution') continue;
+    if (!row.dimensionName) {
+      failedRows++;
+      continue;
+    }
+
+    const { data: existing } = await sb
+      .from('spotify_distribution_metrics')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('payload->>dimension_type', row.dimensionType)
+      .eq('payload->>dimension_name', row.dimensionName)
+      .limit(1);
+
+    const newPayload = {
+      import_id: importId,
+      dimension_type: row.dimensionType,
+      dimension_name: row.dimensionName,
+      percentage: row.percentage,
+      source_file_name: sourceFileName,
+      imported_at: importedAt,
+    };
+
+    if (existing && existing.length > 0) {
+      const { error } = await sb
+        .from('spotify_distribution_metrics')
+        .update({ payload: newPayload, updated_at: importedAt })
+        .eq('id', existing[0].id);
+      if (error) throw error;
+    } else {
+      const { error } = await sb
+        .from('spotify_distribution_metrics')
+        .insert([{ user_id: userId, payload: newPayload }]);
+      if (error) throw error;
+    }
+    processedRows++;
+  }
+
+  return { processedRows, failedRows };
+}
+
+async function importManualMetrics(
+  sb: SupabaseClientAny,
+  userId: string,
+  importId: string,
+  sourceFileName: string,
+  importedAt: string,
+  rows: NormalizedSpotifyRow[]
+): Promise<{ processedRows: number; failedRows: number }> {
+  let processedRows = 0;
+  let failedRows = 0;
+
+  for (const row of rows) {
+    if (row.type !== 'amtme_manual_metrics') continue;
+    if (!row.month || !row.platform) {
+      failedRows++;
+      continue;
+    }
+
+    const { data: existing } = await sb
+      .from('amtme_manual_metrics')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('payload->>month', row.month)
+      .eq('payload->>platform', row.platform)
+      .limit(1);
+
+    const newPayload = {
+      import_id: importId,
+      month: row.month,
+      platform: row.platform,
+      plays: row.plays,
+      reach: row.reach,
+      dms: row.dms,
+      conversions: row.conversions,
+      revenue: row.revenue,
+      source_file_name: sourceFileName,
+      imported_at: importedAt,
+    };
+
+    if (existing && existing.length > 0) {
+      const { error } = await sb
+        .from('amtme_manual_metrics')
+        .update({ payload: newPayload, updated_at: importedAt })
+        .eq('id', existing[0].id);
+      if (error) throw error;
+    } else {
+      const { error } = await sb
+        .from('amtme_manual_metrics')
+        .insert([{ user_id: userId, payload: newPayload }]);
+      if (error) throw error;
+    }
+    processedRows++;
+  }
+
+  return { processedRows, failedRows };
 }
