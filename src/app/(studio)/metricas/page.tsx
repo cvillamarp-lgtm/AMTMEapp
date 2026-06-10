@@ -44,6 +44,7 @@ import {
   BarChart2,
   Mic,
   Upload,
+  Music2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -52,8 +53,14 @@ import {
   getEpisodes,
   getMetricsEpisode,
   createMetricEpisode,
+  getStrategySnapshots,
 } from '@/lib/database';
-import type { MetricMonthly, MetricEpisode, Episode } from '@/types/database';
+import type {
+  MetricMonthly,
+  MetricEpisode,
+  Episode,
+  PodcastStrategySnapshot,
+} from '@/types/database';
 
 type AIReport = {
   id: string;
@@ -82,6 +89,7 @@ export default function MetricasPage() {
   const [metricsEpisode, setMetricsEpisode] = useState<MetricEpisode[]>([]);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [reports, setReports] = useState<AIReport[]>([]);
+  const [strategySnapshots, setStrategySnapshots] = useState<PodcastStrategySnapshot[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -125,14 +133,16 @@ export default function MetricasPage() {
 
   const load = useCallback(async () => {
     try {
-      const [d, ep, eps] = await Promise.all([
+      const [d, ep, eps, snapshots] = await Promise.all([
         getMetricsMonthly(),
         getMetricsEpisode(),
         getEpisodes(),
+        getStrategySnapshots(),
       ]);
       setMetrics(d);
       setMetricsEpisode(ep);
       setEpisodes(eps);
+      setStrategySnapshots(snapshots);
       const saved = localStorage.getItem(REPORTS_KEY);
       if (saved) setReports(JSON.parse(saved));
       const notes = localStorage.getItem(DECISION_KEY);
@@ -171,6 +181,14 @@ export default function MetricasPage() {
 
   // --- ultima recomendacion IA ---
   const latestReport = reports.length > 0 ? reports[0] : null;
+
+  // --- ultimo snapshot de estrategia (Spotify IA) ---
+  const latestStrategy =
+    strategySnapshots.length > 0
+      ? [...strategySnapshots].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )[0]
+      : null;
 
   function resetForm() {
     setForm({
@@ -734,7 +752,71 @@ Solo JSON. Espanol neutro.`;
                 </Card>
               </div>
 
-              {/* 3. RECOMENDACION IA ACTIVA */}
+              {/* 3. ESTRATEGIA SPOTIFY IA */}
+              {latestStrategy && (
+                <Card className="border-[#0c1f36] bg-[#0c1f36]/[0.03]">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Music2 className="h-5 w-5 text-[#0c1f36]" />
+                        <CardTitle className="text-base">
+                          Estrategia actualizada por IA — Spotify
+                        </CardTitle>
+                      </div>
+                      <span className="text-xs text-muted-foreground shrink-0">
+                        {latestStrategy.period_start} a {latestStrategy.period_end}
+                      </span>
+                    </div>
+                    <CardDescription>{latestStrategy.summary}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {latestStrategy.growth_signals.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-green-700 mb-1">
+                          Senales de crecimiento
+                        </p>
+                        <ul className="text-sm space-y-0.5 list-disc list-inside">
+                          {latestStrategy.growth_signals.slice(0, 3).map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {latestStrategy.risk_signals.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-red-700 mb-1">
+                          Senales de riesgo
+                        </p>
+                        <ul className="text-sm space-y-0.5 list-disc list-inside">
+                          {latestStrategy.risk_signals.slice(0, 3).map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {latestStrategy.recommended_actions.immediate.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                          Acciones inmediatas
+                        </p>
+                        <ul className="text-sm space-y-0.5 list-disc list-inside">
+                          {latestStrategy.recommended_actions.immediate.slice(0, 3).map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <Link
+                      href="/metricas/spotify"
+                      className="text-xs text-[#0c1f36] underline inline-block"
+                    >
+                      Ver historial e importar nuevos datos
+                    </Link>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* 4. RECOMENDACION IA ACTIVA */}
               {latestReport && (
                 <Card className="border-[#e8ff40] bg-[#e8ff40]/10">
                   <CardHeader className="pb-3">
@@ -774,7 +856,7 @@ Solo JSON. Espanol neutro.`;
                 </Card>
               )}
 
-              {/* 4. NOTAS DE DECISION EDITORIAL */}
+              {/* 5. NOTAS DE DECISION EDITORIAL */}
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
@@ -841,7 +923,7 @@ Solo JSON. Espanol neutro.`;
                 </CardContent>
               </Card>
 
-              {/* 5. ACCESOS RAPIDOS */}
+              {/* 6. ACCESOS RAPIDOS */}
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/episodios"
