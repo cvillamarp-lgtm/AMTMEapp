@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/shadcn/select';
 import { Pin, Trash2, Plus, Save, X, Zap, BookOpen, Lock } from 'lucide-react';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import { toast } from 'sonner';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
@@ -338,7 +339,11 @@ export default function NotasPage() {
         </Select>
         <div className="flex-1 overflow-y-auto space-y-2">
           {loading ? (
-            <p className="text-xs text-center text-muted-foreground py-4">Cargando...</p>
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 rounded-2xl" />
+              ))}
+            </div>
           ) : filtered.length === 0 ? (
             <p className="text-xs text-center text-muted-foreground py-8">Sin notas</p>
           ) : (
