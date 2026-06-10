@@ -460,6 +460,61 @@ export interface SpotifyEpisodeMetric {
   platform: string | null;
   traffic_source: string | null;
   raw_row: Record<string, unknown> | null;
+  // Campos extra para reportes de tipo "episode_rankings"
+  episode_title?: string | null;
+  episode_uri?: string | null;
+  published_at?: string | null;
+  plays_downloads?: number | null;
+  ranking?: number | null;
+  source_file_name?: string | null;
+  imported_at?: string | null;
+}
+
+export interface SpotifyDailyMetric {
+  id: string;
+  user_id: string | null;
+  created_at: string;
+  updated_at: string;
+  import_id: string;
+  date: string;
+  plays_downloads: number | null;
+  listens: number | null;
+  listening_hours: number | null;
+  followers: number | null;
+  source_file_name: string;
+  imported_at: string;
+}
+
+export type SpotifyDistributionDimensionType = 'app' | 'location';
+
+export interface SpotifyDistributionMetric {
+  id: string;
+  user_id: string | null;
+  created_at: string;
+  updated_at: string;
+  import_id: string;
+  dimension_type: SpotifyDistributionDimensionType;
+  dimension_name: string;
+  percentage: number | null;
+  source_file_name: string;
+  imported_at: string;
+}
+
+export interface AmtmeManualMetric {
+  id: string;
+  user_id: string | null;
+  created_at: string;
+  updated_at: string;
+  import_id: string;
+  month: string;
+  platform: string;
+  plays: number | null;
+  reach: number | null;
+  dms: number | null;
+  conversions: number | null;
+  revenue: number | null;
+  source_file_name: string;
+  imported_at: string;
 }
 
 export interface StrategyRecommendedActions {
@@ -602,6 +657,21 @@ export type Database = {
         Row: PodcastStrategySnapshot;
         Insert: Omit<PodcastStrategySnapshot, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<PodcastStrategySnapshot, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      spotify_daily_metrics: {
+        Row: SpotifyDailyMetric;
+        Insert: Omit<SpotifyDailyMetric, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<SpotifyDailyMetric, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      spotify_distribution_metrics: {
+        Row: SpotifyDistributionMetric;
+        Insert: Omit<SpotifyDistributionMetric, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<SpotifyDistributionMetric, 'id' | 'created_at' | 'updated_at'>>;
+      };
+      amtme_manual_metrics: {
+        Row: AmtmeManualMetric;
+        Insert: Omit<AmtmeManualMetric, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<AmtmeManualMetric, 'id' | 'created_at' | 'updated_at'>>;
       };
     };
   };
