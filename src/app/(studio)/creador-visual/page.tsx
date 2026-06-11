@@ -39,7 +39,6 @@ export default function CreadorVisualPage() {
 
   const saveVisual = () => {
     // TODO: Persist visual assets to database
-    console.log('Visual asset ready:', draft);
   };
 
   return (

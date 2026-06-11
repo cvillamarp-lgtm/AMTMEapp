@@ -159,7 +159,6 @@ export class TinyFishClient {
     } else if (level === 'warn') {
       console.warn(logMessage, data);
     } else {
-      console.log(logMessage, data);
     }
   }
 }

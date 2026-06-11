@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { generateWithProvider } from '@/lib/ai-providers';
 import { aiGenerateRequestSchema, formatZodError } from '@/lib/schemas';
 import type { AIWorkMode } from '@/lib/studio-types';
+import { rateLimiter, extractRateLimitKey } from '@/lib/middleware/rateLimit';
 
 const modeGuides: Record<AIWorkMode, string> = {
   Episodio: 'Devuelve un guion breve con estructura, hooks y CTA.',
@@ -12,6 +13,15 @@ const modeGuides: Record<AIWorkMode, string> = {
 };
 
 export async function POST(request: Request) {
+  // Rate limiting check
+  const key = extractRateLimitKey(request.headers);
+  if (!rateLimiter.isAllowed(key)) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Maximum 10 requests per minute.' },
+      { status: 429, headers: { 'Retry-After': '60' } }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as unknown;
   const parsedBody = aiGenerateRequestSchema.safeParse(body);
 

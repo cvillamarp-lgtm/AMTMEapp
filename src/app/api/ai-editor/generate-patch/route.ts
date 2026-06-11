@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generatePatch } from '@/lib/ai-editor/generatePatch';
 import { AiEditorModeSchema, AiChangePlanSchema } from '@/lib/ai-editor/types';
+import { rateLimiter, extractRateLimitKey } from '@/lib/middleware/rateLimit';
 
 const GeneratePatchRequestSchema = z.object({
   plan: AiChangePlanSchema,
@@ -10,6 +11,15 @@ const GeneratePatchRequestSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  // Rate limiting check
+  const key = extractRateLimitKey(request.headers);
+  if (!rateLimiter.isAllowed(key)) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Maximum 10 requests per minute.' },
+      { status: 429, headers: { 'Retry-After': '60' } }
+    );
+  }
+
   const body = await request.json().catch(() => ({}));
   const parsed = GeneratePatchRequestSchema.safeParse(body);
 

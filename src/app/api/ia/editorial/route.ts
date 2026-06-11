@@ -11,6 +11,7 @@ import {
   type ValidationResult,
   type ScriptBlocks,
 } from '@/prompts/amtme-editorial';
+import { rateLimiter, extractRateLimitKey } from '@/lib/middleware/rateLimit';
 
 export type EditorialOutput = {
   script: ScriptBlocks;
@@ -33,6 +34,15 @@ function defaultValidation(): ValidationResult {
 }
 
 export async function POST(request: Request) {
+  // Rate limiting check
+  const key = extractRateLimitKey(request.headers);
+  if (!rateLimiter.isAllowed(key)) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Maximum 10 requests per minute.' },
+      { status: 429, headers: { 'Retry-After': '60' } }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as EpisodeGenerationInput;
 
   if (!body.topic?.trim()) {
