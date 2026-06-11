@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
+import { useSettings } from '@/hooks/use-settings';
 import { generateVisualPrompt, generateVisualSpec } from '@/lib/studio-generators';
 import type { VisualAsset } from '@/lib/studio-types';
 
@@ -24,7 +24,8 @@ const emptyVisual = (): VisualAsset => ({
 });
 
 export default function CreadorVisualPage() {
-  const { setState } = useStudio();
+  const { settings } = useSettings();
+  const brandSettings = settings?.brand;
   const [draft, setDraft] = useState<VisualAsset>(emptyVisual());
 
   const generatePrompt = () => {
@@ -37,10 +38,8 @@ export default function CreadorVisualPage() {
   };
 
   const saveVisual = () => {
-    setState((current) => ({
-      ...current,
-      visualAssets: [draft, ...current.visualAssets],
-    }));
+    // TODO: Persist visual assets to database
+    console.log('Visual asset ready:', draft);
   };
 
   return (
