@@ -218,6 +218,148 @@ const VALIDATION_RULES: Record<SettingCategory, Record<string, (value: unknown) 
   },
 };
 
+// Allowlist of permitted keys per category (prevents prototype pollution)
+export const PERMITTED_KEYS: Record<SettingCategory, Set<string>> = {
+  general: new Set([
+    'workspace_name',
+    'project_name',
+    'creator_name',
+    'timezone',
+    'language',
+    'date_format',
+    'time_format',
+    'currency',
+    'week_start_day',
+    'editorial_preferred_day',
+    'editorial_preferred_time_window',
+    'system_status',
+  ]),
+  brand: new Set([
+    'brand_name',
+    'full_brand_name',
+    'tagline',
+    'short_description',
+    'voice_tone',
+    'brand_keywords',
+    'banned_words',
+    'primary_palette',
+    'typography',
+    'visual_rules',
+    'thumbnail_rules',
+  ]),
+  podcast: new Set([
+    'podcast_name',
+    'host_name',
+    'main_platform',
+    'secondary_platforms',
+    'ideal_episode_duration_minutes',
+    'max_episode_duration_minutes',
+    'default_primary_cta',
+    'default_secondary_cta',
+    'official_episode_structure',
+    'title_formula',
+    'editorial_categories',
+  ]),
+  content: new Set([
+    'active_formats',
+    'active_platforms',
+    'clips_per_episode',
+    'quotes_per_episode',
+    'copies_per_episode',
+    'default_copy_style',
+    'content_rules',
+    'platform_specific_rules',
+    'repurposing_rules',
+    'approval_required',
+  ]),
+  ai: new Set([
+    'active_provider',
+    'default_model',
+    'creative_temperature',
+    'technical_temperature',
+    'metrics_temperature',
+    'max_tokens',
+    'generation_modes',
+    'base_amtme_prompt',
+    'enabled_modules',
+    'save_generation_history',
+    'allow_auto_overwrite',
+    'require_human_review',
+  ]),
+  metrics: new Set([
+    'primary_metrics_platform',
+    'accepted_file_types',
+    'import_mode',
+    'strict_validation',
+    'allow_partially_valid_files',
+    'save_source_file',
+    'primary_kpis',
+    'current_goals',
+    'benchmark_rules',
+  ]),
+  integrations: new Set(['spotify', 'youtube', 'instagram', 'tiktok', 'linkedin']),
+  automation: new Set([
+    'automation_enabled',
+    'execution_mode',
+    'active_automations',
+    'analysis_frequency',
+    'weekly_report_day',
+    'weekly_report_time',
+    'destructive_actions_require_confirmation',
+  ]),
+  notifications: new Set([
+    'notify_pending_episodes',
+    'notify_missing_metrics',
+    'notify_performance_drop',
+    'notify_ready_to_publish',
+    'notify_overdue_tasks',
+    'notify_integration_errors',
+    'notify_weekly_recommendations',
+    'notification_channels',
+    'priority_rules',
+  ]),
+  security: new Set([
+    'primary_user',
+    'email',
+    'role',
+    'session_status',
+    'last_access',
+    'two_factor_status',
+    'activity_log_enabled',
+    'module_permissions',
+  ]),
+  data: new Set([
+    'last_backup_at',
+    'backup_status',
+    'estimated_data_size',
+    'last_export_at',
+    'logs_retention_days',
+    'export_formats',
+  ]),
+  system: new Set([
+    'app_version',
+    'environment',
+    'supabase_status',
+    'vercel_status',
+    'last_deploy',
+    'last_migration',
+    'tests_status',
+    'integrations_status',
+  ]),
+};
+
+// Dangerous keys that should never be used as setting keys (prototype pollution prevention)
+export const FORBIDDEN_KEYS = new Set([
+  '__proto__',
+  'constructor',
+  'prototype',
+  '__constructor__',
+  '__defineGetter__',
+  '__defineSetter__',
+  '__lookupGetter__',
+  '__lookupSetter__',
+]);
+
 export function validateSetting(
   category: SettingCategory,
   key: string,
@@ -225,8 +367,18 @@ export function validateSetting(
 ): ValidationResult {
   const errors: string[] = [];
 
+  // Check for prototype pollution attempts
+  if (FORBIDDEN_KEYS.has(key)) {
+    return { valid: false, errors: [`Invalid key name: ${key} is not allowed`] };
+  }
+
   if (!VALIDATION_RULES[category]) {
     return { valid: false, errors: [`Unknown category: ${category}`] };
+  }
+
+  // Check if key is in the allowlist for this category
+  if (!PERMITTED_KEYS[category].has(key)) {
+    return { valid: false, errors: [`Unknown key "${key}" for category "${category}"`] };
   }
 
   const categoryRules = VALIDATION_RULES[category];

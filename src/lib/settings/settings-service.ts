@@ -1,6 +1,6 @@
 import { Settings, SettingCategory, SettingsAuditLog } from './settings-types';
 import { DEFAULT_SETTINGS } from './settings-defaults';
-import { validateSetting } from './settings-validation';
+import { validateSetting, FORBIDDEN_KEYS, PERMITTED_KEYS } from './settings-validation';
 
 class SettingsService {
   private settings: Settings = { ...DEFAULT_SETTINGS };
@@ -14,12 +14,45 @@ class SettingsService {
       const stored = localStorage.getItem('amtme:settings');
       if (stored) {
         const parsed = JSON.parse(stored);
-        this.settings = {
-          ...DEFAULT_SETTINGS,
-          ...parsed,
-        };
+        // SECURITY: Validate localStorage JSON against full settings schema (prevent prototype pollution)
+        if (typeof parsed === 'object' && parsed !== null) {
+          // Only merge known top-level categories
+          const mergeData: Partial<Settings> = {};
+          const validCategories = Object.keys(DEFAULT_SETTINGS) as SettingCategory[];
+
+          for (const category of validCategories) {
+            if (
+              category in parsed &&
+              typeof parsed[category] === 'object' &&
+              parsed[category] !== null
+            ) {
+              // Only merge keys that exist in defaults for this category (whitelist validation)
+              const defaultCategoryKeys = Object.keys(DEFAULT_SETTINGS[category]);
+              // Start with defaults to ensure all keys are present (fail-safe)
+              const mergedCategory: Record<string, unknown> = {
+                ...DEFAULT_SETTINGS[category],
+              };
+
+              for (const key of defaultCategoryKeys) {
+                // Defense-in-depth: reject dangerous keys even if they somehow end up in defaults
+                if (FORBIDDEN_KEYS.has(key)) continue;
+                if (key in parsed[category]) {
+                  mergedCategory[key] = parsed[category][key];
+                }
+              }
+
+              (mergeData as Record<string, unknown>)[category] = mergedCategory;
+            }
+          }
+
+          this.settings = {
+            ...DEFAULT_SETTINGS,
+            ...mergeData,
+          };
+        }
       }
     } catch {
+      // Silently fall back to defaults on parse error (don't log to avoid leaking data)
       this.settings = { ...DEFAULT_SETTINGS };
     }
 

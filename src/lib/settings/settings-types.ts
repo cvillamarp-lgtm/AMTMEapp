@@ -165,6 +165,17 @@ export interface NotificationSettings {
   priority_rules?: Record<string, string>;
 }
 
+/**
+ * SECURITY BOUNDARY NOTICE:
+ * `role` and `module_permissions` are CLIENT-SIDE UI preferences ONLY.
+ * They are stored in localStorage (fully user-controllable via devtools).
+ * These MUST NOT be used as authorization boundaries.
+ * All real access control MUST be enforced server-side via:
+ * - Supabase RLS policies
+ * - Authenticated API routes
+ * - Middleware authentication checks
+ * Treat these fields as UI personalization, not security.
+ */
 export interface SecuritySettings {
   primary_user: string;
   email: string;
