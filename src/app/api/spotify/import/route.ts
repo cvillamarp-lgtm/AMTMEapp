@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
       .from('spotify_metric_imports')
       .insert([
         {
-          user_id: userId,
+          owner_id: 'public',
+          workspace_key: 'primary',
           payload: { ...importRecord, status: 'uploaded' },
         },
       ])
@@ -221,7 +222,7 @@ async function importEpisodeRankings(
   const { data: episodesData } = await sb
     .from('episodes')
     .select('id, payload')
-    .eq('user_id', userId);
+    .eq('owner_id', userId);
 
   type EpisodeRow = { id: string; payload: Partial<Episode> };
   const episodes: EpisodeRow[] = (episodesData || []) as EpisodeRow[];
@@ -251,7 +252,7 @@ async function importEpisodeRankings(
     const { data: existing } = await sb
       .from('spotify_episode_metrics')
       .select('id')
-      .eq('user_id', userId)
+      .eq('owner_id', 'public')
       .eq('payload->>normalized_episode_title', row.normalizedEpisodeTitle)
       .eq('payload->>metric_date', row.publishedAt || '')
       .limit(1);
@@ -268,7 +269,8 @@ async function importEpisodeRankings(
         .from('episodes')
         .insert([
           {
-            user_id: userId,
+            owner_id: userId,
+            workspace_key: 'primary',
             payload: {
               title: row.episodeTitle,
               episode_number: '',
@@ -301,7 +303,8 @@ async function importEpisodeRankings(
     }
 
     metricsToInsert.push({
-      user_id: userId,
+      owner_id: 'public',
+      workspace_key: 'primary',
       payload: {
         import_id: importId,
         episode_id: episodeId,
@@ -369,7 +372,7 @@ async function importDailyMetrics(
     const { data: existing } = await sb
       .from('spotify_daily_metrics')
       .select('id, payload')
-      .eq('user_id', userId)
+      .eq('owner_id', 'public')
       .eq('payload->>date', row.date)
       .limit(1);
 
@@ -400,7 +403,7 @@ async function importDailyMetrics(
     } else {
       const { error } = await sb
         .from('spotify_daily_metrics')
-        .insert([{ user_id: userId, payload: newPayload }]);
+        .insert([{ owner_id: 'public', workspace_key: 'primary', payload: newPayload }]);
       if (error) throw error;
     }
     processedRows++;
@@ -430,7 +433,7 @@ async function importDistributionMetrics(
     const { data: existing } = await sb
       .from('spotify_distribution_metrics')
       .select('id')
-      .eq('user_id', userId)
+      .eq('owner_id', 'public')
       .eq('payload->>dimension_type', row.dimensionType)
       .eq('payload->>dimension_name', row.dimensionName)
       .limit(1);
@@ -453,7 +456,7 @@ async function importDistributionMetrics(
     } else {
       const { error } = await sb
         .from('spotify_distribution_metrics')
-        .insert([{ user_id: userId, payload: newPayload }]);
+        .insert([{ owner_id: 'public', workspace_key: 'primary', payload: newPayload }]);
       if (error) throw error;
     }
     processedRows++;
@@ -483,7 +486,7 @@ async function importManualMetrics(
     const { data: existing } = await sb
       .from('amtme_manual_metrics')
       .select('id')
-      .eq('user_id', userId)
+      .eq('owner_id', 'public')
       .eq('payload->>month', row.month)
       .eq('payload->>platform', row.platform)
       .limit(1);
@@ -510,7 +513,7 @@ async function importManualMetrics(
     } else {
       const { error } = await sb
         .from('amtme_manual_metrics')
-        .insert([{ user_id: userId, payload: newPayload }]);
+        .insert([{ owner_id: 'public', workspace_key: 'primary', payload: newPayload }]);
       if (error) throw error;
     }
     processedRows++;
