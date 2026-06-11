@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
+import { useSettings } from '@/hooks/use-settings';
 import { getProviderLabel } from '@/lib/ai-providers';
 import type { AIProvider, AIWorkMode } from '@/lib/studio-types';
 
@@ -107,12 +107,15 @@ const EDITORIAL_PRESETS: PresetCard[] = [
 ];
 
 export default function IAPage() {
-  const { state } = useStudio();
-  const [provider, setProvider] = useState<AIProvider>(state.config.aiPrimaryProvider);
+  const { settings } = useSettings();
+  const aiSettings = settings?.ai;
+  const [provider, setProvider] = useState<AIProvider>(
+    (aiSettings?.active_provider as AIProvider) ?? 'claude'
+  );
   const [mode, setMode] = useState<AIWorkMode>('Copy');
-  const [model, setModel] = useState(state.config.aiPreferredModelByProvider[provider]);
+  const [model, setModel] = useState(aiSettings?.default_model ?? 'claude-opus-4-8');
   const [prompt, setPrompt] = useState(defaultPromptByMode.Copy);
-  const [systemPrompt, setSystemPrompt] = useState(state.config.aiSystemPrompt);
+  const [systemPrompt, setSystemPrompt] = useState(aiSettings?.base_amtme_prompt ?? '');
   const [response, setResponse] = useState<AIResponseState>({
     loading: false,
     error: '',
@@ -128,7 +131,7 @@ export default function IAPage() {
 
   const syncProvider = (nextProvider: AIProvider) => {
     setProvider(nextProvider);
-    setModel(state.config.aiPreferredModelByProvider[nextProvider]);
+    setModel(aiSettings?.default_model ?? 'claude-opus-4-8');
   };
 
   const loadPreset = (preset: PresetCard) => {
@@ -266,8 +269,8 @@ export default function IAPage() {
                 Generacion directa
               </h2>
             </div>
-            <Badge tone={state.config.aiEnabled ? 'good' : 'warning'}>
-              {state.config.aiEnabled ? 'IA activa' : 'IA pausada'}
+            <Badge tone={aiSettings?.enabled_modules?.includes('ia') ? 'good' : 'warning'}>
+              {aiSettings?.enabled_modules?.includes('ia') ? 'IA activa' : 'IA pausada'}
             </Badge>
           </div>
 
@@ -355,25 +358,25 @@ export default function IAPage() {
               <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
                 <span>Proveedor primario</span>
                 <span className="font-medium text-[#0C1F36]">
-                  {getProviderLabel(state.config.aiPrimaryProvider)}
+                  {getProviderLabel((aiSettings?.active_provider as AIProvider) ?? 'claude')}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
-                <span>Proveedor fallback</span>
+                <span>Modelo predeterminado</span>
                 <span className="font-medium text-[#0C1F36]">
-                  {getProviderLabel(state.config.aiFallbackProvider)}
+                  {aiSettings?.default_model ?? 'claude-opus-4-8'}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
-                <span>Modelo Grok</span>
+                <span>Temperatura (creativa)</span>
                 <span className="font-medium text-[#0C1F36]">
-                  {state.config.aiPreferredModelByProvider.grok}
+                  {aiSettings?.creative_temperature ?? 0.7}
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
-                <span>Modelo Gemini</span>
+                <span>Historial de generación</span>
                 <span className="font-medium text-[#0C1F36]">
-                  {state.config.aiPreferredModelByProvider.gemini}
+                  {aiSettings?.save_generation_history ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
             </div>
