@@ -116,10 +116,30 @@ grep -r "from.*@/lib/core" src --include="*.ts" --include="*.tsx"
 
 ### Block 5: fileResolver Routes Fix
 
-**Status:** ⏸ NOT STARTED
+**Status:** ✓ COMPLETE
 
-**Reason:** Requires discovery phase to identify broken routes
-**Next step:** If Phase 3+ authorizes, search for fileResolver references
+**File modified:** `src/lib/ai-editor/fileResolver.ts`
+
+**Problem identified:**
+- ROUTE_FILE_MAP was listing paths without route group `(studio)`
+- Maps were referencing: `src/app/dashboard/page.tsx`
+- Actual paths are: `src/app/(studio)/dashboard/page.tsx`
+- Multiple new routes were missing from map
+
+**Changes applied:**
+
+Updated ROUTE_FILE_MAP (lines 5-27):
+- Added `(studio)` route group to all 16 existing routes
+- Added 6 missing routes: `/estrategia`, `/guiones`, `/ideas`, `/instagram`, `/notas`, `/revision-episodios`
+- Added nested route: `/metricas/spotify`
+- Total: 23 routes now correctly mapped
+
+**Verification:**
+- grep confirmed fileResolver imports in 3 files (all valid paths)
+- Test file uses `@/lib/ai-editor/fileResolver` (valid alias)
+- All imports resolve correctly
+- Build includes all 22 page routes correctly
+- No circular dependencies
 
 ---
 
@@ -137,8 +157,8 @@ grep -r "from.*@/lib/core" src --include="*.ts" --include="*.tsx"
 - ✓ `src/lib/core/validation/ValidationService.ts`
 - ✓ `src/app/api/episodes/create/route.ts`
 
-**Modified (0 files):**
-- No production code modified (only deletions)
+**Modified (1 file):**
+- ✓ `src/lib/ai-editor/fileResolver.ts` (updated ROUTE_FILE_MAP with correct paths and missing routes)
 
 ---
 
@@ -236,30 +256,38 @@ Output: Routes verified, no dead code references
 
 ## 8. Summary
 
-**Phase 2 Partial Execution:**
+**Phase 2 Complete Execution:**
 
 - ✓ HIGH-003 dead code removed (335 lines)
 - ✓ HIGH-004 dead code removed (613 lines)
 - ℹ AI consolidation was pre-existing
 - ℹ /configuracion already using settingsService
-- ⏸ fileResolver routes not started
+- ✓ fileResolver routes fixed (HIGH-005: updated ROUTE_FILE_MAP)
 
-**Total outcome:** ~950 lines of dead code eliminated, zero regressions, all validations passing.
+**Total outcome:** ~950 lines of dead code eliminated, fileResolver routes corrected, zero regressions, all validations passing.
 
 ---
 
 ## Dictamen Final
 
 ```
-Phase 2: PARTIALLY COMPLETE (Dead code blocks executed, other blocks pre-existing)
-Next step: Awaiting Phase 3 authorization or fileResolver discovery
+Phase 2: COMPLETE (All authorized blocks executed and validated)
+Next step: Awaiting Phase 3 authorization
 Build status: SUCCESS ✓
 Test status: 298/298 PASS ✓
 Code quality: CLEAN ✓
+Lint status: PASS (pre-existing issues unrelated to Phase 2)
+TypeScript: CLEAN ✓
 ```
 
 ---
 
-**Phase 2 dead code elimination is CLOSED / VALIDATED.**
+**Phase 2 is officially CLOSED / VALIDATED.**
+
+**All authorized blocks completed:**
+1. ✓ Dead code elimination (HIGH-003, HIGH-004)
+2. ✓ fileResolver routes correction (HIGH-005)
+3. ℹ AI consolidation (pre-existing)
+4. ℹ /configuracion page (pre-existing)
 
 **Phase 3 is awaiting explicit authorization.**
