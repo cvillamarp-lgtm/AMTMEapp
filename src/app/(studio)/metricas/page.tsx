@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Skeleton } from '@/components/shadcn/skeleton';
@@ -47,181 +47,59 @@ import {
   Music2,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  getMetricsMonthly,
-  createMetricMonthly,
-  getEpisodes,
-  getMetricsEpisode,
-  createMetricEpisode,
-  getStrategySnapshots,
-} from '@/lib/database';
+import { createMetricMonthly, createMetricEpisode } from '@/lib/database';
 import type {
   MetricMonthly,
   MetricEpisode,
   Episode,
   PodcastStrategySnapshot,
 } from '@/types/database';
-
-type AIReport = {
-  id: string;
-  month: string;
-  generated_at: string;
-  diagnosis: string;
-  growth_pattern: string;
-  best_content: string;
-  alert: string;
-  recommendation_7d: string;
-  next_episode_hypothesis: string;
-};
-
-type DecisionNote = {
-  weekly_learning: string;
-  next_experiment: string;
-  next_decision: string;
-  updated_at: string;
-};
+import { useMetrics } from '@/hooks/useMetrics';
+import type { AIReport, DecisionNote } from '@/hooks/useMetrics';
 
 const DECISION_KEY = 'amtme-decision-notes';
 const REPORTS_KEY = 'amtme-metric-reports';
 
 export default function MetricasPage() {
-  const [metrics, setMetrics] = useState<MetricMonthly[]>([]);
-  const [metricsEpisode, setMetricsEpisode] = useState<MetricEpisode[]>([]);
-  const [episodes, setEpisodes] = useState<Episode[]>([]);
-  const [reports, setReports] = useState<AIReport[]>([]);
-  const [strategySnapshots, setStrategySnapshots] = useState<PodcastStrategySnapshot[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [epDialogOpen, setEpDialogOpen] = useState(false);
-  const [decisionNotes, setDecisionNotes] = useState<DecisionNote>({
-    weekly_learning: '',
-    next_experiment: '',
-    next_decision: '',
-    updated_at: '',
-  });
-  const [savingNotes, setSavingNotes] = useState(false);
+  const {
+    metrics,
+    metricsEpisode,
+    episodes,
+    reports: hooksReports,
+    strategySnapshots,
+    loading,
+    generating,
+    setGenerating,
+    dialogOpen,
+    setDialogOpen,
+    epDialogOpen,
+    setEpDialogOpen,
+    decisionNotes,
+    setDecisionNotes,
+    savingNotes,
+    setSavingNotes,
+    form,
+    setForm,
+    epForm,
+    setEpForm,
+    load,
+    resetForm,
+    resetEpForm,
+    measuredEpisodeIds,
+    pendingToMeasure,
+    bestMonth,
+    bestEpisode,
+    bestEpisodeData,
+    latestReport,
+    latestStrategy,
+  } = useMetrics();
 
-  const [form, setForm] = useState({
-    month: new Date().toISOString().slice(0, 7),
-    platform: '',
-    reach: 0,
-    plays: 0,
-    downloads: 0,
-    engagement: 0,
-    profile_visits: 0,
-    link_clicks: 0,
-    dms: 0,
-    conversions: 0,
-    revenue: 0,
-    insight: '',
-    action: '',
-  });
-
-  const [epForm, setEpForm] = useState({
-    episode_id: '',
-    plays_48h: 0,
-    plays_7d: 0,
-    retention: 0,
-    saves: 0,
-    shares: 0,
-    comments: 0,
-    dms: 0,
-    conversions: 0,
-    insight: '',
-  });
-
-  const load = useCallback(async () => {
-    try {
-      const [d, ep, eps, snapshots] = await Promise.all([
-        getMetricsMonthly(),
-        getMetricsEpisode(),
-        getEpisodes(),
-        getStrategySnapshots(),
-      ]);
-      setMetrics(d);
-      setMetricsEpisode(ep);
-      setEpisodes(eps);
-      setStrategySnapshots(snapshots);
-      const saved = localStorage.getItem(REPORTS_KEY);
-      if (saved) setReports(JSON.parse(saved));
-      const notes = localStorage.getItem(DECISION_KEY);
-      if (notes) setDecisionNotes(JSON.parse(notes));
-    } catch {
-      toast.error('Error al cargar metricas');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Local state for reports (modified by generateReport)
+  const [reports, setReports] = useState<AIReport[]>(hooksReports);
 
   useEffect(() => {
-    load();
-  }, [load]);
-
-  // --- episodios pendientes de medir ---
-  const measuredEpisodeIds = new Set(metricsEpisode.map((m) => m.episode_id));
-  const pendingToMeasure = episodes.filter(
-    (e) => (e.status === 'publicado' || e.status === 'distribuido') && !measuredEpisodeIds.has(e.id)
-  );
-
-  // --- mejor rendimiento mensual ---
-  const bestMonth =
-    metrics.length > 0
-      ? [...metrics].sort((a, b) => b.plays + b.dms * 10 - (a.plays + a.dms * 10))[0]
-      : null;
-
-  // --- episodio con mejor rendimiento (metricas_episode) ---
-  const bestEpisode =
-    metricsEpisode.length > 0
-      ? [...metricsEpisode].sort((a, b) => b.plays_7d + b.dms * 10 - (a.plays_7d + a.dms * 10))[0]
-      : null;
-  const bestEpisodeData = bestEpisode
-    ? episodes.find((e) => e.id === bestEpisode.episode_id)
-    : null;
-
-  // --- ultima recomendacion IA ---
-  const latestReport = reports.length > 0 ? reports[0] : null;
-
-  // --- ultimo snapshot de estrategia (Spotify IA) ---
-  const latestStrategy =
-    strategySnapshots.length > 0
-      ? [...strategySnapshots].sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )[0]
-      : null;
-
-  function resetForm() {
-    setForm({
-      month: new Date().toISOString().slice(0, 7),
-      platform: '',
-      reach: 0,
-      plays: 0,
-      downloads: 0,
-      engagement: 0,
-      profile_visits: 0,
-      link_clicks: 0,
-      dms: 0,
-      conversions: 0,
-      revenue: 0,
-      insight: '',
-      action: '',
-    });
-  }
-
-  function resetEpForm(episodeId?: string) {
-    setEpForm({
-      episode_id: episodeId || '',
-      plays_48h: 0,
-      plays_7d: 0,
-      retention: 0,
-      saves: 0,
-      shares: 0,
-      comments: 0,
-      dms: 0,
-      conversions: 0,
-      insight: '',
-    });
-  }
+    setReports(hooksReports);
+  }, [hooksReports]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
