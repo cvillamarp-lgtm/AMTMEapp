@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       .from('spotify_metric_imports')
       .insert([
         {
-          owner_id: 'public',
+          owner_id: owner,
           workspace_key: 'primary',
           payload: { ...importRecord, status: 'uploaded' },
         },
@@ -310,7 +310,7 @@ async function importEpisodeRankings(
     }
 
     metricsToInsert.push({
-      owner_id: 'public',
+      owner_id: owner,
       workspace_key: 'primary',
       payload: {
         import_id: importId,
