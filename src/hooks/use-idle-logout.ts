@@ -16,13 +16,7 @@ interface UseIdleLogoutReturn {
   remainingSeconds: number;
 }
 
-const ACTIVITY_EVENTS = [
-  'mousemove',
-  'keydown',
-  'click',
-  'scroll',
-  'touchstart',
-] as const;
+const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'] as const;
 
 export function useIdleLogout({
   enabled,

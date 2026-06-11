@@ -157,7 +157,10 @@ export default function ChecklistsPage() {
       toast.error('El nombre es obligatorio');
       return;
     }
-    const lines = newItemsText.split('\n').map((l) => l.trim()).filter(Boolean);
+    const lines = newItemsText
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
     const items = lines.map((text) => ({ id: crypto.randomUUID(), text, completed: false }));
     setCreating(true);
     try {

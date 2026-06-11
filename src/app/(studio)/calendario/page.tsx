@@ -1,11 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/components/shadcn/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import { Label } from '@/components/shadcn/label';
@@ -230,8 +225,12 @@ export default function CalendarioPage() {
   );
   const weekEvsByDate = useMemo(() => {
     const map: Record<string, CalendarEvent[]> = {};
-    weekDays.forEach((d) => { map[d] = []; });
-    events.forEach((ev) => { if (ev.date in map) map[ev.date].push(ev); });
+    weekDays.forEach((d) => {
+      map[d] = [];
+    });
+    events.forEach((ev) => {
+      if (ev.date in map) map[ev.date].push(ev);
+    });
     return map;
   }, [events, weekDays]);
 
@@ -253,7 +252,6 @@ export default function CalendarioPage() {
     const d = addDays(today, i);
     if (!diasConContenido.has(d)) huecos.push(d);
   }
-
 
   // grid mensual real
   const calGrid = useMemo(() => {
@@ -893,7 +891,12 @@ export default function CalendarioPage() {
             <div className="grid grid-cols-7">
               {calGrid.map((day, i) => {
                 if (day === null) {
-                  return <div key={`empty-${i}`} className="min-h-[80px] border-b border-r border-border/50 bg-muted/20" />;
+                  return (
+                    <div
+                      key={`empty-${i}`}
+                      className="min-h-[80px] border-b border-r border-border/50 bg-muted/20"
+                    />
+                  );
                 }
                 const dateStr = `${calMonth.year}-${padDate(calMonth.month + 1)}-${padDate(day)}`;
                 const dayEvents = eventsByDay(day);
@@ -948,9 +951,7 @@ export default function CalendarioPage() {
           {selectedDay && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">
-                  {weekLabel(selectedDay)}
-                </CardTitle>
+                <CardTitle className="text-sm">{weekLabel(selectedDay)}</CardTitle>
               </CardHeader>
               <CardContent>
                 {eventsByDay(parseInt(selectedDay.slice(8))).length === 0 ? (

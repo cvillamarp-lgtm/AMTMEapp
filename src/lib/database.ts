@@ -29,7 +29,9 @@ async function getActiveUserId(): Promise<string | null> {
   try {
     const authClient = getSupabaseAuthBrowserClient();
     if (!authClient) return null;
-    const { data: { session } } = await authClient.auth.getSession();
+    const {
+      data: { session },
+    } = await authClient.auth.getSession();
     return session?.user?.id ?? null;
   } catch {
     return null;
@@ -62,7 +64,16 @@ function fromRow<T>(row: any): T {
   }
   // Schema con columnas directas — omitir id/timestamps ya incluidos
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id: _id, created_at: _ca, updated_at: _ua, user_id: _uid, owner_id: _oid, workspace_key: _wk, payload: _payload, ...rest } = row;
+  const {
+    id: _id,
+    created_at: _ca,
+    updated_at: _ua,
+    user_id: _uid,
+    owner_id: _oid,
+    workspace_key: _wk,
+    payload: _payload,
+    ...rest
+  } = row;
   return { ...base, ...rest } as T;
 }
 
@@ -511,10 +522,7 @@ export async function createSpotifyEpisodeMetrics(
   if (!sb) throw new Error('Supabase no configurado');
   const activeUserId = await getActiveUserId();
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
-  const { data, error } = await sb
-    .from('spotify_episode_metrics')
-    .insert(rows)
-    .select();
+  const { data, error } = await sb.from('spotify_episode_metrics').insert(rows).select();
   if (error) throw error;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
@@ -536,7 +544,9 @@ export async function getSpotifyMetricsByImport(importId: string): Promise<Spoti
   return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
 }
 
-export async function getSpotifyMetricsByEpisode(episodeId: string): Promise<SpotifyEpisodeMetric[]> {
+export async function getSpotifyMetricsByEpisode(
+  episodeId: string
+): Promise<SpotifyEpisodeMetric[]> {
   const sb = getClient();
   if (!sb) return [];
   const activeUserId = await getActiveUserId();
@@ -565,10 +575,7 @@ export async function createSpotifyDailyMetrics(
   if (!sb) throw new Error('Supabase no configurado');
   const activeUserId = await getActiveUserId();
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
-  const { data, error } = await sb
-    .from('spotify_daily_metrics')
-    .insert(rows)
-    .select();
+  const { data, error } = await sb.from('spotify_daily_metrics').insert(rows).select();
   if (error) throw error;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<SpotifyDailyMetric>(r));
@@ -587,10 +594,7 @@ export async function createSpotifyDistributionMetrics(
   if (!sb) throw new Error('Supabase no configurado');
   const activeUserId = await getActiveUserId();
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
-  const { data, error } = await sb
-    .from('spotify_distribution_metrics')
-    .insert(rows)
-    .select();
+  const { data, error } = await sb.from('spotify_distribution_metrics').insert(rows).select();
   if (error) throw error;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<SpotifyDistributionMetric>(r));
@@ -609,10 +613,7 @@ export async function createAmtmeManualMetrics(
   if (!sb) throw new Error('Supabase no configurado');
   const activeUserId = await getActiveUserId();
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
-  const { data, error } = await sb
-    .from('amtme_manual_metrics')
-    .insert(rows)
-    .select();
+  const { data, error } = await sb.from('amtme_manual_metrics').insert(rows).select();
   if (error) throw error;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<AmtmeManualMetric>(r));

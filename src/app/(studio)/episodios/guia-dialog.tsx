@@ -47,8 +47,15 @@ type GeneratedFicha = {
 };
 
 const EPISODE_STATUSES: EpisodeStatus[] = [
-  'idea', 'investigacion', 'guion', 'grabacion',
-  'edicion', 'publicado', 'distribuido', 'medido', 'archivado',
+  'idea',
+  'investigacion',
+  'guion',
+  'grabacion',
+  'edicion',
+  'publicado',
+  'distribuido',
+  'medido',
+  'archivado',
 ];
 
 const NS_LABELS: Record<keyof NarrativeStructure, string> = {
@@ -245,7 +252,13 @@ export function EpisodioGuiadoDialog({
     setStep('generating');
     try {
       const prompt = buildPrompt({
-        idea, number, status, theme: inputTheme, intention, focus, freeNotes,
+        idea,
+        number,
+        status,
+        theme: inputTheme,
+        intention,
+        focus,
+        freeNotes,
       });
       const result = await generateFicha(prompt);
       setFicha(result);
@@ -579,9 +592,7 @@ export function EpisodioGuiadoDialog({
 
               {/* Notas y metadatos */}
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Notas y metadatos generados
-                </Label>
+                <Label className="text-xs text-muted-foreground">Notas y metadatos generados</Label>
                 <Textarea
                   rows={5}
                   value={editNotes}

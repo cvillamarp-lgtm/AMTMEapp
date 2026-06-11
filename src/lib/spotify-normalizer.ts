@@ -35,22 +35,47 @@ export function normalizeHeader(header: string): string {
 }
 
 // Aliases (ya normalizados) por tipo de reporte y campo normalizado destino.
-export const REPORT_TYPE_ALIASES: Record<Exclude<SpotifyReportType, 'unknown'>, Record<string, string[]>> = {
+export const REPORT_TYPE_ALIASES: Record<
+  Exclude<SpotifyReportType, 'unknown'>,
+  Record<string, string[]>
+> = {
   episode_rankings: {
-    episodeTitle: ['titulo del episodio', 'episode title', 'title', 'episode', 'episodio', 'nombre del episodio'],
-    playsDownloads: ['reproducciones y descargas', 'plays and downloads', 'plays & downloads', 'streams and downloads'],
+    episodeTitle: [
+      'titulo del episodio',
+      'episode title',
+      'title',
+      'episode',
+      'episodio',
+      'nombre del episodio',
+    ],
+    playsDownloads: [
+      'reproducciones y descargas',
+      'plays and downloads',
+      'plays & downloads',
+      'streams and downloads',
+    ],
     publishedAt: ['fecha de publicacion', 'publish date', 'release date', 'published'],
     ranking: ['clasificacion', 'ranking', 'rank'],
     episodeUri: ['uri del episodio', 'episode uri', 'uri'],
   },
   streams_downloads_timeseries: {
     date: ['fecha', 'date'],
-    playsDownloads: ['reproducciones y descargas', 'plays and downloads', 'plays & downloads', 'streams and downloads'],
+    playsDownloads: [
+      'reproducciones y descargas',
+      'plays and downloads',
+      'plays & downloads',
+      'streams and downloads',
+    ],
   },
   spotify_overview_timeseries: {
     date: ['fecha', 'date'],
     listens: ['escuchas', 'listens'],
-    listeningHours: ['horas de reproduccion', 'listening hours', 'hours of playback', 'playback hours'],
+    listeningHours: [
+      'horas de reproduccion',
+      'listening hours',
+      'hours of playback',
+      'playback hours',
+    ],
     followers: ['seguidores', 'followers'],
   },
   apps_distribution: {
@@ -139,7 +164,11 @@ export function detectSpotifyReportType(headers: string[]): SpotifyReportType {
 
   // A) episode_rankings: titulo del episodio + reproducciones y descargas + uri del episodio
   const a = REPORT_TYPE_ALIASES.episode_rankings;
-  if (hasAnyAlias(norm, a.episodeTitle) && hasAnyAlias(norm, a.playsDownloads) && hasAnyAlias(norm, a.episodeUri)) {
+  if (
+    hasAnyAlias(norm, a.episodeTitle) &&
+    hasAnyAlias(norm, a.playsDownloads) &&
+    hasAnyAlias(norm, a.episodeUri)
+  ) {
     return 'episode_rankings';
   }
 
@@ -191,7 +220,10 @@ export function detectSpotifyReportType(headers: string[]): SpotifyReportType {
 }
 
 // Construye el mapa columna_cruda -> campo_normalizado específico del tipo de reporte detectado.
-export function buildColumnMapForType(headers: string[], type: SpotifyReportType): Record<string, string> {
+export function buildColumnMapForType(
+  headers: string[],
+  type: SpotifyReportType
+): Record<string, string> {
   if (type === 'unknown') return {};
   const aliasMap = REPORT_TYPE_ALIASES[type];
   const map: Record<string, string> = {};
@@ -208,7 +240,10 @@ export function buildColumnMapForType(headers: string[], type: SpotifyReportType
 }
 
 // Valida las columnas detectadas según el tipo de reporte.
-export function validateReportType(type: SpotifyReportType, columnMap: Record<string, string>): ReportValidation {
+export function validateReportType(
+  type: SpotifyReportType,
+  columnMap: Record<string, string>
+): ReportValidation {
   if (type === 'unknown') {
     return {
       status: 'invalid',
@@ -222,14 +257,18 @@ export function validateReportType(type: SpotifyReportType, columnMap: Record<st
   const fields = new Set(Object.values(columnMap));
   const config = VALIDATION_CONFIG[type];
   const missingRequired = config.required.filter((f) => !fields.has(f));
-  const anyOfMissing = config.requiredAnyOf ? !config.requiredAnyOf.some((f) => fields.has(f)) : false;
+  const anyOfMissing = config.requiredAnyOf
+    ? !config.requiredAnyOf.some((f) => fields.has(f))
+    : false;
   const missingRecommended = (config.recommended ?? []).filter((f) => !fields.has(f));
 
   if (missingRequired.length > 0 || anyOfMissing) {
     return {
       status: 'invalid',
       message: `${REPORT_TYPE_DESCRIPTIONS[type]} Sin embargo, faltan columnas obligatorias y el archivo no puede importarse.`,
-      missingRequired: anyOfMissing ? [...missingRequired, ...(config.requiredAnyOf ?? [])] : missingRequired,
+      missingRequired: anyOfMissing
+        ? [...missingRequired, ...(config.requiredAnyOf ?? [])]
+        : missingRequired,
       missingRecommended,
     };
   }
@@ -296,7 +335,11 @@ export type NormalizedSpotifyRow =
   | NormalizedDistributionMetric
   | NormalizedManualMetric;
 
-function getMapped(row: Record<string, string>, columnMap: Record<string, string>, field: string): string | null {
+function getMapped(
+  row: Record<string, string>,
+  columnMap: Record<string, string>,
+  field: string
+): string | null {
   const header = Object.keys(columnMap).find((h) => columnMap[h] === field);
   if (!header) return null;
   const v = row[header];
@@ -363,11 +406,17 @@ export function mapSpotifyRow(
 }
 
 // Detecta el periodo (fecha mínima/máxima) cubierto por las filas normalizadas.
-export function detectPeriodForRows(rows: NormalizedSpotifyRow[]): { start: string | null; end: string | null } {
+export function detectPeriodForRows(rows: NormalizedSpotifyRow[]): {
+  start: string | null;
+  end: string | null;
+} {
   const dates: string[] = [];
   for (const row of rows) {
     if (row.type === 'episode_rankings' && row.publishedAt) dates.push(row.publishedAt);
-    if ((row.type === 'streams_downloads_timeseries' || row.type === 'spotify_overview_timeseries') && row.date) {
+    if (
+      (row.type === 'streams_downloads_timeseries' || row.type === 'spotify_overview_timeseries') &&
+      row.date
+    ) {
       dates.push(row.date);
     }
   }
@@ -379,7 +428,10 @@ export function detectPeriodForRows(rows: NormalizedSpotifyRow[]): { start: stri
 // Normaliza un número que puede venir con coma o punto decimal
 export function parseNumber(value: string | null | undefined): number | null {
   if (value == null || value === '') return null;
-  const cleaned = value.toString().replace(/[^0-9.,%-]/g, '').replace(',', '.');
+  const cleaned = value
+    .toString()
+    .replace(/[^0-9.,%-]/g, '')
+    .replace(',', '.');
   const num = parseFloat(cleaned);
   return isNaN(num) ? null : num;
 }
@@ -429,5 +481,8 @@ export async function hashFileContent(content: string): Promise<string> {
   const data = encoder.encode(content.slice(0, 10000)); // hash de primeros 10k chars
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+  return hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 16);
 }

@@ -266,7 +266,6 @@ Devuelve ÚNICAMENTE JSON válido sin markdown:
 El campo seoScore debe ser un número entero del 1 al 10.`;
 }
 
-
 export interface SpotifyAnalysisInput {
   periodStart: string;
   periodEnd: string;

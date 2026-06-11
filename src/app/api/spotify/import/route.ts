@@ -30,7 +30,7 @@ type ImportPayload = {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as ImportPayload;
+    const body = (await req.json()) as ImportPayload;
     const { importRecord, rows, userId } = body;
 
     if (!userId) {
@@ -50,25 +50,33 @@ export async function POST(req: NextRequest) {
       .eq('payload->>file_hash', importRecord.file_hash);
 
     if (existingImports && existingImports.length > 0) {
-      return NextResponse.json({
-        duplicate: true,
-        message: 'Este archivo ya fue importado antes.',
-        existingImportId: existingImports[0].id,
-      }, { status: 409 });
+      return NextResponse.json(
+        {
+          duplicate: true,
+          message: 'Este archivo ya fue importado antes.',
+          existingImportId: existingImports[0].id,
+        },
+        { status: 409 }
+      );
     }
 
     // 2. Crear registro de importación con estado 'uploaded'
     const { data: importRow, error: importError } = await sb
       .from('spotify_metric_imports')
-      .insert([{
-        user_id: userId,
-        payload: { ...importRecord, status: 'uploaded' },
-      }])
+      .insert([
+        {
+          user_id: userId,
+          payload: { ...importRecord, status: 'uploaded' },
+        },
+      ])
       .select()
       .single();
 
     if (importError || !importRow) {
-      return NextResponse.json({ error: 'Error al crear registro de importación' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Error al crear registro de importación' },
+        { status: 500 }
+      );
     }
 
     const importId = importRow.id;
@@ -83,7 +91,14 @@ export async function POST(req: NextRequest) {
     try {
       switch (importRecord.detected_report_type) {
         case 'episode_rankings': {
-          const result = await importEpisodeRankings(sb, userId, importId, sourceFileName, importedAt, rows);
+          const result = await importEpisodeRankings(
+            sb,
+            userId,
+            importId,
+            sourceFileName,
+            importedAt,
+            rows
+          );
           processedRows = result.processedRows;
           failedRows = result.failedRows;
           newEpisodesCreated = result.newEpisodesCreated;
@@ -92,20 +107,41 @@ export async function POST(req: NextRequest) {
         }
         case 'streams_downloads_timeseries':
         case 'spotify_overview_timeseries': {
-          const result = await importDailyMetrics(sb, userId, importId, sourceFileName, importedAt, rows);
+          const result = await importDailyMetrics(
+            sb,
+            userId,
+            importId,
+            sourceFileName,
+            importedAt,
+            rows
+          );
           processedRows = result.processedRows;
           failedRows = result.failedRows;
           break;
         }
         case 'apps_distribution':
         case 'geo_distribution': {
-          const result = await importDistributionMetrics(sb, userId, importId, sourceFileName, importedAt, rows);
+          const result = await importDistributionMetrics(
+            sb,
+            userId,
+            importId,
+            sourceFileName,
+            importedAt,
+            rows
+          );
           processedRows = result.processedRows;
           failedRows = result.failedRows;
           break;
         }
         case 'amtme_manual_metrics': {
-          const result = await importManualMetrics(sb, userId, importId, sourceFileName, importedAt, rows);
+          const result = await importManualMetrics(
+            sb,
+            userId,
+            importId,
+            sourceFileName,
+            importedAt,
+            rows
+          );
           processedRows = result.processedRows;
           failedRows = result.failedRows;
           break;
@@ -170,7 +206,12 @@ async function importEpisodeRankings(
   sourceFileName: string,
   importedAt: string,
   rows: NormalizedSpotifyRow[]
-): Promise<{ processedRows: number; failedRows: number; newEpisodesCreated: number; episodesUpdated: number }> {
+): Promise<{
+  processedRows: number;
+  failedRows: number;
+  newEpisodesCreated: number;
+  episodesUpdated: number;
+}> {
   let processedRows = 0;
   let failedRows = 0;
   let newEpisodesCreated = 0;
@@ -225,26 +266,28 @@ async function importEpisodeRankings(
     if (!episodeId) {
       const { data: newEp } = await sb
         .from('episodes')
-        .insert([{
-          user_id: userId,
-          payload: {
-            title: row.episodeTitle,
-            episode_number: '',
-            theme: 'Importado desde Spotify',
-            emotional_wound: '',
-            central_symbol: '',
-            status: 'medido',
-            script: null,
-            hooks: null,
-            next_action: null,
-            original_title: null,
-            ai_optimized_title: null,
-            title_optimization_status: null,
-            title_optimized_at: null,
-            title_optimization_source: null,
-            narrative_structure: null,
+        .insert([
+          {
+            user_id: userId,
+            payload: {
+              title: row.episodeTitle,
+              episode_number: '',
+              theme: 'Importado desde Spotify',
+              emotional_wound: '',
+              central_symbol: '',
+              status: 'medido',
+              script: null,
+              hooks: null,
+              next_action: null,
+              original_title: null,
+              ai_optimized_title: null,
+              title_optimization_status: null,
+              title_optimized_at: null,
+              title_optimization_source: null,
+              narrative_structure: null,
+            },
           },
-        }])
+        ])
         .select()
         .single();
 
@@ -316,7 +359,8 @@ async function importDailyMetrics(
   let failedRows = 0;
 
   for (const row of rows) {
-    if (row.type !== 'streams_downloads_timeseries' && row.type !== 'spotify_overview_timeseries') continue;
+    if (row.type !== 'streams_downloads_timeseries' && row.type !== 'spotify_overview_timeseries')
+      continue;
     if (!row.date) {
       failedRows++;
       continue;

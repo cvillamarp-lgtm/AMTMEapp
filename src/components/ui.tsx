@@ -35,10 +35,13 @@ export function Button({
 
   const variants: Record<string, string> = {
     primary:
-      'bg-[#0C1F36] text-white hover:bg-[#09182a] active:scale-[0.97] shadow-[0_1px_3px_rgba(12,31,54,0.18)]',
-    secondary: 'bg-black/[0.06] text-[#0C1F36] hover:bg-black/[0.10] active:scale-[0.97]',
-    ghost: 'bg-transparent text-[#0C1F36] hover:bg-black/[0.05] active:scale-[0.97]',
-    danger: 'bg-[#E0211E] text-white hover:bg-[#c01c1a] active:scale-[0.97]',
+      'bg-[#0C1F36] text-white hover:bg-[#09182a] active:scale-[0.97] dark:bg-white dark:text-[#0C1F36] dark:hover:bg-gray-100 shadow-[0_1px_3px_rgba(12,31,54,0.18)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]',
+    secondary:
+      'bg-black/[0.06] text-[#0C1F36] hover:bg-black/[0.10] active:scale-[0.97] dark:bg-white/[0.10] dark:text-white dark:hover:bg-white/[0.15]',
+    ghost:
+      'bg-transparent text-[#0C1F36] hover:bg-black/[0.05] active:scale-[0.97] dark:text-white dark:hover:bg-white/[0.05]',
+    danger:
+      'bg-[#E0211E] text-white hover:bg-[#c01c1a] active:scale-[0.97] dark:bg-red-600 dark:hover:bg-red-700',
   };
 
   const classes = joinClasses(base, variants[variant], className);
@@ -62,8 +65,8 @@ export function Card({ children, className }: { children: ReactNode; className?:
   return (
     <section
       className={joinClasses(
-        'rounded-[20px] border border-black/[0.07] bg-white p-6',
-        'shadow-[0_2px_8px_rgba(12,31,54,0.06),0_0_1px_rgba(12,31,54,0.06)]',
+        'rounded-[20px] border border-black/[0.07] dark:border-white/[0.10] bg-white dark:bg-slate-900 p-6',
+        'shadow-[0_2px_8px_rgba(12,31,54,0.06),0_0_1px_rgba(12,31,54,0.06)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]',
         className
       )}
     >
@@ -81,11 +84,11 @@ export function Badge({
   tone?: 'neutral' | 'good' | 'warning' | 'danger' | 'accent';
 }) {
   const tones: Record<string, string> = {
-    neutral: 'bg-black/[0.06] text-[#0C1F36]',
-    good: 'bg-emerald-50 text-emerald-700',
-    warning: 'bg-[#FEE94B] text-[#0C1F36]',
-    danger: 'bg-red-50 text-[#C0201E]',
-    accent: 'bg-[#FEE94B] text-[#0C1F36]',
+    neutral: 'bg-black/[0.06] dark:bg-white/[0.10] text-[#0C1F36] dark:text-white',
+    good: 'bg-emerald-50 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-200',
+    warning: 'bg-[#FEE94B] dark:bg-yellow-900 text-[#0C1F36] dark:text-yellow-200',
+    danger: 'bg-red-50 dark:bg-red-900 text-[#C0201E] dark:text-red-200',
+    accent: 'bg-[#FEE94B] dark:bg-yellow-900 text-[#0C1F36] dark:text-yellow-200',
   };
 
   return (
@@ -123,11 +126,11 @@ export function Field({
 
 // ─── Inputs ──────────────────────────────────────────────────────────────────────
 const inputBase = [
-  'w-full rounded-xl border border-black/[0.10] bg-black/[0.025]',
-  'px-3.5 py-2.5 text-[14px] text-[#0C1F36]',
-  'placeholder:text-[#6B7B8C]/60',
+  'w-full rounded-xl border border-black/[0.10] dark:border-white/[0.20] bg-black/[0.025] dark:bg-white/[0.05]',
+  'px-3.5 py-2.5 text-[14px] text-[#0C1F36] dark:text-white',
+  'placeholder:text-[#6B7B8C]/60 dark:placeholder:text-white/40',
   'outline-none transition-all duration-150',
-  'focus:border-[#0C1F36]/25 focus:bg-white focus:shadow-[0_0_0_3px_rgba(12,31,54,0.08)]',
+  'focus:border-[#0C1F36]/25 dark:focus:border-white/40 focus:bg-white dark:focus:bg-slate-800 focus:shadow-[0_0_0_3px_rgba(12,31,54,0.08)] dark:focus:shadow-[0_0_0_3px_rgba(255,255,255,0.1)]',
   'disabled:opacity-50',
 ].join(' ');
 

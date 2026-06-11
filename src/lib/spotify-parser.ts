@@ -33,7 +33,9 @@ export interface ParsedSpotifyFile {
   rows: NormalizedSpotifyRow[];
 }
 
-async function parseCSVContent(content: string): Promise<{ headers: string[]; rows: Record<string, string>[] }> {
+async function parseCSVContent(
+  content: string
+): Promise<{ headers: string[]; rows: Record<string, string>[] }> {
   return new Promise((resolve) => {
     Papa.parse<Record<string, string>>(content, {
       header: true,
@@ -46,7 +48,10 @@ async function parseCSVContent(content: string): Promise<{ headers: string[]; ro
   });
 }
 
-function parseXLSXBuffer(buffer: ArrayBuffer): { headers: string[]; rows: Record<string, string>[] } {
+function parseXLSXBuffer(buffer: ArrayBuffer): {
+  headers: string[];
+  rows: Record<string, string>[];
+} {
   const workbook = XLSX.read(buffer, { type: 'array' });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: '' });
@@ -117,7 +122,12 @@ export async function parseSpotifyFile(file: File): Promise<ParsedSpotifyFile> {
   const period = detectPeriodForRows(normalizedRows);
 
   // Hash para deduplicación
-  const sampleText = headers.join(',') + rows.slice(0, 5).map((r) => Object.values(r).join(',')).join('\n');
+  const sampleText =
+    headers.join(',') +
+    rows
+      .slice(0, 5)
+      .map((r) => Object.values(r).join(','))
+      .join('\n');
   const fileHash = await hashFileContent(sampleText);
 
   return {

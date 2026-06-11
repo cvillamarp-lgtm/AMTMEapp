@@ -194,7 +194,9 @@ function TitleOptimizer({
           Título optimizado con IA
         </div>
         {episode.original_title && (
-          <p className="mt-1 text-xs text-muted-foreground line-through">{episode.original_title}</p>
+          <p className="mt-1 text-xs text-muted-foreground line-through">
+            {episode.original_title}
+          </p>
         )}
         <p className="mt-1 text-sm font-semibold">{episode.title}</p>
         <button
@@ -466,22 +468,40 @@ export default function EpisodePage({ params }: EpisodePageProps) {
 
       <Tabs defaultValue="ficha">
         <TabsList className="mb-4 overflow-x-auto w-full justify-start h-auto flex-wrap gap-1 bg-transparent p-0">
-          <TabsTrigger value="ficha" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+          <TabsTrigger
+            value="ficha"
+            className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white"
+          >
             Ficha
           </TabsTrigger>
-          <TabsTrigger value="guion" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+          <TabsTrigger
+            value="guion"
+            className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white"
+          >
             Guión {scripts.length > 0 ? `(${scripts.length})` : ''}
           </TabsTrigger>
-          <TabsTrigger value="contenido" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+          <TabsTrigger
+            value="contenido"
+            className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white"
+          >
             Contenido {content.length > 0 ? `(${content.length})` : ''}
           </TabsTrigger>
-          <TabsTrigger value="checklists" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+          <TabsTrigger
+            value="checklists"
+            className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white"
+          >
             Checklists {checklists.length > 0 ? `(${checklists.length})` : ''}
           </TabsTrigger>
-          <TabsTrigger value="leads" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+          <TabsTrigger
+            value="leads"
+            className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white"
+          >
             Leads {leads.length > 0 ? `(${leads.length})` : ''}
           </TabsTrigger>
-          <TabsTrigger value="spotify" className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white">
+          <TabsTrigger
+            value="spotify"
+            className="data-[state=active]:bg-[#0c1f36] data-[state=active]:text-white"
+          >
             Spotify {spotifyMetrics.length > 0 ? `(${spotifyMetrics.length})` : ''}
           </TabsTrigger>
         </TabsList>
@@ -585,10 +605,7 @@ export default function EpisodePage({ params }: EpisodePageProps) {
               <FileText className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
               <p className="text-sm text-muted-foreground">Sin guiones para este episodio</p>
               <Link href="/guiones">
-                <Button
-                  size="sm"
-                  className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
-                >
+                <Button size="sm" className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]">
                   Ir a Guiones
                 </Button>
               </Link>
@@ -624,10 +641,7 @@ export default function EpisodePage({ params }: EpisodePageProps) {
                 Sin piezas de contenido para este episodio
               </p>
               <Link href="/contenido">
-                <Button
-                  size="sm"
-                  className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
-                >
+                <Button size="sm" className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]">
                   Ir a Contenido
                 </Button>
               </Link>
@@ -666,10 +680,7 @@ export default function EpisodePage({ params }: EpisodePageProps) {
               <CheckSquare className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
               <p className="text-sm text-muted-foreground">Sin checklists para este episodio</p>
               <Link href="/checklists">
-                <Button
-                  size="sm"
-                  className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
-                >
+                <Button size="sm" className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]">
                   Ir a Checklists
                 </Button>
               </Link>
@@ -708,9 +719,7 @@ export default function EpisodePage({ params }: EpisodePageProps) {
                             {item.completed ? '✓' : '○'}
                           </span>
                           <span
-                            className={
-                              item.completed ? 'line-through text-muted-foreground' : ''
-                            }
+                            className={item.completed ? 'line-through text-muted-foreground' : ''}
                           >
                             {item.text}
                           </span>
@@ -736,10 +745,7 @@ export default function EpisodePage({ params }: EpisodePageProps) {
               <DollarSign className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
               <p className="text-sm text-muted-foreground">Sin leads asociados a este episodio</p>
               <Link href="/monetizacion">
-                <Button
-                  size="sm"
-                  className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
-                >
+                <Button size="sm" className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]">
                   Ir a Monetización
                 </Button>
               </Link>
@@ -777,7 +783,9 @@ export default function EpisodePage({ params }: EpisodePageProps) {
           {spotifyMetrics.length === 0 ? (
             <div className="text-center py-12">
               <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-20" />
-              <p className="text-sm text-muted-foreground">Sin métricas de Spotify importadas para este episodio</p>
+              <p className="text-sm text-muted-foreground">
+                Sin métricas de Spotify importadas para este episodio
+              </p>
               <Link href="/metricas/spotify">
                 <Button size="sm" className="mt-3 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]">
                   Importar métricas de Spotify
@@ -789,10 +797,33 @@ export default function EpisodePage({ params }: EpisodePageProps) {
               {/* KPIs agregados */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: 'Total plays', value: spotifyMetrics.reduce((s, m) => s + (m.plays ?? 0), 0).toLocaleString() },
-                  { label: 'Oyentes únicos', value: spotifyMetrics.reduce((s, m) => s + (m.listeners ?? 0), 0).toLocaleString() },
-                  { label: 'Retención prom.', value: (() => { const v = spotifyMetrics.filter(m => m.completion_rate != null); return v.length ? Math.round(v.reduce((s, m) => s + (m.completion_rate ?? 0), 0) / v.length) + '%' : '—'; })() },
-                  { label: 'Min. escuchados', value: spotifyMetrics.reduce((s, m) => s + (m.minutes_listened ?? 0), 0).toLocaleString() },
+                  {
+                    label: 'Total plays',
+                    value: spotifyMetrics.reduce((s, m) => s + (m.plays ?? 0), 0).toLocaleString(),
+                  },
+                  {
+                    label: 'Oyentes únicos',
+                    value: spotifyMetrics
+                      .reduce((s, m) => s + (m.listeners ?? 0), 0)
+                      .toLocaleString(),
+                  },
+                  {
+                    label: 'Retención prom.',
+                    value: (() => {
+                      const v = spotifyMetrics.filter((m) => m.completion_rate != null);
+                      return v.length
+                        ? Math.round(
+                            v.reduce((s, m) => s + (m.completion_rate ?? 0), 0) / v.length
+                          ) + '%'
+                        : '—';
+                    })(),
+                  },
+                  {
+                    label: 'Min. escuchados',
+                    value: spotifyMetrics
+                      .reduce((s, m) => s + (m.minutes_listened ?? 0), 0)
+                      .toLocaleString(),
+                  },
                 ].map((kpi) => (
                   <Card key={kpi.label}>
                     <CardContent className="pt-4 pb-3">
@@ -807,16 +838,52 @@ export default function EpisodePage({ params }: EpisodePageProps) {
                 <Card key={m.id}>
                   <CardContent className="pt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-muted-foreground">{m.metric_date || m.period_start || 'Fecha desconocida'}</p>
-                      {m.traffic_source && <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{m.traffic_source}</span>}
+                      <p className="text-xs text-muted-foreground">
+                        {m.metric_date || m.period_start || 'Fecha desconocida'}
+                      </p>
+                      {m.traffic_source && (
+                        <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">
+                          {m.traffic_source}
+                        </span>
+                      )}
                     </div>
                     <div className="grid grid-cols-3 md:grid-cols-6 gap-3 text-sm">
-                      {m.plays != null && <div><p className="font-bold">{m.plays.toLocaleString()}</p><p className="text-xs text-muted-foreground">Plays</p></div>}
-                      {m.listeners != null && <div><p className="font-bold">{m.listeners.toLocaleString()}</p><p className="text-xs text-muted-foreground">Oyentes</p></div>}
-                      {m.completion_rate != null && <div><p className="font-bold">{m.completion_rate}%</p><p className="text-xs text-muted-foreground">Retención</p></div>}
-                      {m.minutes_listened != null && <div><p className="font-bold">{m.minutes_listened.toLocaleString()}</p><p className="text-xs text-muted-foreground">Minutos</p></div>}
-                      {m.country && <div><p className="font-bold">{m.country}</p><p className="text-xs text-muted-foreground">País</p></div>}
-                      {m.platform && <div><p className="font-bold">{m.platform}</p><p className="text-xs text-muted-foreground">Plataforma</p></div>}
+                      {m.plays != null && (
+                        <div>
+                          <p className="font-bold">{m.plays.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">Plays</p>
+                        </div>
+                      )}
+                      {m.listeners != null && (
+                        <div>
+                          <p className="font-bold">{m.listeners.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">Oyentes</p>
+                        </div>
+                      )}
+                      {m.completion_rate != null && (
+                        <div>
+                          <p className="font-bold">{m.completion_rate}%</p>
+                          <p className="text-xs text-muted-foreground">Retención</p>
+                        </div>
+                      )}
+                      {m.minutes_listened != null && (
+                        <div>
+                          <p className="font-bold">{m.minutes_listened.toLocaleString()}</p>
+                          <p className="text-xs text-muted-foreground">Minutos</p>
+                        </div>
+                      )}
+                      {m.country && (
+                        <div>
+                          <p className="font-bold">{m.country}</p>
+                          <p className="text-xs text-muted-foreground">País</p>
+                        </div>
+                      )}
+                      {m.platform && (
+                        <div>
+                          <p className="font-bold">{m.platform}</p>
+                          <p className="text-xs text-muted-foreground">Plataforma</p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

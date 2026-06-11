@@ -5,11 +5,7 @@ import { useStudio } from '@/components/studio-provider';
 import type { SearchResult, SearchResultCategory } from '@/lib/search-types';
 
 function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .trim();
+  return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 }
 
 function tokenize(text: string): string[] {
@@ -127,11 +123,7 @@ export function useGlobalSearch() {
 
     // 6. Métricas mensuales
     state.metricsMonthly.forEach((mm) => {
-      const keywords = [
-        ...tokenize(mm.month),
-        ...tokenize(mm.platform),
-        ...tokenize(mm.insight),
-      ];
+      const keywords = [...tokenize(mm.month), ...tokenize(mm.platform), ...tokenize(mm.insight)];
       results.push({
         id: mm.id,
         title: `${mm.platform} · ${mm.month}`,
@@ -168,11 +160,7 @@ export function useGlobalSearch() {
 
     // 8. Monetización
     state.monetizationLeads.forEach((ml) => {
-      const keywords = [
-        ...tokenize(ml.source),
-        ...tokenize(ml.name),
-        ...tokenize(ml.status),
-      ];
+      const keywords = [...tokenize(ml.source), ...tokenize(ml.name), ...tokenize(ml.status)];
       results.push({
         id: ml.id,
         title: ml.name,
@@ -188,11 +176,7 @@ export function useGlobalSearch() {
 
     // 9. Automatización
     state.automationRules.forEach((ar) => {
-      const keywords = [
-        ...tokenize(ar.name),
-        ...tokenize(ar.objective),
-        ...tokenize(ar.trigger),
-      ];
+      const keywords = [...tokenize(ar.name), ...tokenize(ar.objective), ...tokenize(ar.trigger)];
       results.push({
         id: ar.id,
         title: ar.name,
@@ -208,11 +192,7 @@ export function useGlobalSearch() {
 
     // 10. Archivo
     state.archiveItems.forEach((ai) => {
-      const keywords = [
-        ...tokenize(ai.name),
-        ...tokenize(ai.type),
-        ...tokenize(ai.origin),
-      ];
+      const keywords = [...tokenize(ai.name), ...tokenize(ai.type), ...tokenize(ai.origin)];
       results.push({
         id: ai.id,
         title: ai.name,
@@ -244,11 +224,7 @@ export function useGlobalSearch() {
 
     // 12. Historial IA
     state.aiHistory.slice(0, 5).forEach((ah) => {
-      const keywords = [
-        ...tokenize(ah.engine),
-        ...tokenize(ah.promptSummary),
-        ah.provider,
-      ];
+      const keywords = [...tokenize(ah.engine), ...tokenize(ah.promptSummary), ah.provider];
       results.push({
         id: ah.id,
         title: ah.engine,

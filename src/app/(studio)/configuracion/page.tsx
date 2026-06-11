@@ -188,7 +188,17 @@ export default function ConfiguracionPage() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <Field label="Plataformas activas">
               <div className="flex flex-wrap gap-2 pt-1">
-                {['Spotify', 'Apple Podcasts', 'Instagram', 'TikTok', 'YouTube', 'YouTube Shorts', 'Threads', 'WhatsApp', 'Newsletter'].map((p) => (
+                {[
+                  'Spotify',
+                  'Apple Podcasts',
+                  'Instagram',
+                  'TikTok',
+                  'YouTube',
+                  'YouTube Shorts',
+                  'Threads',
+                  'WhatsApp',
+                  'Newsletter',
+                ].map((p) => (
                   <button
                     key={p}
                     type="button"

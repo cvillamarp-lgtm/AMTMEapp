@@ -3,9 +3,27 @@
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Upload, FileText, CheckCircle, XCircle, AlertCircle, Loader2, Eye, Trash2, BarChart3, RefreshCw } from 'lucide-react';
+import {
+  ArrowLeft,
+  Upload,
+  FileText,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Loader2,
+  Eye,
+  Trash2,
+  BarChart3,
+  RefreshCw,
+} from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/shadcn/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/shadcn/card';
 import { Badge } from '@/components/shadcn/badge';
 import { parseSpotifyFile, type ParsedSpotifyFile } from '@/lib/spotify-parser';
 import { REPORT_TYPE_LABELS } from '@/lib/spotify-normalizer';
@@ -70,7 +88,14 @@ export default function SpotifyImportPage() {
       const id = nextSessionId();
       setSessions((prev) => [
         ...prev,
-        { id, step: 'validating', parsedFile: null, importSummary: null, strategy: null, generatingAnalysis: false },
+        {
+          id,
+          step: 'validating',
+          parsedFile: null,
+          importSummary: null,
+          strategy: null,
+          generatingAnalysis: false,
+        },
       ]);
 
       try {
@@ -83,11 +108,14 @@ export default function SpotifyImportPage() {
     }
   }, []);
 
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
-  }, [handleFiles]);
+  const onDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
+    },
+    [handleFiles]
+  );
 
   async function handleImport(sessionId: string) {
     const session = sessions.find((s) => s.id === sessionId);
@@ -98,7 +126,9 @@ export default function SpotifyImportPage() {
     try {
       const authClient = getSupabaseAuthBrowserClient();
       if (!authClient) throw new Error('No autenticado');
-      const { data: { session: authSession } } = await authClient.auth.getSession();
+      const {
+        data: { session: authSession },
+      } = await authClient.auth.getSession();
       if (!authSession?.user) throw new Error('No autenticado');
       const userId = authSession.user.id;
 
@@ -143,11 +173,17 @@ export default function SpotifyImportPage() {
     }
   }
 
-  async function generateStrategyAnalysis(sessionId: string, importId: string, file: ParsedSpotifyFile) {
+  async function generateStrategyAnalysis(
+    sessionId: string,
+    importId: string,
+    file: ParsedSpotifyFile
+  ) {
     updateSession(sessionId, { generatingAnalysis: true });
     try {
       const metricsForAI = file.rows
-        .filter((r): r is Extract<typeof r, { type: 'episode_rankings' }> => r.type === 'episode_rankings')
+        .filter(
+          (r): r is Extract<typeof r, { type: 'episode_rankings' }> => r.type === 'episode_rankings'
+        )
         .filter((r) => r.episodeTitle)
         .slice(0, 50)
         .map((r) => ({
@@ -175,7 +211,9 @@ export default function SpotifyImportPage() {
         if (data.snapshot) {
           const snapshotWithImport = { ...data.snapshot, import_id: importId };
           const saved = await createStrategySnapshot(snapshotWithImport);
-          await updateSpotifyImport(importId, { status: 'processed' } as Partial<SpotifyMetricImport>);
+          await updateSpotifyImport(importId, {
+            status: 'processed',
+          } as Partial<SpotifyMetricImport>);
           updateSession(sessionId, { strategy: saved });
         }
       }
@@ -228,11 +266,17 @@ export default function SpotifyImportPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-[#0c1f36]">Importar métricas de Spotify</h1>
-            <p className="text-sm text-gray-500">Sube archivos exportados desde Spotify for Creators</p>
+            <p className="text-sm text-gray-500">
+              Sube archivos exportados desde Spotify for Creators
+            </p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={loadHistory} disabled={loadingHistory}>
-          {loadingHistory ? <Loader2 className="h-4 w-4 animate-spin" /> : <BarChart3 className="h-4 w-4" />}
+          {loadingHistory ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <BarChart3 className="h-4 w-4" />
+          )}
           <span className="ml-1">Historial</span>
         </Button>
       </div>
@@ -241,12 +285,17 @@ export default function SpotifyImportPage() {
       <Card>
         <CardContent className="pt-6">
           <div
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={onDrop}
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-colors ${
-              isDragging ? 'border-[#0c1f36] bg-[#0c1f36]/5' : 'border-gray-200 hover:border-[#0c1f36]/40'
+              isDragging
+                ? 'border-[#0c1f36] bg-[#0c1f36]/5'
+                : 'border-gray-200 hover:border-[#0c1f36]/40'
             }`}
           >
             <Upload className="h-10 w-10 mx-auto mb-4 text-gray-400" />
@@ -254,12 +303,15 @@ export default function SpotifyImportPage() {
               {sessions.length === 0 ? 'Subir archivos de Spotify' : 'Subir más archivos'}
             </p>
             <p className="text-sm text-gray-500 mb-4">
-              Sube aquí los archivos exportados desde Spotify Creators para actualizar el historial de métricas de AMTME.
-              Puedes subir varios archivos de distintos tipos en la misma sesión.
+              Sube aquí los archivos exportados desde Spotify Creators para actualizar el historial
+              de métricas de AMTME. Puedes subir varios archivos de distintos tipos en la misma
+              sesión.
             </p>
             <div className="flex gap-2 justify-center">
               {['CSV', 'XLSX', 'JSON', 'ZIP'].map((fmt) => (
-                <Badge key={fmt} variant="secondary">{fmt}</Badge>
+                <Badge key={fmt} variant="secondary">
+                  {fmt}
+                </Badge>
               ))}
             </div>
             <input
@@ -268,7 +320,9 @@ export default function SpotifyImportPage() {
               multiple
               accept=".csv,.xlsx,.xls,.json,.zip"
               className="hidden"
-              onChange={(e) => { if (e.target.files && e.target.files.length > 0) handleFiles(e.target.files); }}
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) handleFiles(e.target.files);
+              }}
             />
           </div>
           <p className="text-xs text-gray-400 text-center mt-3">
@@ -310,17 +364,26 @@ export default function SpotifyImportPage() {
             ) : (
               <div className="space-y-2">
                 {pastImports.map((imp) => (
-                  <div key={imp.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm">
+                  <div
+                    key={imp.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm"
+                  >
                     <div className="flex items-center gap-3">
                       <FileText className="h-4 w-4 text-gray-400" />
                       <div>
                         <p className="font-medium">{imp.file_name}</p>
                         <p className="text-xs text-gray-500">
                           {imp.detected_report_type && (
-                            <>{REPORT_TYPE_LABELS[imp.detected_report_type as keyof typeof REPORT_TYPE_LABELS] ?? imp.detected_report_type} · </>
+                            <>
+                              {REPORT_TYPE_LABELS[
+                                imp.detected_report_type as keyof typeof REPORT_TYPE_LABELS
+                              ] ?? imp.detected_report_type}{' '}
+                              ·{' '}
+                            </>
                           )}
                           {imp.period_start && `${imp.period_start} → ${imp.period_end} · `}
-                          {imp.processed_rows ?? imp.total_rows} filas · {imp.uploaded_at?.slice(0, 10)}
+                          {imp.processed_rows ?? imp.total_rows} filas ·{' '}
+                          {imp.uploaded_at?.slice(0, 10)}
                         </p>
                       </div>
                     </div>
@@ -328,11 +391,7 @@ export default function SpotifyImportPage() {
                       <Badge variant={imp.status === 'processed' ? 'default' : 'secondary'}>
                         {imp.status}
                       </Badge>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDeleteImport(imp.id)}
-                      >
+                      <Button size="sm" variant="ghost" onClick={() => handleDeleteImport(imp.id)}>
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
@@ -413,7 +472,9 @@ function FileSessionCard({
                 <p className="text-xs text-green-600">Filas guardadas</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-blue-800">{importSummary.newEpisodesCreated}</p>
+                <p className="text-2xl font-bold text-blue-800">
+                  {importSummary.newEpisodesCreated}
+                </p>
                 <p className="text-xs text-blue-600">Episodios creados</p>
               </div>
               <div className="text-center">
@@ -421,13 +482,16 @@ function FileSessionCard({
                 <p className="text-xs text-gray-600">Episodios actualizados</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-500">{importSummary.duplicatesSkipped}</p>
+                <p className="text-2xl font-bold text-gray-500">
+                  {importSummary.duplicatesSkipped}
+                </p>
                 <p className="text-xs text-gray-400">Duplicados ignorados</p>
               </div>
             </div>
             {importSummary.periodStart && (
               <div className="mt-3 text-sm text-green-700">
-                Periodo: <strong>{importSummary.periodStart}</strong> → <strong>{importSummary.periodEnd}</strong>
+                Periodo: <strong>{importSummary.periodStart}</strong> →{' '}
+                <strong>{importSummary.periodEnd}</strong>
               </div>
             )}
           </CardContent>
@@ -463,7 +527,8 @@ function FileSessionCard({
                     <ul className="space-y-1">
                       {strategy.growth_signals.slice(0, 3).map((s, i) => (
                         <li key={i} className="flex gap-2 text-gray-600">
-                          <span className="text-green-500 flex-shrink-0">↑</span>{s}
+                          <span className="text-green-500 flex-shrink-0">↑</span>
+                          {s}
                         </li>
                       ))}
                     </ul>
@@ -475,7 +540,8 @@ function FileSessionCard({
                     <ul className="space-y-1">
                       {strategy.risk_signals.slice(0, 3).map((s, i) => (
                         <li key={i} className="flex gap-2 text-gray-600">
-                          <span className="text-red-500 flex-shrink-0">↓</span>{s}
+                          <span className="text-red-500 flex-shrink-0">↓</span>
+                          {s}
                         </li>
                       ))}
                     </ul>
@@ -489,7 +555,9 @@ function FileSessionCard({
                   <ul className="space-y-1 text-sm">
                     {strategy.recommended_actions.immediate.slice(0, 4).map((a, i) => (
                       <li key={i} className="flex gap-2">
-                        <span className="text-[#e8ff40] bg-[#0c1f36] rounded-full w-4 h-4 flex items-center justify-center text-xs flex-shrink-0 font-bold">{i + 1}</span>
+                        <span className="text-[#e8ff40] bg-[#0c1f36] rounded-full w-4 h-4 flex items-center justify-center text-xs flex-shrink-0 font-bold">
+                          {i + 1}
+                        </span>
                         <span className="text-gray-700">{a}</span>
                       </li>
                     ))}
@@ -505,7 +573,9 @@ function FileSessionCard({
                   </Button>
                 </Link>
                 <Link href="/episodios">
-                  <Button variant="outline" size="sm">Ver episodios</Button>
+                  <Button variant="outline" size="sm">
+                    Ver episodios
+                  </Button>
                 </Link>
               </div>
             </CardContent>
@@ -528,16 +598,30 @@ function FileSessionCard({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">{parsedFile.fileName}</CardTitle>
-            <Badge variant={
-              validationStatus === 'valid' ? 'default' :
-              validationStatus === 'partial' ? 'secondary' : 'destructive'
-            }>
+            <Badge
+              variant={
+                validationStatus === 'valid'
+                  ? 'default'
+                  : validationStatus === 'partial'
+                    ? 'secondary'
+                    : 'destructive'
+              }
+            >
               {validationStatus === 'valid' ? (
-                <><CheckCircle className="h-3 w-3 mr-1" />Válido</>
+                <>
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Válido
+                </>
               ) : validationStatus === 'partial' ? (
-                <><AlertCircle className="h-3 w-3 mr-1" />Parcialmente válido</>
+                <>
+                  <AlertCircle className="h-3 w-3 mr-1" />
+                  Parcialmente válido
+                </>
               ) : (
-                <><XCircle className="h-3 w-3 mr-1" />No compatible</>
+                <>
+                  <XCircle className="h-3 w-3 mr-1" />
+                  No compatible
+                </>
               )}
             </Badge>
           </div>
@@ -561,7 +645,9 @@ function FileSessionCard({
           {(parsedFile.periodStart || parsedFile.periodEnd) && (
             <div className="mt-3 p-3 bg-[#e8ff40]/10 rounded-lg text-sm">
               <span className="text-gray-500">Periodo detectado: </span>
-              <span className="font-medium">{parsedFile.periodStart} → {parsedFile.periodEnd}</span>
+              <span className="font-medium">
+                {parsedFile.periodStart} → {parsedFile.periodEnd}
+              </span>
             </div>
           )}
 
@@ -583,14 +669,19 @@ function FileSessionCard({
           )}
 
           <div className="mt-3">
-            <p className="text-xs text-gray-500 mb-2">Columnas detectadas ({parsedFile.headers.length}):</p>
+            <p className="text-xs text-gray-500 mb-2">
+              Columnas detectadas ({parsedFile.headers.length}):
+            </p>
             <div className="flex flex-wrap gap-1">
               {parsedFile.headers.map((h) => (
-                <span key={h} className={`text-xs px-2 py-0.5 rounded ${
-                  parsedFile.columnMap[h]
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-500'
-                }`}>
+                <span
+                  key={h}
+                  className={`text-xs px-2 py-0.5 rounded ${
+                    parsedFile.columnMap[h]
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
+                  }`}
+                >
                   {h}
                   {parsedFile.columnMap[h] && (
                     <span className="ml-1 opacity-60">→ {parsedFile.columnMap[h]}</span>
@@ -617,7 +708,10 @@ function FileSessionCard({
                 <thead>
                   <tr className="bg-gray-50">
                     {parsedFile.headers.slice(0, 8).map((h) => (
-                      <th key={h} className="text-left p-2 border border-gray-100 font-medium text-gray-600 max-w-[100px]">
+                      <th
+                        key={h}
+                        className="text-left p-2 border border-gray-100 font-medium text-gray-600 max-w-[100px]"
+                      >
                         {h}
                       </th>
                     ))}
@@ -630,7 +724,11 @@ function FileSessionCard({
                   {parsedFile.previewRows.map((row, i) => (
                     <tr key={i} className="hover:bg-gray-50">
                       {parsedFile.headers.slice(0, 8).map((h) => (
-                        <td key={h} className="p-2 border border-gray-100 max-w-[100px] truncate" title={row[h]}>
+                        <td
+                          key={h}
+                          className="p-2 border border-gray-100 max-w-[100px] truncate"
+                          title={row[h]}
+                        >
                           {row[h] || '—'}
                         </td>
                       ))}
@@ -681,8 +779,13 @@ function NormalizedRowsPreview({ rows }: { rows: ParsedSpotifyFile['rows'] }) {
         switch (row.type) {
           case 'episode_rankings':
             return (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm">
-                <div className="font-medium text-[#0c1f36] flex-1 mr-4 truncate">{row.episodeTitle}</div>
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm"
+              >
+                <div className="font-medium text-[#0c1f36] flex-1 mr-4 truncate">
+                  {row.episodeTitle}
+                </div>
                 <div className="flex gap-4 text-gray-500 text-xs">
                   {row.playsDownloads != null && <span>{row.playsDownloads} plays/descargas</span>}
                   {row.ranking != null && <span>#{row.ranking}</span>}
@@ -693,7 +796,10 @@ function NormalizedRowsPreview({ rows }: { rows: ParsedSpotifyFile['rows'] }) {
           case 'streams_downloads_timeseries':
           case 'spotify_overview_timeseries':
             return (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm">
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm"
+              >
                 <div className="font-medium text-[#0c1f36]">{row.date}</div>
                 <div className="flex gap-4 text-gray-500 text-xs">
                   {row.playsDownloads != null && <span>{row.playsDownloads} plays/descargas</span>}
@@ -706,15 +812,27 @@ function NormalizedRowsPreview({ rows }: { rows: ParsedSpotifyFile['rows'] }) {
           case 'apps_distribution':
           case 'geo_distribution':
             return (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm">
-                <div className="font-medium text-[#0c1f36] flex-1 mr-4 truncate">{row.dimensionName}</div>
-                <div className="text-gray-500 text-xs">{row.percentage != null ? `${row.percentage}%` : '—'}</div>
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm"
+              >
+                <div className="font-medium text-[#0c1f36] flex-1 mr-4 truncate">
+                  {row.dimensionName}
+                </div>
+                <div className="text-gray-500 text-xs">
+                  {row.percentage != null ? `${row.percentage}%` : '—'}
+                </div>
               </div>
             );
           case 'amtme_manual_metrics':
             return (
-              <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm">
-                <div className="font-medium text-[#0c1f36]">{row.month} · {row.platform}</div>
+              <div
+                key={i}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm"
+              >
+                <div className="font-medium text-[#0c1f36]">
+                  {row.month} · {row.platform}
+                </div>
                 <div className="flex gap-3 text-gray-500 text-xs">
                   {row.plays != null && <span>{row.plays} plays</span>}
                   {row.reach != null && <span>{row.reach} alcance</span>}

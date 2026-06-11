@@ -47,7 +47,15 @@ describe('detectSpotifyReportType', () => {
   });
 
   it('detecta amtme_manual_metrics', () => {
-    const headers = ['mes', 'plataforma', 'reproducciones', 'alcance', 'dms', 'conversiones', 'ingresos'];
+    const headers = [
+      'mes',
+      'plataforma',
+      'reproducciones',
+      'alcance',
+      'dms',
+      'conversiones',
+      'ingresos',
+    ];
     expect(detectSpotifyReportType(headers)).toBe('amtme_manual_metrics');
   });
 
@@ -117,7 +125,7 @@ describe('mapSpotifyRow', () => {
       'Título del episodio': 'Ep. 29 — Sanando heridas',
       'Reproducciones y descargas': '1234',
       'Fecha de publicación': '12/5/2026',
-      'Clasificación': '3',
+      Clasificación: '3',
       'URI del episodio': 'spotify:episode:abc123',
     };
     const mapped = mapSpotifyRow(row, columnMap, type);
@@ -159,7 +167,15 @@ describe('mapSpotifyRow', () => {
   });
 
   it('mapea fila de amtme_manual_metrics', () => {
-    const headers = ['mes', 'plataforma', 'reproducciones', 'alcance', 'dms', 'conversiones', 'ingresos'];
+    const headers = [
+      'mes',
+      'plataforma',
+      'reproducciones',
+      'alcance',
+      'dms',
+      'conversiones',
+      'ingresos',
+    ];
     const type = detectSpotifyReportType(headers);
     const columnMap = buildColumnMapForType(headers, type);
     const row = {

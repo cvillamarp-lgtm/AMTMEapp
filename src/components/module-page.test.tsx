@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Button } from '@/components/ui';
 import { ModulePage, Surface, TwoColumnLayout } from '@/components/module-page';
 
 describe('module-page', () => {
   it('renderiza encabezado, acciones y contenido principal del módulo', () => {
-    render(
+    const { getByText, getByRole } = render(
       <ModulePage
         eyebrow="Operación"
         title="Panel de control"
@@ -15,22 +15,22 @@ describe('module-page', () => {
       </ModulePage>
     );
 
-    expect(screen.getByText('Operación')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Panel de control' })).toBeInTheDocument();
-    expect(screen.getByText('Resumen del estado operativo.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Actualizar' })).toBeInTheDocument();
-    expect(screen.getByText('Contenido principal')).toBeInTheDocument();
+    expect(getByText('Operación')).toBeInTheDocument();
+    expect(getByRole('heading', { name: 'Panel de control' })).toBeInTheDocument();
+    expect(getByText('Resumen del estado operativo.')).toBeInTheDocument();
+    expect(getByRole('button', { name: 'Actualizar' })).toBeInTheDocument();
+    expect(getByText('Contenido principal')).toBeInTheDocument();
   });
 
   it('compone layouts de dos columnas con superficies reutilizables', () => {
-    render(
+    const { getByText } = render(
       <TwoColumnLayout
         left={<Surface>Columna izquierda</Surface>}
         right={<Surface>Columna derecha</Surface>}
       />
     );
 
-    expect(screen.getByText('Columna izquierda')).toBeInTheDocument();
-    expect(screen.getByText('Columna derecha')).toBeInTheDocument();
+    expect(getByText('Columna izquierda')).toBeInTheDocument();
+    expect(getByText('Columna derecha')).toBeInTheDocument();
   });
 });

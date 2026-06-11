@@ -33,6 +33,7 @@ import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { useIdleLogout } from '@/hooks/use-idle-logout';
 import { GlobalCommandPalette } from '@/components/global-command-palette';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const ALL_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: House },
@@ -162,7 +163,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
       <aside
         className={cn(
-          'hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-30 transition-all duration-200',
+          'hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-amtme-navy dark:bg-slate-950 z-30 transition-all duration-200 border-r border-white/10 dark:border-white/5',
           collapsed ? 'md:w-16' : 'md:w-64'
         )}
       >
@@ -211,8 +212,12 @@ export function StudioShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          {/* Footer con logout visible */}
-          <div className="px-2 py-4 border-t border-white/10 shrink-0">
+          {/* Footer con theme toggle y logout */}
+          <div className="px-2 py-4 border-t border-white/10 shrink-0 space-y-2">
+            <div className={cn('flex items-center gap-1', collapsed && 'justify-center')}>
+              <ThemeToggle />
+              {!collapsed && <span className="text-xs text-white/50">Tema</span>}
+            </div>
             {authRequired && (
               <button
                 onClick={() => void signOut()}
@@ -234,7 +239,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
       {/* ── Main content ────────────────────────────────────────────────── */}
       <main
         className={cn(
-          'flex-1 min-h-screen transition-all duration-200',
+          'flex-1 min-h-screen transition-all duration-200 bg-white dark:bg-slate-950 text-black dark:text-white',
           collapsed ? 'md:pl-16' : 'md:pl-64'
         )}
       >
@@ -243,7 +248,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
       {mobileItems.length > 0 && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-white/10 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy dark:bg-slate-950 border-t border-white/10 dark:border-white/5 z-50">
           <div
             className={cn('gap-1 p-2', {
               'grid grid-cols-5': mobileItems.length === 5,

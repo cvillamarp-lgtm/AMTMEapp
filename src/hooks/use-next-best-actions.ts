@@ -30,7 +30,10 @@ export function useNextBestActions(): NextBestAction[] {
     // Rule 1: Episodio sin guion
     for (let i = 0; i < state.episodes.length; i++) {
       const ep = state.episodes[i];
-      if ((ep.status === 'En investigación' || ep.status === 'Idea') && (!ep.script || ep.script.trim() === '')) {
+      if (
+        (ep.status === 'En investigación' || ep.status === 'Idea') &&
+        (!ep.script || ep.script.trim() === '')
+      ) {
         actions.push({
           id: generateId('nba-no-script', i),
           title: `Episodio ${ep.episodeNumber}: crear guion`,

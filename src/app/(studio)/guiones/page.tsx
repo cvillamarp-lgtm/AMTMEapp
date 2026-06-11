@@ -28,7 +28,16 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/shadcn/dialog';
-import { Plus, Pencil, Trash2, FileText, Sparkles, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  FileText,
+  Sparkles,
+  Loader2,
+  CheckCircle,
+  AlertTriangle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { getScripts, createScript, updateScript, deleteScript } from '@/lib/database';
 import { callAI, runEditorialEngine } from '@/lib/ai-studio';
@@ -390,14 +399,18 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
 
               {/* Panel de validación — aparece después de usar el motor editorial */}
               {editorialResult && (
-                <div className={`rounded-xl border p-4 space-y-3 ${editorialResult.approved ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+                <div
+                  className={`rounded-xl border p-4 space-y-3 ${editorialResult.approved ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}
+                >
                   <div className="flex items-center gap-2">
                     {editorialResult.approved ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
                       <AlertTriangle className="h-4 w-4 text-amber-600" />
                     )}
-                    <span className={`text-sm font-semibold ${editorialResult.approved ? 'text-green-800' : 'text-amber-800'}`}>
+                    <span
+                      className={`text-sm font-semibold ${editorialResult.approved ? 'text-green-800' : 'text-amber-800'}`}
+                    >
                       {editorialResult.wasRewritten
                         ? 'Corregido automáticamente'
                         : editorialResult.approved
@@ -407,7 +420,9 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                   </div>
 
                   {editorialResult.validation.diagnosis && (
-                    <p className="text-xs text-black/60 italic">{editorialResult.validation.diagnosis}</p>
+                    <p className="text-xs text-black/60 italic">
+                      {editorialResult.validation.diagnosis}
+                    </p>
                   )}
 
                   <div className="grid grid-cols-3 gap-1.5">
@@ -415,9 +430,16 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                       const score = editorialResult.validation.scores[c.key] ?? 0;
                       const pass = score >= c.min;
                       return (
-                        <div key={c.key} className={`rounded-lg px-2 py-1.5 text-center ${pass ? 'bg-white/60' : 'bg-red-100'}`}>
+                        <div
+                          key={c.key}
+                          className={`rounded-lg px-2 py-1.5 text-center ${pass ? 'bg-white/60' : 'bg-red-100'}`}
+                        >
                           <p className="text-[10px] text-black/50 leading-tight">{c.label}</p>
-                          <p className={`text-sm font-bold ${pass ? 'text-green-700' : 'text-red-600'}`}>{score}/10</p>
+                          <p
+                            className={`text-sm font-bold ${pass ? 'text-green-700' : 'text-red-600'}`}
+                          >
+                            {score}/10
+                          </p>
                         </div>
                       );
                     })}
@@ -425,10 +447,15 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
 
                   {editorialResult.validation.strong_phrases.length > 0 && (
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-wider text-black/40 mb-1">Frases para reels</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-black/40 mb-1">
+                        Frases para reels
+                      </p>
                       <ul className="space-y-1">
                         {editorialResult.validation.strong_phrases.map((phrase, i) => (
-                          <li key={i} className="text-xs text-[#0c1f36] bg-white/70 rounded-lg px-3 py-1.5 border border-[#e8ff40]/40">
+                          <li
+                            key={i}
+                            className="text-xs text-[#0c1f36] bg-white/70 rounded-lg px-3 py-1.5 border border-[#e8ff40]/40"
+                          >
                             "{phrase}"
                           </li>
                         ))}

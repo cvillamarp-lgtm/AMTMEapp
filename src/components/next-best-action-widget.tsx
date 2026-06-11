@@ -41,7 +41,11 @@ export function NextBestActionWidget({ actions }: { actions: NextBestAction[] })
       <div className="flex items-start justify-between gap-4 mb-3">
         <h2 className="font-semibold text-primary">🎯 Siguiente mejor acción</h2>
         <span className={cn('text-xs font-semibold px-2 py-1 rounded-md capitalize', colors.badge)}>
-          {action.severity === 'high' ? 'Crítica' : action.severity === 'medium' ? 'Importante' : 'Sugerencia'}
+          {action.severity === 'high'
+            ? 'Crítica'
+            : action.severity === 'medium'
+              ? 'Importante'
+              : 'Sugerencia'}
         </span>
       </div>
 

@@ -286,171 +286,167 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
           <p className="text-sm text-muted-foreground mt-1">Ciclo completo de producción</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setGuiaOpen(true)}
-            className="text-xs gap-1.5"
-          >
+          <Button variant="outline" onClick={() => setGuiaOpen(true)} className="text-xs gap-1.5">
             <Sparkles className="h-3.5 w-3.5" />
             Crear con guía IA
           </Button>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={resetForm}
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
-            >
-              <Plus className="mr-2 h-4 w-4" /> Crear episodio
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingEpisode ? 'Editar episodio' : 'Crear episodio'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <DialogTrigger asChild>
+              <Button
+                onClick={resetForm}
+                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Crear episodio
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{editingEpisode ? 'Editar episodio' : 'Crear episodio'}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Número *</Label>
+                    <Input
+                      value={formData.episode_number}
+                      onChange={(e) => setFormData({ ...formData, episode_number: e.target.value })}
+                      placeholder="35"
+                    />
+                  </div>
+                  <div>
+                    <Label>Estado</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(v: EpisodeStatus) => setFormData({ ...formData, status: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[
+                          'idea',
+                          'investigacion',
+                          'guion',
+                          'grabacion',
+                          'edicion',
+                          'publicado',
+                          'distribuido',
+                          'medido',
+                        ].map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
                 <div>
-                  <Label>Número *</Label>
+                  <Label>Título *</Label>
                   <Input
-                    value={formData.episode_number}
-                    onChange={(e) => setFormData({ ...formData, episode_number: e.target.value })}
-                    placeholder="35"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Cuando ya no puedes seguir fingiendo"
+                  />
+                </div>
+                <div className="flex gap-2 mt-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={generateHooks}
+                    disabled={generatingHooks}
+                    className="text-xs"
+                  >
+                    {generatingHooks ? (
+                      <>
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                        Generando...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        Generar hooks con IA
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {suggestedHooks.length > 0 && (
+                  <div className="border rounded-lg p-3 bg-muted/50 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">
+                      Selecciona un hook:
+                    </p>
+                    {suggestedHooks.map((h, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, title: h })}
+                        className="block w-full text-left text-sm p-2 rounded hover:bg-background transition-colors"
+                      >
+                        {h}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div>
+                  <Label>Tema *</Label>
+                  <Input
+                    value={formData.theme}
+                    onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
+                    placeholder="agotamiento emocional y verdad personal"
                   />
                 </div>
                 <div>
-                  <Label>Estado</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(v: EpisodeStatus) => setFormData({ ...formData, status: v })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[
-                        'idea',
-                        'investigacion',
-                        'guion',
-                        'grabacion',
-                        'edicion',
-                        'publicado',
-                        'distribuido',
-                        'medido',
-                      ].map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>Herida emocional *</Label>
+                  <Input
+                    value={formData.emotional_wound}
+                    onChange={(e) => setFormData({ ...formData, emotional_wound: e.target.value })}
+                  />
                 </div>
-              </div>
-              <div>
-                <Label>Título *</Label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Cuando ya no puedes seguir fingiendo"
-                />
-              </div>
-              <div className="flex gap-2 mt-1">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="secondary"
-                  onClick={generateHooks}
-                  disabled={generatingHooks}
-                  className="text-xs"
-                >
-                  {generatingHooks ? (
-                    <>
-                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                      Generando...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      Generar hooks con IA
-                    </>
-                  )}
-                </Button>
-              </div>
-              {suggestedHooks.length > 0 && (
-                <div className="border rounded-lg p-3 bg-muted/50 space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">
-                    Selecciona un hook:
-                  </p>
-                  {suggestedHooks.map((h, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, title: h })}
-                      className="block w-full text-left text-sm p-2 rounded hover:bg-background transition-colors"
-                    >
-                      {h}
-                    </button>
-                  ))}
+                <div>
+                  <Label>Símbolo central *</Label>
+                  <Input
+                    value={formData.central_symbol}
+                    onChange={(e) => setFormData({ ...formData, central_symbol: e.target.value })}
+                  />
                 </div>
-              )}
-              <div>
-                <Label>Tema *</Label>
-                <Input
-                  value={formData.theme}
-                  onChange={(e) => setFormData({ ...formData, theme: e.target.value })}
-                  placeholder="agotamiento emocional y verdad personal"
-                />
-              </div>
-              <div>
-                <Label>Herida emocional *</Label>
-                <Input
-                  value={formData.emotional_wound}
-                  onChange={(e) => setFormData({ ...formData, emotional_wound: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>Símbolo central *</Label>
-                <Input
-                  value={formData.central_symbol}
-                  onChange={(e) => setFormData({ ...formData, central_symbol: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label>CTA</Label>
-                <Textarea
-                  value={formData.cta}
-                  onChange={(e) => setFormData({ ...formData, cta: e.target.value })}
-                  rows={2}
-                />
-              </div>
-              <div>
-                <Label>Notas</Label>
-                <Textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  rows={3}
-                />
-              </div>
-              <div>
-                <Label>Fecha de publicación</Label>
-                <Input
-                  type="date"
-                  value={formData.publish_date || ''}
-                  onChange={(e) =>
-                    setFormData({ ...formData, publish_date: e.target.value || null })
-                  }
-                />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit">
-                  {editingEpisode ? 'Guardar cambios' : 'Crear episodio'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+                <div>
+                  <Label>CTA</Label>
+                  <Textarea
+                    value={formData.cta}
+                    onChange={(e) => setFormData({ ...formData, cta: e.target.value })}
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label>Notas</Label>
+                  <Textarea
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label>Fecha de publicación</Label>
+                  <Input
+                    type="date"
+                    value={formData.publish_date || ''}
+                    onChange={(e) =>
+                      setFormData({ ...formData, publish_date: e.target.value || null })
+                    }
+                  />
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit">
+                    {editingEpisode ? 'Guardar cambios' : 'Crear episodio'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

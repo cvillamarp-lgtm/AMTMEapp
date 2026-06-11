@@ -5,7 +5,7 @@ import type { PodcastStrategySnapshot } from '@/types/database';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as SpotifyAnalysisInput;
+    const body = (await req.json()) as SpotifyAnalysisInput;
 
     if (!body.metrics || body.metrics.length === 0) {
       return NextResponse.json({ error: 'Sin métricas para analizar' }, { status: 400 });
@@ -32,7 +32,10 @@ export async function POST(req: NextRequest) {
     };
 
     try {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const cleaned = raw
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .trim();
       analysis = JSON.parse(cleaned);
     } catch {
       return NextResponse.json({ error: 'IA devolvió formato inválido', raw }, { status: 422 });

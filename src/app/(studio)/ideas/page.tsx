@@ -85,7 +85,9 @@ export default function IdeasPage() {
   const [saving, setSaving] = useState(false);
   const [filterStatus, setFilterStatus] = useState<IdeaStatus | 'todas'>('todas');
   const [filterCategory, setFilterCategory] = useState<IdeaCategory | 'todas'>('todas');
-  const [filterPriority, setFilterPriority] = useState<'alta' | 'media' | 'baja' | 'todas'>('todas');
+  const [filterPriority, setFilterPriority] = useState<'alta' | 'media' | 'baja' | 'todas'>(
+    'todas'
+  );
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
@@ -281,10 +283,7 @@ export default function IdeasPage() {
               const categoryLabel =
                 CATEGORIES.find((c) => c.value === idea.category)?.label ?? idea.category;
               return (
-                <div
-                  key={idea.id}
-                  className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4"
-                >
+                <div key={idea.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-semibold leading-snug text-[#0C1F36] truncate">
@@ -342,7 +341,9 @@ export default function IdeasPage() {
                   )}
 
                   {idea.notes && (
-                    <p className="mt-2 text-sm text-black/55 leading-6 line-clamp-2">{idea.notes}</p>
+                    <p className="mt-2 text-sm text-black/55 leading-6 line-clamp-2">
+                      {idea.notes}
+                    </p>
                   )}
 
                   <p className="mt-3 text-xs text-black/35">
@@ -403,9 +404,7 @@ export default function IdeasPage() {
               <Field label="Prioridad">
                 <Select
                   value={form.priority}
-                  onChange={(e) =>
-                    set('priority')(e.target.value as 'alta' | 'media' | 'baja')
-                  }
+                  onChange={(e) => set('priority')(e.target.value as 'alta' | 'media' | 'baja')}
                 >
                   {PRIORITIES.map((p) => (
                     <option key={p.value} value={p.value}>

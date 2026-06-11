@@ -59,7 +59,6 @@ export default function DashboardPage() {
     load();
   }, []);
 
-
   const inProgress = episodes.filter(
     (e) => !['publicado', 'distribuido', 'medido', 'archivado'].includes(e.status)
   ).length;
@@ -73,8 +72,6 @@ export default function DashboardPage() {
   const activeLeads = leads.filter(
     (l) => !['pagado', 'entregado', 'perdido'].includes(l.status)
   ).length;
-
-
 
   const recent = episodes.slice(0, 5);
   const nextBestActions = useNextBestActions();
@@ -127,7 +124,11 @@ export default function DashboardPage() {
                 {(
                   [
                     { key: 'idea', label: 'Idea', color: 'bg-gray-100 text-gray-700' },
-                    { key: 'investigacion', label: 'Invest.', color: 'bg-orange-100 text-orange-700' },
+                    {
+                      key: 'investigacion',
+                      label: 'Invest.',
+                      color: 'bg-orange-100 text-orange-700',
+                    },
                     { key: 'guion', label: 'Guion', color: 'bg-yellow-100 text-yellow-800' },
                     { key: 'grabacion', label: 'Grab.', color: 'bg-blue-100 text-blue-700' },
                     { key: 'edicion', label: 'Edic.', color: 'bg-purple-100 text-purple-700' },
@@ -155,7 +156,7 @@ export default function DashboardPage() {
 
           {/* Siguiente acción + Estado de producción */}
           <div className="grid gap-4 lg:grid-cols-2">
-<NextBestActionWidget actions={nextBestActions} />
+            <NextBestActionWidget actions={nextBestActions} />
 
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <h2 className="font-semibold text-primary">Acciones rápidas</h2>

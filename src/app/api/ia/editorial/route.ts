@@ -22,7 +22,9 @@ export type EditorialOutput = {
 
 function defaultValidation(): ValidationResult {
   return {
-    scores: Object.fromEntries(VALIDATION_CRITERIA.map((c) => [c.key, 8])) as ValidationResult['scores'],
+    scores: Object.fromEntries(
+      VALIDATION_CRITERIA.map((c) => [c.key, 8])
+    ) as ValidationResult['scores'],
     approved: true,
     issues: [],
     strong_phrases: [],
@@ -59,17 +61,17 @@ export async function POST(request: Request) {
       const parsed = JSON.parse(clean) as ValidationResult;
 
       // Recompute approved against actual minimums (don't trust the LLM's boolean)
-      const failingKeys = VALIDATION_CRITERIA.filter(
-        (c) => (parsed.scores[c.key] ?? 0) < c.min
-      );
+      const failingKeys = VALIDATION_CRITERIA.filter((c) => (parsed.scores[c.key] ?? 0) < c.min);
       validation = {
         ...parsed,
         approved: failingKeys.length === 0,
-        issues: failingKeys.length > 0
-          ? failingKeys.map(
-              (c) => `${c.label} (${parsed.scores[c.key] ?? '?'}/10 — mínimo ${c.min}): ${c.question}`
-            )
-          : parsed.issues,
+        issues:
+          failingKeys.length > 0
+            ? failingKeys.map(
+                (c) =>
+                  `${c.label} (${parsed.scores[c.key] ?? '?'}/10 — mínimo ${c.min}): ${c.question}`
+              )
+            : parsed.issues,
       };
     } catch {
       // Validation parse failed — continue with default, don't block the user
