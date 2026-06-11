@@ -28,14 +28,21 @@ type ImportPayload = {
   userId: string;
 };
 
+// Resolve operational owner based on auth context
+function resolveOperationalOwner(userId: string | null | undefined): string {
+  // If userId provided (auth-required mode), use it
+  if (userId) return userId;
+  // If no userId (auth-disabled mode), use public owner
+  return 'public';
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ImportPayload;
     const { importRecord, rows, userId } = body;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
-    }
+    // Resolve owner: explicit userId or 'public' if auth-disabled
+    const owner = resolveOperationalOwner(userId);
 
     const sb = getServerClient();
     if (!sb) {
@@ -94,7 +101,7 @@ export async function POST(req: NextRequest) {
         case 'episode_rankings': {
           const result = await importEpisodeRankings(
             sb,
-            userId,
+            owner,
             importId,
             sourceFileName,
             importedAt,
@@ -110,7 +117,7 @@ export async function POST(req: NextRequest) {
         case 'spotify_overview_timeseries': {
           const result = await importDailyMetrics(
             sb,
-            userId,
+            owner,
             importId,
             sourceFileName,
             importedAt,
@@ -124,7 +131,7 @@ export async function POST(req: NextRequest) {
         case 'geo_distribution': {
           const result = await importDistributionMetrics(
             sb,
-            userId,
+            owner,
             importId,
             sourceFileName,
             importedAt,
@@ -137,7 +144,7 @@ export async function POST(req: NextRequest) {
         case 'amtme_manual_metrics': {
           const result = await importManualMetrics(
             sb,
-            userId,
+            owner,
             importId,
             sourceFileName,
             importedAt,
@@ -202,7 +209,7 @@ type SupabaseClientAny = any;
 
 async function importEpisodeRankings(
   sb: SupabaseClientAny,
-  userId: string,
+  owner: string,
   importId: string,
   sourceFileName: string,
   importedAt: string,
@@ -222,7 +229,7 @@ async function importEpisodeRankings(
   const { data: episodesData } = await sb
     .from('episodes')
     .select('id, payload')
-    .eq('owner_id', userId);
+    .eq('owner_id', owner);
 
   type EpisodeRow = { id: string; payload: Partial<Episode> };
   const episodes: EpisodeRow[] = (episodesData || []) as EpisodeRow[];
@@ -269,7 +276,7 @@ async function importEpisodeRankings(
         .from('episodes')
         .insert([
           {
-            owner_id: userId,
+            owner_id: owner,
             workspace_key: 'primary',
             payload: {
               title: row.episodeTitle,
@@ -352,7 +359,7 @@ async function importEpisodeRankings(
 
 async function importDailyMetrics(
   sb: SupabaseClientAny,
-  userId: string,
+  owner: string,
   importId: string,
   sourceFileName: string,
   importedAt: string,
@@ -372,7 +379,7 @@ async function importDailyMetrics(
     const { data: existing } = await sb
       .from('spotify_daily_metrics')
       .select('id, payload')
-      .eq('owner_id', 'public')
+      .eq('owner_id', owner)
       .eq('payload->>date', row.date)
       .limit(1);
 
@@ -403,7 +410,7 @@ async function importDailyMetrics(
     } else {
       const { error } = await sb
         .from('spotify_daily_metrics')
-        .insert([{ owner_id: 'public', workspace_key: 'primary', payload: newPayload }]);
+        .insert([{ owner_id: owner, workspace_key: 'primary', payload: newPayload }]);
       if (error) throw error;
     }
     processedRows++;
@@ -414,7 +421,7 @@ async function importDailyMetrics(
 
 async function importDistributionMetrics(
   sb: SupabaseClientAny,
-  userId: string,
+  owner: string,
   importId: string,
   sourceFileName: string,
   importedAt: string,
@@ -433,7 +440,7 @@ async function importDistributionMetrics(
     const { data: existing } = await sb
       .from('spotify_distribution_metrics')
       .select('id')
-      .eq('owner_id', 'public')
+      .eq('owner_id', owner)
       .eq('payload->>dimension_type', row.dimensionType)
       .eq('payload->>dimension_name', row.dimensionName)
       .limit(1);
@@ -456,7 +463,7 @@ async function importDistributionMetrics(
     } else {
       const { error } = await sb
         .from('spotify_distribution_metrics')
-        .insert([{ owner_id: 'public', workspace_key: 'primary', payload: newPayload }]);
+        .insert([{ owner_id: owner, workspace_key: 'primary', payload: newPayload }]);
       if (error) throw error;
     }
     processedRows++;
@@ -467,7 +474,7 @@ async function importDistributionMetrics(
 
 async function importManualMetrics(
   sb: SupabaseClientAny,
-  userId: string,
+  owner: string,
   importId: string,
   sourceFileName: string,
   importedAt: string,
@@ -486,7 +493,7 @@ async function importManualMetrics(
     const { data: existing } = await sb
       .from('amtme_manual_metrics')
       .select('id')
-      .eq('owner_id', 'public')
+      .eq('owner_id', owner)
       .eq('payload->>month', row.month)
       .eq('payload->>platform', row.platform)
       .limit(1);
@@ -513,7 +520,7 @@ async function importManualMetrics(
     } else {
       const { error } = await sb
         .from('amtme_manual_metrics')
-        .insert([{ owner_id: 'public', workspace_key: 'primary', payload: newPayload }]);
+        .insert([{ owner_id: owner, workspace_key: 'primary', payload: newPayload }]);
       if (error) throw error;
     }
     processedRows++;
