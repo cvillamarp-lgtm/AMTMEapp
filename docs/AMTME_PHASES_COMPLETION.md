@@ -16,7 +16,7 @@
 | Fase 4 | [#9](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/9) | MERGED | Workspace operativo por episodio |
 | Fase 5 | [#10](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/10) | MERGED | Visual OS mínimo |
 | Fase 6 | [#11](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/11) | MERGED | Automatización controlada |
-| Fase 7 | [#12](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/12) | OPEN | QA final, documentación y cierre integral |
+| Fase 7 | [#12](https://github.com/cvillamarp-lgtm/AMTMEapp/pull/12) | MERGED | QA final, documentación y cierre integral |
 
 ## Resumen por fase
 
