@@ -19,3 +19,4 @@ backups/
 # Local IDE and tool directories
 .claude/
 .vscode/
+.env*
