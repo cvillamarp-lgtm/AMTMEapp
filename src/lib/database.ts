@@ -1,10 +1,17 @@
 /**
- * database.ts — Capa de acceso a Supabase para AMTMEapp
- * Schema: todas las tablas usan { id, owner_id, workspace_key, payload jsonb, created_at, updated_at }
- * Los campos de negocio van dentro de payload.
+ * database.ts — Entity-specific database operations for AMTMEapp
+ * Uses core persistence layer from database-persistence.ts
  */
 
-import { getSupabaseAuthBrowserClient } from './supabase/auth-browser';
+import {
+  getClient,
+  getActiveUserId,
+  getAll,
+  insertOne,
+  updateOne,
+  deleteOne,
+  fromRow,
+} from './database-persistence';
 import type {
   Episode,
   ContentPiece,
@@ -23,117 +30,6 @@ import type {
   AmtmeManualMetric,
   PodcastStrategySnapshot,
 } from '@/types/database';
-
-// FASE 8E — Auth obligatoria. RLS estricta en 15 tablas. Solo auth.uid() = user_id.
-async function getActiveUserId(): Promise<string | null> {
-  try {
-    const authClient = getSupabaseAuthBrowserClient();
-    if (!authClient) return null;
-    const {
-      data: { session },
-    } = await authClient.auth.getSession();
-    return session?.user?.id ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function getClient() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase client types not fully exposed in auth browser module
-  return getSupabaseAuthBrowserClient() as any;
-}
-
-// ---- helpers ----
-
-// FASE 8E: toRow requiere userId de sesión activa. Sin sesión: falla seguro.
-function toRow(payload: object, userId: string | null = null) {
-  return { user_id: userId, payload };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase rows have dynamic schema (payload + direct columns merged dynamically)
-function fromRow<T>(row: any): T {
-  // Si tiene payload jsonb, expandirlo; si no, usar las columnas directas
-  const base = {
-    id: row.id,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    user_id: row.user_id,
-  };
-  if (row.payload && typeof row.payload === 'object' && Object.keys(row.payload).length > 0) {
-    return { ...base, ...row.payload } as T;
-  }
-  // Schema con columnas directas — omitir id/timestamps ya incluidos
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars — Intentionally destructure system fields to exclude from rest spread
-  const {
-    id: _id,
-    created_at: _ca,
-    updated_at: _ua,
-    user_id: _uid,
-    owner_id: _oid,
-    workspace_key: _wk,
-    payload: _payload,
-    ...rest
-  } = row;
-  return { ...base, ...rest } as T;
-}
-
-// FASE 8E: getAll filtra solo por user_id = auth.uid(). Sin sesión: devuelve vacío.
-async function getAll<T>(table: string): Promise<T[]> {
-  const sb = getClient();
-  if (!sb) return [];
-  const activeUserId = await getActiveUserId();
-  if (!activeUserId) return [];
-  const { data, error } = await sb
-    .from(table)
-    .select('*')
-    .eq('user_id', activeUserId)
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase query result rows have dynamic schema
-  return (data || []).map((r: any) => fromRow<T>(r));
-}
-
-// FASE 8E: insertOne usa user_id de sesión activa. Sin sesión: falla seguro.
-async function insertOne<T>(table: string, payload: object): Promise<T> {
-  const sb = getClient();
-  if (!sb) throw new Error('Supabase no configurado');
-  const activeUserId = await getActiveUserId();
-  const { data, error } = await sb
-    .from(table)
-    .insert([toRow(payload, activeUserId)])
-    .select()
-    .single();
-  if (error) throw error;
-  return fromRow<T>(data);
-}
-
-async function updateOne<T>(table: string, id: string, updates: object): Promise<T> {
-  const sb = getClient();
-  if (!sb) throw new Error('Supabase no configurado');
-  // Primero obtenemos el payload actual para hacer merge
-  const { data: current, error: fetchError } = await sb
-    .from(table)
-    .select('payload')
-    .eq('id', id)
-    .single();
-  if (fetchError) throw fetchError;
-  const merged = { ...(current?.payload || {}), ...updates };
-  const { data, error } = await sb
-    .from(table)
-    .update({ payload: merged, updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) throw error;
-  return fromRow<T>(data);
-}
-
-async function deleteOne(table: string, id: string): Promise<void> {
-  const sb = getClient();
-  if (!sb) throw new Error('Supabase no configurado');
-  const { error } = await sb.from(table).delete().eq('id', id);
-  if (error) throw error;
-}
 
 // ---- EPISODES ----
 export async function getEpisodes(): Promise<Episode[]> {
