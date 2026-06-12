@@ -15,26 +15,10 @@ import {
 import { Pin, Trash2, Plus, Save, X, Zap, BookOpen, Lock } from 'lucide-react';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import { toast } from 'sonner';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { getNotes, createNote, updateNote, deleteNote } from '@/lib/database';
+import type { Note, NoteCategory, NoteStatus } from '@/types/database';
 
-// FASE 8C.1 — Compatibilidad de lectura dual
-const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
-const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
-
-type Note = {
-  id: string;
-  user_id: string | null;
-  created_at: string;
-  updated_at: string;
-  title: string;
-  content: string;
-  category: string;
-  status: string;
-  pinned: boolean;
-  tags?: string[];
-};
-
-const CATEGORIES = [
+const CATEGORIES: NoteCategory[] = [
   'general',
   'reflexion',
   'episodio',
@@ -45,7 +29,7 @@ const CATEGORIES = [
   'insight',
   'pendiente',
 ];
-const STATUS_OPTIONS = ['activa', 'archivada', 'pendiente'];
+const STATUS_OPTIONS: NoteStatus[] = ['activa', 'archivada', 'pendiente'];
 
 const MODOS_BAJA_ENERGIA = [
   'Escucha un episodio propio. Anotalo sin presion.',
@@ -61,93 +45,20 @@ const PLAN_MINIMO_VIABLE = [
   'Registra una idea en Notas. Sin estructura.',
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseClient = any;
-
-async function getNotes(): Promise<Note[]> {
-  const sb = getSupabaseBrowserClient() as SupabaseClient;
-  if (!sb) return [];
-  const { data, error } = await sb
-    .from('notes')
-    .select('*')
-    .or(CHRISTIAN_UUID_FILTER)
-    .order('pinned', { ascending: false })
-    .order('updated_at', { ascending: false });
-  if (error) {
-    console.error(error);
-    return [];
-  }
-  return (data || []).map((r: Record<string, unknown>) => ({
-    id: r.id as string,
-    user_id: r.user_id as string | null,
-    created_at: r.created_at as string,
-    updated_at: r.updated_at as string,
-    ...(r.payload as Omit<Note, 'id' | 'user_id' | 'created_at' | 'updated_at'>),
-  }));
-}
-
-async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
-  const sb = getSupabaseBrowserClient() as SupabaseClient;
-  const payload = {
-    title: data.title,
-    content: data.content,
-    category: data.category,
-    status: data.status,
-    pinned: data.pinned ?? false,
-    tags: data.tags ?? [],
-  };
-  if (id) {
-    const { data: row, error } = await sb
-      .from('notes')
-      .update({ payload, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return {
-      id: row.id,
-      user_id: row.user_id,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-      ...row.payload,
-    };
-  } else {
-    const { data: row, error } = await sb
-      .from('notes')
-      .insert([{ user_id: null, payload }])
-      .select()
-      .single();
-    if (error) throw error;
-    return {
-      id: row.id,
-      user_id: row.user_id,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-      ...row.payload,
-    };
-  }
-}
-
-async function deleteNote(id: string) {
-  const sb = getSupabaseBrowserClient() as SupabaseClient;
-  const { error } = await sb.from('notes').delete().eq('id', id);
-  if (error) throw error;
-}
-
 export default function NotasPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Note | null>(null);
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState<NoteCategory | 'all'>('all');
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [energiaMode, setEnergiaMode] = useState(false);
   const [draft, setDraft] = useState({
     title: '',
     content: '',
-    category: 'general',
-    status: 'activa',
+    category: 'general' as NoteCategory,
+    status: 'activa' as NoteStatus,
     pinned: false,
     tags: [] as string[],
   });
@@ -199,14 +110,14 @@ export default function NotasPage() {
     const newDraft = {
       title: 'Nueva nota',
       content: '',
-      category: 'general',
-      status: 'activa',
+      category: 'general' as NoteCategory,
+      status: 'activa' as NoteStatus,
       pinned: false,
       tags: [] as string[],
     };
     setSaving(true);
     try {
-      const created = await saveNote(null, newDraft);
+      const created = await createNote(newDraft);
       setNotes((prev) => [created, ...prev]);
       setSelected(created);
       setDraft(newDraft);
@@ -222,7 +133,7 @@ export default function NotasPage() {
     if (!selected) return;
     setSaving(true);
     try {
-      const updated = await saveNote(selected.id, draft);
+      const updated = await updateNote(selected.id, draft);
       setNotes((prev) => prev.map((n) => (n.id === updated.id ? updated : n)));
       setSelected(updated);
       setEditing(false);
@@ -248,7 +159,7 @@ export default function NotasPage() {
 
   async function togglePin(note: Note) {
     try {
-      const updated = await saveNote(note.id, { ...note, pinned: !note.pinned });
+      const updated = await updateNote(note.id, { pinned: !note.pinned });
       setNotes((prev) =>
         prev
           .map((n) => (n.id === updated.id ? updated : n))

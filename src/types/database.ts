@@ -389,6 +389,32 @@ export type AppConfig = {
   updated_at: string;
 };
 
+export type Note = {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  category: NoteCategory;
+  status: NoteStatus;
+  pinned: boolean;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type NoteCategory =
+  | 'general'
+  | 'reflexion'
+  | 'episodio'
+  | 'frase'
+  | 'aprendizaje'
+  | 'simbolo'
+  | 'sueno'
+  | 'insight'
+  | 'pendiente';
+
+export type NoteStatus = 'activa' | 'archivada' | 'pendiente';
+
 export type Idea = {
   id: string;
   user_id: string;

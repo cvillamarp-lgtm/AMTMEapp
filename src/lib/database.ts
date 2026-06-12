@@ -22,6 +22,7 @@ import type {
   Script,
   VisualAsset,
   AutomationRule,
+  Note,
   Idea,
   SpotifyMetricImport,
   SpotifyEpisodeMetric,
@@ -364,6 +365,22 @@ export async function updateMetricEpisode(
   updates: Partial<import('@/types/database').MetricEpisode>
 ): Promise<import('@/types/database').MetricEpisode> {
   return updateOne<import('@/types/database').MetricEpisode>('metrics_episode', id, updates);
+}
+
+// ---- NOTES ----
+export async function getNotes(): Promise<Note[]> {
+  return getAll<Note>('notes');
+}
+export async function createNote(
+  note: Omit<Note, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+): Promise<Note> {
+  return insertOne<Note>('notes', note);
+}
+export async function updateNote(id: string, updates: Partial<Note>): Promise<Note> {
+  return updateOne<Note>('notes', id, updates);
+}
+export async function deleteNote(id: string): Promise<void> {
+  return deleteOne('notes', id);
 }
 
 // ---- IDEAS ----
