@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
 import { useSettings } from '@/hooks/use-settings';
 import { generateVisualPrompt, generateVisualSpec } from '@/lib/studio-generators';
+import { createVisualAsset, updateVisualAsset } from '@/lib/database';
 import type { VisualAsset } from '@/lib/studio-types';
+import type { VisualAsset as DbVisualAsset, VisualType, VisualFormat } from '@/types/database';
 
 const emptyVisual = (): VisualAsset => ({
   id: `vis-${Date.now()}`,
@@ -27,6 +29,8 @@ export default function CreadorVisualPage() {
   const { settings } = useSettings();
   const brandSettings = settings?.brand;
   const [draft, setDraft] = useState<VisualAsset>(emptyVisual());
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const generatePrompt = () => {
     setDraft((current) => ({
@@ -37,8 +41,44 @@ export default function CreadorVisualPage() {
     }));
   };
 
-  const saveVisual = () => {
-    // TODO: Persist visual assets to database
+  const saveVisual = async () => {
+    try {
+      setIsSaving(true);
+      setSaveStatus('idle');
+
+      const payload: Omit<DbVisualAsset, 'id' | 'created_at' | 'updated_at' | 'user_id'> = {
+        type: draft.type as VisualType,
+        format: draft.format as VisualFormat,
+        title: draft.title,
+        main_text: draft.mainText || null,
+        secondary_text: draft.secondaryText || null,
+        cta: draft.cta || null,
+        prompt: draft.prompt,
+        technical_spec: draft.technicalSpec || null,
+        template_variables: draft.templateVariables ? { raw: draft.templateVariables } : null,
+        palette: draft.palette,
+        status: draft.status,
+        episode_id: draft.episodeId || null,
+        content_id: null,
+        visual_reference: null,
+      };
+
+      if (draft.id.startsWith('vis-')) {
+        // New asset — create
+        await createVisualAsset(payload);
+      } else {
+        // Existing asset — update
+        await updateVisualAsset(draft.id, payload);
+      }
+
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (error) {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -122,10 +162,13 @@ export default function CreadorVisualPage() {
           </Field>
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button onClick={generatePrompt}>Generar prompt visual</Button>
-          <Button variant="secondary" onClick={saveVisual}>
-            Guardar pieza
+          <Button onClick={generatePrompt} disabled={isSaving}>
+            Generar prompt visual
           </Button>
+          <Button variant="secondary" onClick={saveVisual} disabled={isSaving}>
+            {isSaving ? 'Guardando…' : saveStatus === 'success' ? '✓ Guardado' : 'Guardar pieza'}
+          </Button>
+          {saveStatus === 'error' && <span className="text-xs text-red-600">Error al guardar</span>}
         </div>
       </Card>
 
