@@ -39,7 +39,7 @@ async function getActiveUserId(): Promise<string | null> {
 }
 
 function getClient() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase client types not fully exposed in auth browser module
   return getSupabaseAuthBrowserClient() as any;
 }
 
@@ -50,7 +50,7 @@ function toRow(payload: object, userId: string | null = null) {
   return { user_id: userId, payload };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase rows have dynamic schema (payload + direct columns merged dynamically)
 function fromRow<T>(row: any): T {
   // Si tiene payload jsonb, expandirlo; si no, usar las columnas directas
   const base = {
@@ -63,7 +63,7 @@ function fromRow<T>(row: any): T {
     return { ...base, ...row.payload } as T;
   }
   // Schema con columnas directas — omitir id/timestamps ya incluidos
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars — Intentionally destructure system fields to exclude from rest spread
   const {
     id: _id,
     created_at: _ca,
@@ -89,7 +89,7 @@ async function getAll<T>(table: string): Promise<T[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase query result rows have dynamic schema
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 
@@ -342,7 +342,7 @@ export async function createScript(
   const { data, error } = await sb
     .from('scripts')
     .insert([
-      /* eslint-disable @typescript-eslint/no-explicit-any */
+      /* eslint-disable @typescript-eslint/no-explicit-any — Script row fields stored as direct columns, not in payload; cast required for type safety */
       {
         user_id: activeUserId,
         episode_id: (s as any).episode_id,
@@ -423,7 +423,7 @@ export async function deleteAutomationRule(id: string): Promise<void> {
 }
 
 // ---- ARCHIVE ITEMS ----
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any — Archive items have unstructured dynamic schema, type cannot be narrowed statically */
 export async function getArchiveItems(): Promise<any[]> {
   return getAll<any>('archive_items');
 }
@@ -486,7 +486,7 @@ export async function deleteIdea(id: string): Promise<void> {
 }
 
 // ---- MASTER SECTIONS ----
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any — Master sections have unstructured dynamic schema, type cannot be narrowed statically */
 export async function getMasterSections(): Promise<any[]> {
   return getAll<any>('master_sections');
 }
