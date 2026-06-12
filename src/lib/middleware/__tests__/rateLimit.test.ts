@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { rateLimiter, extractRateLimitKey } from '../rateLimit';
 
 /**
@@ -9,7 +9,7 @@ import { rateLimiter, extractRateLimitKey } from '../rateLimit';
 describe('Rate Limiter Middleware (MED-004)', () => {
   beforeEach(() => {
     // Clear rate limiter state before each test
-    const limiter = rateLimiter as any;
+    const limiter = rateLimiter as unknown as { store: Map<string, unknown> };
     limiter.store.clear();
   });
 

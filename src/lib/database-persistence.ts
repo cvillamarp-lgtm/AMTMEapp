@@ -21,7 +21,8 @@ export async function getActiveUserId(): Promise<string | null> {
 }
 
 export function getClient() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase client types not fully exposed in auth browser module
+  // Supabase client types not fully exposed in auth browser module
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return getSupabaseAuthBrowserClient() as any;
 }
 
@@ -30,7 +31,8 @@ export function toRow(payload: object, userId: string | null = null) {
   return { user_id: userId, payload };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase rows have dynamic schema (payload + direct columns merged dynamically)
+// Supabase rows have dynamic schema (payload + direct columns merged dynamically)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function fromRow<T>(row: any): T {
   // If payload exists, merge it; otherwise use direct columns
   const base = {
@@ -43,7 +45,8 @@ export function fromRow<T>(row: any): T {
     return { ...base, ...row.payload } as T;
   }
   // Schema with direct columns — omit id/timestamps already included
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars — Intentionally destructure system fields to exclude from rest spread
+  // Intentionally destructure system fields to exclude from rest spread
+
   const {
     id: _id,
     created_at: _ca,
@@ -69,7 +72,8 @@ export async function getAll<T>(table: string): Promise<T[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any — Supabase query result rows have dynamic schema
+  // Supabase query result rows have dynamic schema
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 

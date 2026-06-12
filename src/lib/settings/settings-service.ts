@@ -1,6 +1,6 @@
 import { Settings, SettingCategory, SettingsAuditLog } from './settings-types';
 import { DEFAULT_SETTINGS } from './settings-defaults';
-import { validateSetting, FORBIDDEN_KEYS, PERMITTED_KEYS } from './settings-validation';
+import { validateSetting, FORBIDDEN_KEYS } from './settings-validation';
 
 class SettingsService {
   private settings: Settings = { ...DEFAULT_SETTINGS };
@@ -121,7 +121,7 @@ class SettingsService {
       key: string;
       value: unknown;
     }>,
-    userId: string = 'system'
+    _userId: string = 'system'
   ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 

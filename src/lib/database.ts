@@ -238,7 +238,8 @@ export async function createScript(
   const { data, error } = await sb
     .from('scripts')
     .insert([
-      /* eslint-disable @typescript-eslint/no-explicit-any — Script row fields stored as direct columns, not in payload; cast required for type safety */
+      /* Script row fields stored as direct columns, not in payload; cast required for type safety */
+      /* eslint-disable @typescript-eslint/no-explicit-any */
       {
         user_id: activeUserId,
         episode_id: (s as any).episode_id,
@@ -256,7 +257,6 @@ export async function createScript(
         cta: (s as any).cta || null,
         voice_notes: (s as any).voice_notes || null,
       },
-      /* eslint-enable @typescript-eslint/no-explicit-any */
     ])
     .select()
     .single();
@@ -319,7 +319,8 @@ export async function deleteAutomationRule(id: string): Promise<void> {
 }
 
 // ---- ARCHIVE ITEMS ----
-/* eslint-disable @typescript-eslint/no-explicit-any — Archive items have unstructured dynamic schema, type cannot be narrowed statically */
+/* Archive items have unstructured dynamic schema, type cannot be narrowed statically */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function getArchiveItems(): Promise<any[]> {
   return getAll<any>('archive_items');
 }
@@ -329,7 +330,7 @@ export async function createArchiveItem(item: object): Promise<any> {
 export async function updateArchiveItem(id: string, updates: object): Promise<any> {
   return updateOne<any>('archive_items', id, updates);
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export async function deleteArchiveItem(id: string): Promise<void> {
   return deleteOne('archive_items', id);
 }
@@ -382,7 +383,8 @@ export async function deleteIdea(id: string): Promise<void> {
 }
 
 // ---- MASTER SECTIONS ----
-/* eslint-disable @typescript-eslint/no-explicit-any — Master sections have unstructured dynamic schema, type cannot be narrowed statically */
+/* Master sections have unstructured dynamic schema, type cannot be narrowed statically */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function getMasterSections(): Promise<any[]> {
   return getAll<any>('master_sections');
 }
@@ -392,7 +394,7 @@ export async function createMasterSection(section: object): Promise<any> {
 export async function updateMasterSection(id: string, updates: object): Promise<any> {
   return updateOne<any>('master_sections', id, updates);
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export async function deleteMasterSection(id: string): Promise<void> {
   return deleteOne('master_sections', id);
 }
@@ -434,7 +436,7 @@ export async function createSpotifyEpisodeMetrics(
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
   const { data, error } = await sb.from('spotify_episode_metrics').insert(rows).select();
   if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
 }
 
@@ -450,7 +452,7 @@ export async function getSpotifyMetricsByImport(importId: string): Promise<Spoti
     .eq('payload->>import_id', importId)
     .order('created_at', { ascending: false });
   if (error) return [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
 }
 
@@ -468,7 +470,7 @@ export async function getSpotifyMetricsByEpisode(
     .eq('payload->>episode_id', episodeId)
     .order('created_at', { ascending: false });
   if (error) return [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return (data || []).map((r: any) => fromRow<SpotifyEpisodeMetric>(r));
 }
 
@@ -487,7 +489,7 @@ export async function createSpotifyDailyMetrics(
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
   const { data, error } = await sb.from('spotify_daily_metrics').insert(rows).select();
   if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return (data || []).map((r: any) => fromRow<SpotifyDailyMetric>(r));
 }
 
@@ -506,7 +508,7 @@ export async function createSpotifyDistributionMetrics(
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
   const { data, error } = await sb.from('spotify_distribution_metrics').insert(rows).select();
   if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return (data || []).map((r: any) => fromRow<SpotifyDistributionMetric>(r));
 }
 
@@ -525,7 +527,7 @@ export async function createAmtmeManualMetrics(
   const rows = metrics.map((m) => ({ user_id: activeUserId, payload: m }));
   const { data, error } = await sb.from('amtme_manual_metrics').insert(rows).select();
   if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   return (data || []).map((r: any) => fromRow<AmtmeManualMetric>(r));
 }
 

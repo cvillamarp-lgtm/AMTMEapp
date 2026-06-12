@@ -1,5 +1,4 @@
 import { settingsService } from '../settings-service';
-import { DEFAULT_SETTINGS } from '../settings-defaults';
 
 describe('SettingsService', () => {
   beforeEach(() => {
