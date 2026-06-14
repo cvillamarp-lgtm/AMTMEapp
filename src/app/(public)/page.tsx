@@ -5,6 +5,14 @@ import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
 const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
 
+interface EpisodeRow {
+  payload: {
+    episode_number?: number;
+    title?: string;
+    theme?: string;
+  };
+}
+
 async function getRecentEpisodes() {
   try {
     const sb = getSupabaseServiceRoleClient();
@@ -16,7 +24,7 @@ async function getRecentEpisodes() {
       .order('created_at', { ascending: false })
       .limit(3);
 
-    return (data || []).map((r: any) => r.payload);
+    return (data || []).map((r: EpisodeRow) => r.payload);
   } catch {
     return [];
   }
@@ -77,7 +85,7 @@ export default async function HomePage() {
             Episodios recientes
           </h2>
           <div className="space-y-4">
-            {episodes.map((ep: any, i: number) => (
+            {episodes.map((ep, i) => (
               <div
                 key={i}
                 className="border border-white/10 rounded-2xl p-5 hover:border-[#e8ff40]/40 transition-colors"

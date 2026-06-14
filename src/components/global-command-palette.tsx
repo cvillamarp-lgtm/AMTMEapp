@@ -55,7 +55,9 @@ export function GlobalCommandPalette() {
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedIndex((prev) => (prev - 1 + Math.max(results.length, 1)) % Math.max(results.length, 1));
+          setSelectedIndex(
+            (prev) => (prev - 1 + Math.max(results.length, 1)) % Math.max(results.length, 1)
+          );
           break;
         case 'Enter':
           e.preventDefault();
@@ -237,7 +239,8 @@ export function GlobalCommandPalette() {
               <kbd className="px-2 py-1 rounded bg-muted text-foreground font-medium">↵</kbd> Abrir
             </span>
             <span>
-              <kbd className="px-2 py-1 rounded bg-muted text-foreground font-medium">Esc</kbd> Cerrar
+              <kbd className="px-2 py-1 rounded bg-muted text-foreground font-medium">Esc</kbd>{' '}
+              Cerrar
             </span>
           </div>
           {results.length > 0 && (

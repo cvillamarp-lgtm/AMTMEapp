@@ -814,6 +814,12 @@ Solo JSON. Espanol neutro.`;
               {/* 5. ACCESOS RAPIDOS */}
               <div className="flex flex-wrap gap-3">
                 <Link
+                  href="/metricas/spotify"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#1ed760] bg-[#1ed760]/10 px-4 py-2 text-sm font-medium text-[#0c1f36] hover:bg-[#1ed760]/20 transition-colors"
+                >
+                  Importar desde Spotify <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+                <Link
                   href="/episodios"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
                 >

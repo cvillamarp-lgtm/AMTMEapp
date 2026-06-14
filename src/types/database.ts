@@ -145,6 +145,7 @@ export type VisualAsset = {
   cta: string | null;
   prompt: string;
   technical_spec: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   template_variables: Record<string, any> | null;
   palette: string;
   status: string;

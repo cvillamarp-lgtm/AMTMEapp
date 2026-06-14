@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/shadcn/card';
+import { Card, CardContent } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Badge } from '@/components/shadcn/badge';
 import { Progress } from '@/components/shadcn/progress';
 import { Alert, AlertDescription } from '@/components/shadcn/alert';
-import { Sparkles, AlertTriangle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Sparkles, CheckCircle2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEpisodes, updateEpisode } from '@/lib/database';
 import type { Episode } from '@/types/database';
@@ -99,7 +99,6 @@ export default function RevisionEpisodiosPage() {
 
   const incomplete = analyses.filter((a) => a.pct < 100);
   const critical = analyses.filter((a) => a.criticalFailed > 0);
-  const complete = analyses.filter((a) => a.pct === 100);
 
   async function handleComplete(ep: Episode) {
     setCompleting(ep.id);

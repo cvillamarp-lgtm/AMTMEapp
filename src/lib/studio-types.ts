@@ -236,7 +236,13 @@ export interface NavPreferences {
 
 export type NextBestActionSeverity = 'high' | 'medium' | 'low';
 export type NextBestActionStatus = 'pending' | 'completed' | 'dismissed';
-export type NextBestActionCategory = 'contenido' | 'produccion' | 'distribucion' | 'metricas' | 'energia' | 'sistema';
+export type NextBestActionCategory =
+  | 'contenido'
+  | 'produccion'
+  | 'distribucion'
+  | 'metricas'
+  | 'energia'
+  | 'sistema';
 
 export interface NextBestAction {
   id: string;

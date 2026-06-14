@@ -16,13 +16,7 @@ interface UseIdleLogoutReturn {
   remainingSeconds: number;
 }
 
-const ACTIVITY_EVENTS = [
-  'mousemove',
-  'keydown',
-  'click',
-  'scroll',
-  'touchstart',
-] as const;
+const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'] as const;
 
 export function useIdleLogout({
   enabled,
@@ -106,8 +100,7 @@ export function useIdleLogout({
         window.removeEventListener(event, handleActivity);
       });
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [enabled, scheduleTimers, clearAllTimers]);
 
   return { showWarning, keepSession, signOutNow, remainingSeconds };
 }

@@ -193,7 +193,7 @@ Devuelve exactamente:
       }
       toast.success('Mensaje generado');
     } catch (e: unknown) {
-      toast.error((e as Error).message || 'Error al generar');
+      toast.error(e instanceof Error ? e.message : 'Error al generar');
     } finally {
       setGeneratingId(null);
     }

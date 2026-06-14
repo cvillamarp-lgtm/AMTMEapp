@@ -58,7 +58,6 @@ export default function DashboardPage() {
     load();
   }, []);
 
-
   const inProgress = episodes.filter(
     (e) => !['publicado', 'distribuido', 'medido', 'archivado'].includes(e.status)
   ).length;
@@ -72,8 +71,6 @@ export default function DashboardPage() {
   const activeLeads = leads.filter(
     (l) => !['pagado', 'entregado', 'perdido'].includes(l.status)
   ).length;
-
-
 
   const recent = episodes.slice(0, 5);
   const nextBestActions = useNextBestActions();
@@ -110,7 +107,7 @@ export default function DashboardPage() {
 
           {/* Siguiente acción + Estado de producción */}
           <div className="grid gap-4 lg:grid-cols-2">
-<NextBestActionWidget actions={nextBestActions} />
+            <NextBestActionWidget actions={nextBestActions} />
 
             <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
               <h2 className="font-semibold text-primary">Acciones rápidas</h2>

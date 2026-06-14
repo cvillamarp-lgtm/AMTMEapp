@@ -22,15 +22,18 @@ async function getActiveUserId(): Promise<string | null> {
   try {
     const authClient = getSupabaseAuthBrowserClient();
     if (!authClient) return null;
-    const { data: { session } } = await authClient.auth.getSession();
+    const {
+      data: { session },
+    } = await authClient.auth.getSession();
     return session?.user?.id ?? null;
   } catch {
     return null;
   }
 }
 
-function getClient() {
-  return getSupabaseAuthBrowserClient() as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getClient(): any {
+  return getSupabaseAuthBrowserClient();
 }
 
 // ---- helpers ----
@@ -40,6 +43,7 @@ function toRow(payload: object, userId: string | null = null) {
   return { user_id: userId, payload };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function fromRow<T>(row: any): T {
   // Si tiene payload jsonb, expandirlo; si no, usar las columnas directas
   const base = {
@@ -52,6 +56,7 @@ function fromRow<T>(row: any): T {
     return { ...base, ...row.payload } as T;
   }
   // Schema con columnas directas — omitir id/timestamps ya incluidos
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, created_at, updated_at, user_id, owner_id, workspace_key, payload, ...rest } = row;
   return { ...base, ...rest } as T;
 }
@@ -68,6 +73,7 @@ async function getAll<T>(table: string): Promise<T[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 
@@ -202,6 +208,7 @@ export async function getCalendarEvents(): Promise<CalendarEvent[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: true });
   if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => fromRow<CalendarEvent>(r));
 }
 export async function createCalendarEvent(
@@ -232,6 +239,7 @@ export async function getScripts(): Promise<Script[]> {
     .eq('user_id', activeUserId)
     .order('created_at', { ascending: false });
   if (error) throw error;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data || []).map((r: any) => {
     if (r.payload && typeof r.payload === 'object') return fromRow<Script>(r);
     return { ...r } as Script;
@@ -243,25 +251,27 @@ export async function createScript(
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
   const activeUserId = await getActiveUserId();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sAny = s as any;
   const { data, error } = await sb
     .from('scripts')
     .insert([
       {
         user_id: activeUserId,
-        episode_id: (s as any).episode_id,
-        title: (s as any).title,
-        status: (s as any).status || 'borrador',
+        episode_id: sAny.episode_id,
+        title: sAny.title,
+        status: sAny.status || 'borrador',
         version: 1,
-        opening: (s as any).opening || null,
-        threshold: (s as any).threshold || null,
-        wound: (s as any).wound || null,
-        symbol: (s as any).symbol || null,
-        truth: (s as any).truth || null,
-        bridge: (s as any).bridge || null,
-        action: (s as any).action || null,
-        closing: (s as any).closing || null,
-        cta: (s as any).cta || null,
-        voice_notes: (s as any).voice_notes || null,
+        opening: sAny.opening || null,
+        threshold: sAny.threshold || null,
+        wound: sAny.wound || null,
+        symbol: sAny.symbol || null,
+        truth: sAny.truth || null,
+        bridge: sAny.bridge || null,
+        action: sAny.action || null,
+        closing: sAny.closing || null,
+        cta: sAny.cta || null,
+        voice_notes: sAny.voice_notes || null,
       },
     ])
     .select()
@@ -311,13 +321,19 @@ export async function deleteAutomationRule(id: string): Promise<void> {
 }
 
 // ---- ARCHIVE ITEMS ----
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getArchiveItems(): Promise<any[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return getAll<any>('archive_items');
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createArchiveItem(item: object): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return insertOne<any>('archive_items', item);
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateArchiveItem(id: string, updates: object): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return updateOne<any>('archive_items', id, updates);
 }
 export async function deleteArchiveItem(id: string): Promise<void> {
@@ -356,13 +372,19 @@ export async function updateMetricEpisode(
 }
 
 // ---- MASTER SECTIONS ----
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getMasterSections(): Promise<any[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return getAll<any>('master_sections');
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createMasterSection(section: object): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return insertOne<any>('master_sections', section);
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateMasterSection(id: string, updates: object): Promise<any> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return updateOne<any>('master_sections', id, updates);
 }
 export async function deleteMasterSection(id: string): Promise<void> {
