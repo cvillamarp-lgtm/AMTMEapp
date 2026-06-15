@@ -1,7 +1,10 @@
 /**
  * database.ts — Capa de acceso a Supabase para AMTMEapp
- * Schema: todas las tablas usan { id, owner_id, workspace_key, payload jsonb, created_at, updated_at }
- * Los campos de negocio van dentro de payload.
+ * Schema: todas las tablas usan { id, user_id uuid, payload jsonb, created_at, updated_at }.
+ * Los campos de negocio van dentro de payload. `user_id` es obligatorio y se
+ * filtra/exige en toda operación (auth.uid()). Ver supabase/migrations/20260615000000_fix_user_id_contract.sql
+ * para el contrato RLS correspondiente. Columnas legacy `owner_id`/`workspace_key`
+ * quedan en las tablas pero no son usadas por esta capa.
  */
 
 import { getSupabaseAuthBrowserClient } from './supabase/auth-browser';
@@ -77,11 +80,14 @@ async function getAll<T>(table: string): Promise<T[]> {
   return (data || []).map((r: any) => fromRow<T>(r));
 }
 
-// FASE 8E: insertOne usa user_id de sesión activa. Sin sesión: falla seguro.
+// FASE 8E / P0: insertOne requiere user_id de sesión activa. Sin sesión: falla seguro,
+// nunca inserta con user_id null (violaría RLS y rompería ownership).
 async function insertOne<T>(table: string, payload: object): Promise<T> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
   const activeUserId = await getActiveUserId();
+  if (!activeUserId) throw new Error('No autenticado: no se puede crear el registro.');
+
   const { data, error } = await sb
     .from(table)
     .insert([toRow(payload, activeUserId)])
@@ -91,14 +97,20 @@ async function insertOne<T>(table: string, payload: object): Promise<T> {
   return fromRow<T>(data);
 }
 
+// FASE 8E / P0: update y delete deben filtrar por id + ownership (user_id = auth.uid()).
+// Sin sesión activa, fallar explícitamente en lugar de operar sin ownership.
 async function updateOne<T>(table: string, id: string, updates: object): Promise<T> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
-  // Primero obtenemos el payload actual para hacer merge
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) throw new Error('No autenticado: no se puede actualizar.');
+
+  // Primero obtenemos el payload actual para hacer merge, validando ownership
   const { data: current, error: fetchError } = await sb
     .from(table)
     .select('payload')
     .eq('id', id)
+    .eq('user_id', activeUserId)
     .single();
   if (fetchError) throw fetchError;
   const merged = { ...(current?.payload || {}), ...updates };
@@ -106,6 +118,7 @@ async function updateOne<T>(table: string, id: string, updates: object): Promise
     .from(table)
     .update({ payload: merged, updated_at: new Date().toISOString() })
     .eq('id', id)
+    .eq('user_id', activeUserId)
     .select()
     .single();
   if (error) throw error;
@@ -115,7 +128,10 @@ async function updateOne<T>(table: string, id: string, updates: object): Promise
 async function deleteOne(table: string, id: string): Promise<void> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
-  const { error } = await sb.from(table).delete().eq('id', id);
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) throw new Error('No autenticado: no se puede eliminar.');
+
+  const { error } = await sb.from(table).delete().eq('id', id).eq('user_id', activeUserId);
   if (error) throw error;
 }
 
