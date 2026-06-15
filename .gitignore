@@ -17,5 +17,6 @@ supabase/.temp/
 backups/
 
 # Local IDE and tool directories
+!.claude/agents/
 .claude/
 .vscode/
