@@ -57,7 +57,9 @@ const config: Config = {
         '2xl': 'calc(var(--radius) * 2.5)',
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        josefin: ['var(--font-josefin)', 'system-ui', 'sans-serif'],
+        'special-elite': ['var(--font-special-elite)', 'Georgia', 'serif'],
       },
     },
   },

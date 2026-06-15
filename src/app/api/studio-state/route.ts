@@ -2,14 +2,12 @@ import { NextResponse } from 'next/server';
 import { formatZodError, studioStatePutBodySchema } from '@/lib/schemas';
 import { getSupabaseAuthServerClient } from '@/lib/supabase/auth-server';
 import { isSupabaseServerConfigured } from '@/lib/supabase/env';
-import { isAuthRequired } from '@/lib/supabase/env';
 import { loadStudioStateFromRemote, saveStudioStateToRemote } from '@/lib/studio-persistence';
 
-async function resolveOwnerId() {
-  if (!isAuthRequired()) {
-    return 'public';
-  }
-
+// P0 FIX: studio_state ya no admite un owner compartido ('public').
+// Cada usuario solo puede leer/escribir su propio estado remoto.
+// Sin sesión activa -> 401, el cliente debe operar en modo local/demo.
+async function resolveOwnerId(): Promise<string | null> {
   const client = await getSupabaseAuthServerClient();
 
   if (!client) {

@@ -14,11 +14,7 @@ import {
 } from '@/components/shadcn/select';
 import { Pin, Trash2, Plus, Save, X, Zap, BookOpen, Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-
-// FASE 8C.1 — Compatibilidad de lectura dual
-const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
-const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
+import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 
 type Note = {
   id: string;
@@ -52,30 +48,56 @@ const PLAN_MINIMO_VIABLE = [
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseClient = any;
 
-async function getNotes(): Promise<Note[]> {
-  const sb = getSupabaseBrowserClient() as SupabaseClient;
-  if (!sb) return [];
+class NotAuthenticatedError extends Error {
+  constructor() {
+    super('No autenticado. Inicia sesion para usar tus notas privadas.');
+    this.name = 'NotAuthenticatedError';
+  }
+}
+
+async function getActiveUserId(sb: SupabaseClient): Promise<string | null> {
+  const {
+    data: { session },
+  } = await sb.auth.getSession();
+  return session?.user?.id ?? null;
+}
+
+async function getNotes(): Promise<{ notes: Note[]; authenticated: boolean }> {
+  const sb = getSupabaseAuthBrowserClient() as SupabaseClient;
+  if (!sb) return { notes: [], authenticated: false };
+
+  const userId = await getActiveUserId(sb);
+  if (!userId) return { notes: [], authenticated: false };
+
   const { data, error } = await sb
     .from('notes')
     .select('*')
-    .or(CHRISTIAN_UUID_FILTER)
+    .eq('user_id', userId)
     .order('pinned', { ascending: false })
     .order('updated_at', { ascending: false });
   if (error) {
     console.error(error);
-    return [];
+    return { notes: [], authenticated: true };
   }
-  return (data || []).map((r: Record<string, unknown>) => ({
-    id: r.id as string,
-    user_id: r.user_id as string | null,
-    created_at: r.created_at as string,
-    updated_at: r.updated_at as string,
-    ...(r.payload as Omit<Note, 'id' | 'user_id' | 'created_at' | 'updated_at'>),
-  }));
+  return {
+    authenticated: true,
+    notes: (data || []).map((r: Record<string, unknown>) => ({
+      id: r.id as string,
+      user_id: r.user_id as string | null,
+      created_at: r.created_at as string,
+      updated_at: r.updated_at as string,
+      ...(r.payload as Omit<Note, 'id' | 'user_id' | 'created_at' | 'updated_at'>),
+    })),
+  };
 }
 
 async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
-  const sb = getSupabaseBrowserClient() as SupabaseClient;
+  const sb = getSupabaseAuthBrowserClient() as SupabaseClient;
+  if (!sb) throw new Error('Supabase no esta configurado.');
+
+  const userId = await getActiveUserId(sb);
+  if (!userId) throw new NotAuthenticatedError();
+
   const payload = {
     title: data.title,
     content: data.content,
@@ -88,6 +110,7 @@ async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
       .from('notes')
       .update({ payload, updated_at: new Date().toISOString() })
       .eq('id', id)
+      .eq('user_id', userId)
       .select()
       .single();
     if (error) throw error;
@@ -101,7 +124,7 @@ async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
   } else {
     const { data: row, error } = await sb
       .from('notes')
-      .insert([{ user_id: null, payload }])
+      .insert([{ user_id: userId, payload }])
       .select()
       .single();
     if (error) throw error;
@@ -116,14 +139,20 @@ async function saveNote(id: string | null, data: Partial<Note>): Promise<Note> {
 }
 
 async function deleteNote(id: string) {
-  const sb = getSupabaseBrowserClient() as SupabaseClient;
-  const { error } = await sb.from('notes').delete().eq('id', id);
+  const sb = getSupabaseAuthBrowserClient() as SupabaseClient;
+  if (!sb) throw new Error('Supabase no esta configurado.');
+
+  const userId = await getActiveUserId(sb);
+  if (!userId) throw new NotAuthenticatedError();
+
+  const { error } = await sb.from('notes').delete().eq('id', id).eq('user_id', userId);
   if (error) throw error;
 }
 
 export default function NotasPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(true);
   const [selected, setSelected] = useState<Note | null>(null);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -144,8 +173,9 @@ export default function NotasPage() {
 
   async function load() {
     try {
-      const data = await getNotes();
+      const { notes: data, authenticated: isAuthed } = await getNotes();
       setNotes(data);
+      setAuthenticated(isAuthed);
     } catch {
       toast.error('Error al cargar notas');
     } finally {
@@ -178,7 +208,19 @@ export default function NotasPage() {
     setEditing(false);
   }
 
+  function reportError(error: unknown, fallback: string) {
+    if (error instanceof NotAuthenticatedError) {
+      toast.error(error.message);
+      return;
+    }
+    toast.error(fallback);
+  }
+
   async function handleNew() {
+    if (!authenticated) {
+      toast.error('Inicia sesion para crear notas privadas.');
+      return;
+    }
     const newDraft = {
       title: 'Nueva nota',
       content: '',
@@ -193,8 +235,8 @@ export default function NotasPage() {
       setSelected(created);
       setDraft(newDraft);
       setEditing(true);
-    } catch {
-      toast.error('Error al crear nota');
+    } catch (error) {
+      reportError(error, 'Error al crear nota');
     } finally {
       setSaving(false);
     }
@@ -209,8 +251,8 @@ export default function NotasPage() {
       setSelected(updated);
       setEditing(false);
       toast.success('Nota guardada');
-    } catch {
-      toast.error('Error al guardar');
+    } catch (error) {
+      reportError(error, 'Error al guardar');
     } finally {
       setSaving(false);
     }
@@ -223,8 +265,8 @@ export default function NotasPage() {
       setNotes((prev) => prev.filter((n) => n.id !== id));
       if (selected?.id === id) setSelected(null);
       toast.success('Nota eliminada');
-    } catch {
-      toast.error('Error al eliminar');
+    } catch (error) {
+      reportError(error, 'Error al eliminar');
     }
   }
 
@@ -237,8 +279,8 @@ export default function NotasPage() {
           .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
       );
       if (selected?.id === note.id) setSelected(updated);
-    } catch {
-      toast.error('Error al fijar nota');
+    } catch (error) {
+      reportError(error, 'Error al fijar nota');
     }
   }
 
@@ -300,7 +342,7 @@ export default function NotasPage() {
           />
           <Button
             onClick={handleNew}
-            disabled={saving}
+            disabled={saving || !authenticated}
             className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] px-3"
           >
             <Plus className="h-4 w-4" />
@@ -322,6 +364,15 @@ export default function NotasPage() {
         <div className="flex-1 overflow-y-auto space-y-2">
           {loading ? (
             <p className="text-xs text-center text-muted-foreground py-4">Cargando...</p>
+          ) : !authenticated ? (
+            <div className="rounded-xl border border-[#0c1f36]/10 bg-[#F5F1E8] p-4 text-center">
+              <Lock className="mx-auto mb-2 h-4 w-4 text-muted-foreground" />
+              <p className="text-xs font-semibold text-[#0c1f36]">Inicia sesion</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Las notas son privadas por usuario. Inicia sesion para crear, ver y editar tus
+                notas.
+              </p>
+            </div>
           ) : filtered.length === 0 ? (
             <p className="text-xs text-center text-muted-foreground py-8">Sin notas</p>
           ) : (
@@ -488,11 +539,16 @@ export default function NotasPage() {
           </>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center text-center text-muted-foreground p-8">
-            <p className="text-lg font-semibold text-[#0c1f36]">Selecciona una nota</p>
-            <p className="text-sm mt-1">o crea una nueva</p>
+            <p className="text-lg font-semibold text-[#0c1f36]">
+              {authenticated ? 'Selecciona una nota' : 'Inicia sesion para ver tus notas'}
+            </p>
+            <p className="text-sm mt-1">
+              {authenticated ? 'o crea una nueva' : 'Las notas son privadas por usuario'}
+            </p>
             <Button
               className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
               onClick={handleNew}
+              disabled={!authenticated || saving}
             >
               <Plus className="h-4 w-4 mr-2" />
               Nueva nota
