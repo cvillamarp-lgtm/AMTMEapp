@@ -1,9 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Sparkle, Leaf } from '@phosphor-icons/react';
-import { cn } from '@/lib/utils';
 import { useNextBestActions } from '@/hooks/use-next-best-actions';
 import { useEpisodes, useContentPieces, useMonetizationLeads } from '@/hooks';
 import { NextBestActionWidget } from '@/components/next-best-action-widget';
@@ -19,8 +17,6 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
 }
 
 export default function DashboardPage() {
-  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(null);
-
   // Fetch data using hooks
   const { data: allEpisodes, loading: episodesLoading } = useEpisodes();
   const { data: allContent, loading: contentLoading } = useContentPieces();
@@ -176,7 +172,7 @@ export default function DashboardPage() {
           <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
             <h2 className="font-semibold text-primary">Producción actual</h2>
             <p className="text-sm text-muted-foreground mb-4">Episodios recientes desde Supabase</p>
-            <EpisodeList limit={5} onSelectEpisode={setSelectedEpisodeId} />
+            <EpisodeList limit={5} />
           </div>
         </>
       )}

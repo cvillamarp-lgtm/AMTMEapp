@@ -35,15 +35,23 @@ export function useEpisodes(filters?: EpisodeFilters) {
 
       if (err) throw err;
 
+      interface EpisodeRow {
+        id: string;
+        created_at: string;
+        updated_at: string;
+        user_id: string | null;
+        payload: Record<string, unknown>;
+      }
+
       // Transform payload into Episode
       setData(
-        rows?.map((row: any) => ({
+        (rows?.map((row: EpisodeRow) => ({
           id: row.id,
           created_at: row.created_at,
           updated_at: row.updated_at,
           user_id: row.user_id,
           ...(row.payload || {}),
-        })) || []
+        })) || []) as unknown as Episode[]
       );
       setError(null);
     } catch (e) {

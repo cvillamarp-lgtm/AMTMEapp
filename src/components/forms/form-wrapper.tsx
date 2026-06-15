@@ -3,13 +3,13 @@
 import { ReactNode } from 'react';
 import { useForm, UseFormProps, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ZodSchema } from 'zod';
+import { ZodSchema, z } from 'zod';
 import { Button } from '@/components/shadcn/button';
 
 interface FormWrapperProps<T extends ZodSchema> extends Omit<UseFormProps, 'resolver'> {
   schema: T;
   children: ReactNode;
-  onSubmit: SubmitHandler<any>;
+  onSubmit: SubmitHandler<z.infer<T>>;
   submitLabel?: string;
   loading?: boolean;
   onCancel?: () => void;
