@@ -1,25 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Sparkle, Leaf } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
-import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { useNextBestActions } from '@/hooks/use-next-best-actions';
+import { useEpisodes, useContentPieces, useMonetizationLeads } from '@/hooks';
 import { NextBestActionWidget } from '@/components/next-best-action-widget';
-
-type Episode = {
-  id: string;
-  episode_number: string;
-  title: string;
-  theme: string;
-  status: string;
-  cta: string | null;
-  spotify_description: string | null;
-};
-
-type ContentPiece = { id: string; status: string };
-type Lead = { id: string; status: string; next_action: string };
+import { EpisodeList } from '@/components/lists';
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
@@ -31,49 +19,28 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
 }
 
 export default function DashboardPage() {
-  const [episodes, setEpisodes] = useState<Episode[]>([]);
-  const [content, setContent] = useState<ContentPiece[]>([]);
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedEpisodeId, setSelectedEpisodeId] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const supabase = getSupabaseAuthBrowserClient();
-        if (!supabase) return;
-        const [ep, ct, ld] = await Promise.all([
-          supabase.from('episodes').select('*').order('created_at', { ascending: false }),
-          supabase.from('content_pieces').select('id,status'),
-          supabase.from('monetization_leads').select('id,status,next_action'),
-        ]);
-        setEpisodes(ep.data || []);
-        setContent(ct.data || []);
-        setLeads(ld.data || []);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+  // Fetch data using hooks
+  const { data: allEpisodes, loading: episodesLoading } = useEpisodes();
+  const { data: allContent, loading: contentLoading } = useContentPieces();
+  const { data: allLeads, loading: leadsLoading } = useMonetizationLeads();
 
-  const inProgress = episodes.filter(
-    (e) => !['publicado', 'distribuido', 'medido', 'archivado'].includes(e.status)
-  ).length;
-
-  const published = episodes.filter((e) =>
-    ['publicado', 'distribuido', 'medido'].includes(e.status)
-  ).length;
-
-  const contentPending = content.filter((c) => ['borrador', 'listo'].includes(c.status)).length;
-
-  const activeLeads = leads.filter(
-    (l) => !['pagado', 'entregado', 'perdido'].includes(l.status)
-  ).length;
-
-  const recent = episodes.slice(0, 5);
+  const loading = episodesLoading || contentLoading || leadsLoading;
   const nextBestActions = useNextBestActions();
+
+  // Compute KPIs from fetched data
+  const inProgress = allEpisodes.filter(
+    (e) => !['Publicado', 'Distribuido', 'Medido', 'Archivado'].includes(e.status)
+  ).length;
+
+  const published = allEpisodes.filter((e) =>
+    ['Publicado', 'Distribuido', 'Medido'].includes(e.status)
+  ).length;
+
+  const contentPending = allContent.filter((c) => ['Borrador', 'Listo'].includes(c.status)).length;
+
+  const activeLeads = allLeads.filter((l) => !['Pagado', 'Perdido'].includes(l.status)).length;
 
   return (
     <div className="space-y-6 pb-10">
@@ -208,40 +175,8 @@ export default function DashboardPage() {
           {/* Episodios recientes */}
           <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
             <h2 className="font-semibold text-primary">Producción actual</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Últimos episodios cargados desde Supabase
-            </p>
-            {recent.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4">
-                No hay episodios. Revisa la conexión con Supabase.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {recent.map((ep) => (
-                  <div
-                    key={ep.id}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background p-4"
-                  >
-                    <div>
-                      <p className="font-semibold text-primary">
-                        #{ep.episode_number}: {ep.title}
-                      </p>
-                      <p className="text-sm text-muted-foreground">Tema: {ep.theme}</p>
-                    </div>
-                    <span
-                      className={cn(
-                        'rounded-full px-3 py-1 text-xs font-semibold',
-                        ep.status === 'publicado'
-                          ? 'bg-amtme-lemon text-black'
-                          : 'bg-muted text-muted-foreground'
-                      )}
-                    >
-                      {ep.status.charAt(0).toUpperCase() + ep.status.slice(1)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <p className="text-sm text-muted-foreground mb-4">Episodios recientes desde Supabase</p>
+            <EpisodeList limit={5} onSelectEpisode={setSelectedEpisodeId} />
           </div>
         </>
       )}
