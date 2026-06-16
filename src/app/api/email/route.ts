@@ -1,125 +1,183 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from '@/lib/email/send-email';
-import { getSupabaseAuthServerClient } from '@/lib/supabase/auth-server';
+import { z } from 'zod';
+
+// Email validation schema
+const newsletterSchema = z.object({
+  type: z.literal('newsletter'),
+  email: z.string().email(),
+});
+
+const lecturaSchema = z.object({
+  type: z.literal('lectura-tarot'),
+  name: z.string().min(1),
+  email: z.string().email(),
+  situation: z.string().min(10),
+  question: z.string().optional(),
+  payment_method: z.string().optional(),
+});
+
+type NewsletterData = z.infer<typeof newsletterSchema>;
+type LecturaData = z.infer<typeof lecturaSchema>;
+
+async function sendEmailViaResend(
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[Email API] RESEND_API_KEY not configured');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        from: 'noreply@amitampocomeexplicaron.com',
+        to,
+        subject,
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('[Email API] Resend error', error);
+      return { success: false, error: 'Failed to send email' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('[Email API] Error sending email', error);
+    return { success: false, error: 'Email delivery error' };
+  }
+}
+
+async function handleNewsletter(data: NewsletterData): Promise<Response> {
+  // Send confirmation to user
+  const userEmailHtml = `
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0c1f36;">
+        <p>Gracias por suscribirte a AMTME.</p>
+        <p>Esta será una carta breve, íntima y sin ruido. Sin spam, siempre.</p>
+        <p>Próximo envío en dos semanas.</p>
+        <p>— Christian</p>
+      </body>
+    </html>
+  `;
+
+  await sendEmailViaResend(data.email, 'Bienvenida a AMTME', userEmailHtml);
+
+  // Send notification to admin
+  const adminEmail = process.env.AMTME_CONTACT_EMAIL || 'c.villamarp@gmail.com';
+  const adminEmailHtml = `
+    <html>
+      <body style="font-family: monospace;">
+        <h2>Nueva suscripción newsletter</h2>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+      </body>
+    </html>
+  `;
+
+  await sendEmailViaResend(adminEmail, 'Nueva suscripción newsletter — AMTME', adminEmailHtml);
+
+  return NextResponse.json({ success: true }, { status: 200 });
+}
+
+async function handleLectura(data: LecturaData): Promise<Response> {
+  // Send confirmation to user
+  const userEmailHtml = `
+    <html>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0c1f36;">
+        <p>Gracias por solicitar tu lectura simbólica.</p>
+        <p>Recibí tu mensaje. Te responderé personalmente con los detalles de pago y el siguiente paso.</p>
+        <p>Que esperes esta lectura con claridad, no con ansiedad.</p>
+        <p>— Christian</p>
+      </body>
+    </html>
+  `;
+
+  await sendEmailViaResend(data.email, 'Tu lectura simbólica — AMTME', userEmailHtml);
+
+  // Send notification to admin
+  const adminEmail = process.env.AMTME_CONTACT_EMAIL || 'c.villamarp@gmail.com';
+  const adminEmailHtml = `
+    <html>
+      <body style="font-family: monospace;">
+        <h2>Nueva solicitud de lectura simbólica</h2>
+        <p><strong>Nombre:</strong> ${data.name}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        <p><strong>Situación:</strong></p>
+        <pre>${data.situation}</pre>
+        <p><strong>Pregunta:</strong></p>
+        <pre>${data.question || 'Lectura general'}</pre>
+        <p><strong>Método de pago:</strong> ${data.payment_method || 'No especificado'}</p>
+        <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+      </body>
+    </html>
+  `;
+
+  await sendEmailViaResend(
+    adminEmail,
+    'Nueva solicitud de lectura simbólica — AMTME',
+    adminEmailHtml
+  );
+
+  return NextResponse.json({ success: true }, { status: 200 });
+}
 
 export async function POST(request: NextRequest) {
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.error('[Email API] Email service is not configured');
+    const contentType = request.headers.get('content-type');
 
+    let data: Record<string, string>;
+
+    if (contentType?.includes('application/json')) {
+      data = await request.json();
+    } else if (contentType?.includes('application/x-www-form-urlencoded')) {
+      const formData = await request.formData();
+      data = {};
+      formData.forEach((value, key) => {
+        if (typeof value === 'string') {
+          data[key] = value;
+        }
+      });
+    } else {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Email service unavailable',
-          code: 'CONFIG_ERROR',
-        },
-        { status: 503 }
+        { success: false, error: 'Unsupported content type' },
+        { status: 415 }
       );
     }
 
-    // Verify user is authenticated
-    const supabase = await getSupabaseAuthServerClient();
-    if (!supabase) {
-      console.error('[Email API] Authentication service is not configured');
+    const type = data.type as string;
 
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Email request could not be processed',
-          code: 'CONFIG_ERROR',
-        },
-        { status: 503 }
-      );
+    // Route to appropriate handler
+    if (type === 'newsletter') {
+      const validated = newsletterSchema.parse(data);
+      return await handleNewsletter(validated);
+    } else if (type === 'lectura-tarot') {
+      const validated = lecturaSchema.parse(data);
+      return await handleLectura(validated);
+    } else {
+      return NextResponse.json({ success: false, error: 'Invalid request type' }, { status: 400 });
     }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
+  } catch (error) {
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Unauthorized',
-          code: 'UNAUTHORIZED',
-        },
-        { status: 401 }
-      );
-    }
-
-    const body = await request.json();
-
-    const { to, templateId, subject, variables } = body;
-
-    // Basic request validation
-    if (!to || !templateId || !subject) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Missing required fields: to, templateId, subject',
-          code: 'INVALID_REQUEST',
-        },
+        { success: false, error: 'Invalid form data', details: error.errors },
         { status: 400 }
       );
     }
 
-    // Security: Verify recipient email matches authenticated user
-    // Users can only send to their own email address
-    if (to !== user.email) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'You can only send emails to your registered email address',
-          code: 'FORBIDDEN',
-        },
-        { status: 403 }
-      );
-    }
-
-    // Send email
-    const result = await sendEmail({
-      to,
-      templateId,
-      subject,
-      variables: variables || {},
-    });
-
-    // Return 400 for validation errors, 500 for server errors
-    if (!result.success) {
-      const statusCode =
-        result.code === 'INVALID_EMAIL' || result.code === 'INVALID_TEMPLATE' ? 400 : 500;
-
-      if (statusCode >= 500) {
-        console.error('[Email API] Email delivery failed', {
-          code: result.code,
-          message: result.error,
-        });
-
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Email request could not be processed',
-            code: result.code || 'EMAIL_DELIVERY_ERROR',
-          },
-          { status: statusCode }
-        );
-      }
-
-      return NextResponse.json(result, { status: statusCode });
-    }
-
-    return NextResponse.json(result, { status: 200 });
-  } catch (error) {
-    console.error('[Email API] Request failed', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-    });
-
+    console.error('[Email API] Request failed', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Email request could not be processed',
-        code: 'SERVER_ERROR',
-      },
+      { success: false, error: 'Request processing failed' },
       { status: 500 }
     );
   }

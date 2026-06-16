@@ -24,8 +24,8 @@ const specialElite = Special_Elite({
 });
 
 export const metadata: Metadata = {
-  title: 'AMTME Studio OS',
-  description: 'Sistema operativo editorial, documental y operativo para AMTME.',
+  title: 'A Mí Tampoco Me Explicaron',
+  description: 'Pódcast sobre amor, apego e identidad. Escucha gratis en Spotify.',
   robots: { index: false, follow: false },
 };
 

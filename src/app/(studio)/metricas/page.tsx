@@ -820,7 +820,7 @@ Solo JSON. Espanol neutro.`;
                   Importar desde Spotify <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
                 <Link
-                  href="/episodios"
+                  href="/episodios-admin"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition-colors"
                 >
                   Ver episodios <ArrowRight className="h-3.5 w-3.5" />

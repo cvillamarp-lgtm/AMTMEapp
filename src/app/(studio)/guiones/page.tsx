@@ -419,7 +419,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
           </p>
           <div className="flex gap-2 justify-center">
             <Link
-              href="/episodios"
+              href="/episodios-admin"
               className="rounded-lg border border-black/10 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
             >
               Ver episodios
