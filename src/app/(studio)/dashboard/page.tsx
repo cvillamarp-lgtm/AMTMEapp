@@ -83,7 +83,7 @@ export default function DashboardPage() {
                   Documento maestro
                 </Link>
                 <Link
-                  href="/episodios-admin"
+                  href="/studio/episodios"
                   className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
                 >
                   Episodios

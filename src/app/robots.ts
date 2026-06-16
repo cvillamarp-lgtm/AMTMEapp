@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/studio', '/auth', '/(studio)'],
+        disallow: ['/studio', '/studio/*', '/auth', '/api'],
       },
     ],
     sitemap: 'https://www.amitampocomeexplicaron.com/sitemap.xml',

@@ -335,7 +335,7 @@ export default function DocumentoMaestroPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Link
-                  href="/episodios-admin"
+                  href="/studio/episodios"
                   className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-[#0C1F36] hover:text-white transition-colors"
                 >
                   → Convertir en episodio
@@ -358,7 +358,7 @@ export default function DocumentoMaestroPage() {
             <p className="text-sm text-black/40">Selecciona una sección para editarla.</p>
             <div className="flex gap-2">
               <Link
-                href="/episodios-admin"
+                href="/studio/episodios"
                 className="rounded-xl border border-black/10 bg-[#F5F2EA] px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-white transition-colors"
               >
                 Ver episodios
