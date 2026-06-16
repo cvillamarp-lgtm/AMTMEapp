@@ -1,80 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700&family=Crimson+Text:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
-    font-family:
-      'Inter',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      sans-serif;
+    @apply border-amtme-border;
   }
+
+  html {
+    font-size: 16px;
+  }
+
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-amtme-background text-amtme-foreground font-body;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-bold leading-tight tracking-tight;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl lg:text-7xl;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h4 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  h5 {
+    @apply text-xl md:text-2xl;
+  }
+
+  h6 {
+    @apply text-lg md:text-xl;
+  }
+
+  /* Body text */
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Links */
+  a {
+    @apply text-amtme-accent hover:text-amtme-yellow transition-colors duration-200;
+  }
+
+  /* Focus visible */
+  :focus-visible {
+    @apply outline-2 outline-amtme-yellow outline-offset-2;
+  }
+
+  /* Code */
+  code {
+    @apply font-mono text-sm;
   }
 }
 
 :root {
+  /* AMTME Color Palette */
+  --amtme-navy: #0c1f36;
+  --amtme-yellow: #fee94b;
+  --amtme-red: #e0211e;
+  --amtme-white: #f8f8f6;
+  --amtme-charcoal: #0d0d0d;
+
+  /* Semantic colors */
+  --amtme-background: #0c1f36;
+  --amtme-foreground: #f8f8f6;
+  --amtme-accent: #fee94b;
+  --amtme-accent-dark: #0c1f36;
+  --amtme-destructive: #e0211e;
+  --amtme-border: rgba(248, 248, 246, 0.1);
+
+  /* Grays */
+  --amtme-gray-50: #f9fafb;
+  --amtme-gray-100: #f3f4f6;
+  --amtme-gray-200: #e5e7eb;
+  --amtme-gray-300: #d1d5db;
+  --amtme-gray-400: #9ca3af;
+  --amtme-gray-500: #6b7b8c;
+  --amtme-gray-600: #4b5563;
+  --amtme-gray-700: #374151;
+  --amtme-gray-800: #1f2937;
+  --amtme-gray-900: #111827;
+
+  /* Functional colors */
+  --amtme-success: #10b981;
+  --amtme-warning: #f59e0b;
+  --amtme-info: #3b82f6;
+
+  /* Motion */
+  --amtme-duration-fast: 150ms;
+  --amtme-duration-base: 200ms;
+  --amtme-duration-slow: 300ms;
+  --amtme-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Radius */
+  --amtme-radius-sm: 2px;
+  --amtme-radius-md: 4px;
+  --amtme-radius-lg: 6px;
+  --amtme-radius-xl: 8px;
+
+  /* Z-index */
+  --amtme-z-base: 0;
+  --amtme-z-dropdown: 1000;
+  --amtme-z-sticky: 1020;
+  --amtme-z-fixed: 1030;
+  --amtme-z-backdrop: 1040;
+  --amtme-z-modal: 1060;
+  --amtme-z-popover: 1070;
+  --amtme-z-tooltip: 1080;
+
+  /* Backward compatibility with shadcn */
   --background: 43 20% 96%;
   --foreground: 231 50% 18%;
-
   --card: 0 0% 100%;
   --card-foreground: 231 50% 18%;
-
   --popover: 0 0% 100%;
   --popover-foreground: 231 50% 18%;
-
   --primary: 231 50% 18%;
   --primary-foreground: 0 0% 100%;
-
   --secondary: 215 20% 55%;
   --secondary-foreground: 0 0% 100%;
-
   --muted: 43 15% 93%;
   --muted-foreground: 215 20% 45%;
-
   --accent: 54 99% 65%;
   --accent-foreground: 231 50% 18%;
-
   --destructive: 4 85% 55%;
   --destructive-foreground: 0 0% 100%;
-
   --border: 220 13% 88%;
   --input: 220 13% 88%;
   --ring: 54 99% 65%;
-
-  --radius: 0.625rem;
-
-  /* AMTME tokens exactos */
-  --amtme-navy: #0c1f36;
-  --amtme-lemon: #e8ff40;
-  --amtme-cream: #f5f1e8;
-  --amtme-slate: #6b7b8c;
-  --amtme-red: #e0211e;
-  --amtme-white: #ffffff;
+  --radius: 6px;
 }
 
-/* Scrollbar discreta */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: rgba(12, 31, 54, 0.15);
+  background: rgba(248, 248, 246, 0.15);
   border-radius: 99px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(12, 31, 54, 0.28);
+  background: rgba(248, 248, 246, 0.3);
 }
 
+/* Selection */
 ::selection {
-  background: rgba(232, 255, 64, 0.4);
+  background: rgba(254, 233, 75, 0.3);
   color: #0c1f36;
+}
+
+/* Component utilities */
+@layer components {
+  /* Button base */
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-amtme-yellow focus-visible:outline-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-amtme-navy text-amtme-yellow hover:bg-amtme-charcoal;
+  }
+
+  .btn-secondary {
+    @apply btn bg-amtme-yellow text-amtme-navy hover:bg-amtme-accent-dark hover:text-amtme-yellow border border-amtme-yellow;
+  }
+
+  .btn-ghost {
+    @apply btn text-amtme-yellow hover:bg-amtme-navy/20;
+  }
+
+  .btn-destructive {
+    @apply btn bg-amtme-red text-amtme-white hover:bg-amtme-red/80;
+  }
+
+  /* Card base */
+  .card {
+    @apply rounded-lg border border-amtme-border bg-amtme-navy/50 backdrop-blur-sm p-6 shadow-sm;
+  }
+
+  /* Section */
+  .section {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Container */
+  .container-amtme {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
 }

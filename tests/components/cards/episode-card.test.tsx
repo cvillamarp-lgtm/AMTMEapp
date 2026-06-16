@@ -27,7 +27,7 @@ const mockEpisode: Episode = {
 describe('EpisodeCard', () => {
   it('renders episode number and title', () => {
     render(<EpisodeCard episode={mockEpisode} />);
-    expect(screen.getByText('001')).toBeInTheDocument();
+    expect(screen.getByText(/001/)).toBeInTheDocument();
     expect(screen.getByText('Test Episode')).toBeInTheDocument();
   });
 

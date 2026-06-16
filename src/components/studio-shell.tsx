@@ -30,6 +30,7 @@ import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { useIdleLogout } from '@/hooks/use-idle-logout';
 import { GlobalCommandPalette } from '@/components/global-command-palette';
+import type { ReactNode as RN } from 'react';
 
 const ALL_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: House },
@@ -91,7 +92,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
   });
 
   return (
-    <div className="flex min-h-screen bg-background font-sans">
+    <div className="flex min-h-screen bg-amtme-navy font-body">
       {/* ── Banner de inactividad ────────────────────────────────────────── */}
       {showWarning && (
         <div
@@ -99,19 +100,21 @@ export function StudioShell({ children }: { children: ReactNode }) {
           aria-modal="true"
           aria-labelledby="idle-title"
           aria-describedby="idle-desc"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          className="fixed inset-0 z-modal flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-sm rounded-lg bg-amtme-white p-6 shadow-lg border border-amtme-border">
             <div className="flex items-start gap-3">
-              <Warning size={22} weight="fill" className="mt-0.5 shrink-0 text-amber-500" />
+              <Warning size={22} weight="fill" className="mt-0.5 shrink-0 text-amtme-yellow" />
               <div>
                 <p id="idle-title" className="text-sm font-semibold text-amtme-navy">
                   Sesión por cerrarse
                 </p>
-                <p id="idle-desc" className="mt-1 text-sm text-amtme-slate">
+                <p id="idle-desc" className="mt-1 text-sm text-amtme-gray-500">
                   Por seguridad, tu sesión se cerrará por inactividad.
                   {remainingSeconds > 0 && (
-                    <span className="ml-1 font-medium text-amtme-navy">({remainingSeconds}s)</span>
+                    <span className="ml-1 font-semibold text-amtme-navy">
+                      ({remainingSeconds}s)
+                    </span>
                   )}
                 </p>
               </div>
@@ -119,13 +122,13 @@ export function StudioShell({ children }: { children: ReactNode }) {
             <div className="mt-5 flex gap-3">
               <button
                 onClick={keepSession}
-                className="flex-1 rounded-xl bg-amtme-navy px-4 py-2.5 text-sm font-semibold text-amtme-white transition hover:bg-opacity-90"
+                className="flex-1 rounded-md bg-amtme-yellow text-amtme-navy px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:bg-amtme-yellow/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-navy"
               >
                 Mantener sesión
               </button>
               <button
                 onClick={() => void signOutNow()}
-                className="rounded-xl border border-amtme-red/30 px-4 py-2.5 text-sm font-semibold text-amtme-red transition hover:bg-amtme-red/8"
+                className="rounded-md border border-amtme-gray-300 px-4 py-2.5 text-sm font-semibold text-amtme-navy transition-all duration-200 hover:bg-amtme-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-yellow"
               >
                 Cerrar sesión
               </button>
@@ -135,15 +138,17 @@ export function StudioShell({ children }: { children: ReactNode }) {
       )}
 
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-30">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-fixed border-r border-amtme-yellow/10">
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-5 border-b border-white/10">
-            <h1 className="text-base font-semibold text-white tracking-tight">AMTME Studio OS</h1>
+          <div className="flex items-center justify-between h-16 px-6 border-b border-amtme-yellow/10">
+            <h1 className="text-base font-display font-bold text-amtme-yellow tracking-tight">
+              AMTME Studio
+            </h1>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-3 py-4 space-y-0.5">
+          <nav className="flex-1 px-3 py-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -154,10 +159,10 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
+                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200',
                     isActive
-                      ? 'bg-amtme-lemon text-amtme-navy'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white'
+                      ? 'bg-amtme-yellow text-amtme-navy shadow-soft'
+                      : 'text-amtme-white/70 hover:bg-amtme-white/10 hover:text-amtme-white'
                   )}
                 >
                   <Icon size={20} weight="regular" />
@@ -168,12 +173,12 @@ export function StudioShell({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Footer con logout visible */}
-          <div className="px-4 py-4 border-t border-white/10">
+          <div className="px-4 py-4 border-t border-amtme-yellow/10">
             {authRequired && (
               <button
                 onClick={() => void signOut()}
                 disabled={signingOut}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40"
+                className="flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium text-amtme-white/60 transition-all duration-200 hover:bg-amtme-white/10 hover:text-amtme-white disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-yellow"
               >
                 <SignOut size={18} weight="regular" />
                 {signingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
@@ -184,13 +189,15 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="flex-1 md:pl-64 min-h-screen">
-        <div className="h-full p-6 pb-24 md:pb-6">{children}</div>
+      <main className="flex-1 md:pl-64 min-h-screen bg-amtme-background">
+        <div className="h-full p-6 pb-24 md:pb-6 max-w-7xl mx-auto">
+          <div className="space-y-6">{children}</div>
+        </div>
       </main>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
       {mobileItems.length > 0 && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-white/10 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-amtme-yellow/10 z-fixed">
           <div
             className={cn('gap-1 p-2', {
               'grid grid-cols-5': mobileItems.length === 5,
@@ -209,8 +216,10 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-colors',
-                    isActive ? 'bg-amtme-lemon text-amtme-navy' : 'text-white/70'
+                    'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-all duration-200',
+                    isActive
+                      ? 'bg-amtme-yellow text-amtme-navy shadow-soft'
+                      : 'text-amtme-white/70 hover:text-amtme-white'
                   )}
                 >
                   <Icon size={20} weight="regular" />
