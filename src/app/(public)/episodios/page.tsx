@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
+import { PublicNav } from '@/components/public/PublicNav';
+import { PublicFooter } from '@/components/public/PublicFooter';
+import { Section } from '@/components/public/Section';
 
 const SPOTIFY_SHOW_URL =
   process.env.NEXT_PUBLIC_SPOTIFY_URL || 'https://open.spotify.com/show/REEMPLAZA';
@@ -37,9 +40,9 @@ async function getAllEpisodes() {
 }
 
 export const metadata = {
-  title: 'Episodios | AMTME',
+  title: 'Episodios | A Mí Tampoco Me Explicaron',
   description:
-    'Todos los episodios de A Mí Tampoco Me Explicaron. 34+ conversaciones sobre amor, apego e identidad.',
+    'Conversaciones honestas sobre amor, apego, identidad, límites y todo eso que nadie nos explicó.',
 };
 
 export default async function EpisodiosPage() {
@@ -47,51 +50,37 @@ export default async function EpisodiosPage() {
 
   return (
     <div className="min-h-screen bg-[#0c1f36] text-white">
-      {/* NAV */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <Link
-          href="/"
-          className="font-bold text-lg tracking-tight hover:text-[#e8ff40] transition-colors"
-        >
-          AMTME
-        </Link>
-        <div className="flex gap-6 text-sm">
-          <Link href="/episodios" className="text-[#e8ff40] font-semibold">
-            Episodios
-          </Link>
-          <Link href="/lecturas" className="text-[#9DC4D5] hover:text-white transition-colors">
-            Lecturas
-          </Link>
-          <Link href="/sobre" className="text-[#9DC4D5] hover:text-white transition-colors">
-            Sobre
-          </Link>
-        </div>
-      </nav>
+      <PublicNav activeRoute="/episodios" />
 
-      {/* HERO */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
-        <p className="text-[#e8ff40] text-sm font-semibold uppercase tracking-widest mb-4">
-          Escúchalos todos
-        </p>
-        <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 font-josefin">
-          {episodes.length || '34+'} conversaciones profundas
-        </h1>
-        <p className="text-[#9DC4D5] text-lg leading-relaxed max-w-2xl">
-          Episodios sobre amor, apego, identidad, límites, ruptura y tarot simbólico. Escúchalos en
-          Spotify o explora los títulos aquí.
-        </p>
-        <a
-          href={SPOTIFY_SHOW_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block mt-8 bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-3 rounded-full hover:bg-[#d4eb3a] transition-colors"
-        >
-          Escuchar en Spotify →
-        </a>
+      {/* HERO — Editorial */}
+      <section className="pt-32 pb-20 px-6 border-b border-white/10">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#e8ff40] mb-4">
+              Escúchalos todos
+            </p>
+            <h1 className="text-5xl md:text-6xl font-josefin font-bold leading-tight mb-6">
+              Episodios
+            </h1>
+            <p className="text-lg text-[#9DC4D5] leading-relaxed max-w-3xl">
+              Conversaciones honestas sobre amor, apego, identidad, límites y todo eso que nadie nos
+              explicó.
+            </p>
+          </div>
+
+          <a
+            href={SPOTIFY_SHOW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-4 rounded-lg hover:bg-[#d4eb3a] transition-all duration-200"
+          >
+            Escuchar en Spotify
+          </a>
+        </div>
       </section>
 
-      {/* EPISODIOS GRID */}
-      <section className="max-w-4xl mx-auto px-6 py-16 border-t border-white/10">
+      {/* EPISODIOS LISTA */}
+      <Section background="transparent" border="none">
         {episodes.length > 0 ? (
           <div className="space-y-4">
             {episodes.map((ep: any) => (
@@ -100,24 +89,26 @@ export default async function EpisodiosPage() {
                 href={SPOTIFY_SHOW_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block border border-white/10 rounded-2xl p-6 hover:border-[#e8ff40]/40 hover:bg-white/5 transition-all group"
+                className="group block border border-white/10 rounded-xl p-6 hover:border-[#e8ff40]/30 hover:bg-white/5 transition-all duration-200"
               >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <span className="text-[#e8ff40] font-bold text-xl">
-                      #{ep.episode_number || '?'}
+                <div className="flex items-start gap-6">
+                  <div className="flex-shrink-0 pt-1">
+                    <span className="text-3xl font-bold text-[#e8ff40]">
+                      {ep.episode_number || '?'}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-white group-hover:text-[#e8ff40] transition-colors">
+                    <h3 className="text-lg font-semibold text-white group-hover:text-[#e8ff40] transition-colors mb-2">
                       {ep.title || 'Sin título'}
                     </h3>
-                    {ep.theme && <p className="text-[#9DC4D5] text-sm mt-1">{ep.theme}</p>}
-                    {ep.description && (
-                      <p className="text-[#9DC4D5] text-sm mt-2 line-clamp-2">{ep.description}</p>
-                    )}
+                    <div className="flex flex-col gap-2">
+                      {ep.theme && <p className="text-[#9DC4D5] text-sm">{ep.theme}</p>}
+                      {ep.description && (
+                        <p className="text-[#9DC4D5] text-sm line-clamp-2">{ep.description}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-shrink-0 text-[#e8ff40] text-xl group-hover:translate-x-1 transition-transform">
+                  <div className="flex-shrink-0 text-[#e8ff40] text-xl opacity-0 group-hover:opacity-100 transition-opacity">
                     →
                   </div>
                 </div>
@@ -125,86 +116,23 @@ export default async function EpisodiosPage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <p className="text-[#9DC4D5] mb-6">
+          <div className="text-center py-24">
+            <p className="text-[#9DC4D5] text-lg mb-8">
               Los episodios se cargan desde Spotify. Explora todos aquí:
             </p>
             <a
               href={SPOTIFY_SHOW_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-3 rounded-full hover:bg-[#d4eb3a] transition-colors"
+              className="inline-block bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-4 rounded-lg hover:bg-[#d4eb3a] transition-all duration-200"
             >
-              Ver en Spotify →
+              Ver en Spotify
             </a>
           </div>
         )}
-      </section>
+      </Section>
 
-      {/* FILTROS FUTUROS */}
-      {episodes.length > 0 && (
-        <section className="max-w-4xl mx-auto px-6 py-16 border-t border-white/10">
-          <p className="text-[#9DC4D5] text-sm text-center">
-            Filtros por tema próximamente: Amor, Apego, Identidad, Límites, Ruptura, Tarot simbólico
-          </p>
-        </section>
-      )}
-
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 px-6 py-12 bg-white/5">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h4 className="font-bold mb-3">Contenido</h4>
-              <ul className="space-y-2 text-[#9DC4D5] text-sm">
-                <li>
-                  <Link href="/episodios" className="hover:text-white transition-colors">
-                    Episodios
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/lecturas" className="hover:text-white transition-colors">
-                    Lecturas simbólicas
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href={SPOTIFY_SHOW_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors"
-                  >
-                    Spotify
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3">Sobre</h4>
-              <ul className="space-y-2 text-[#9DC4D5] text-sm">
-                <li>
-                  <Link href="/sobre" className="hover:text-white transition-colors">
-                    Acerca de AMTME
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="https://instagram.com/yosoyvillamar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors"
-                  >
-                    @yosoyvillamar
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center text-[#9DC4D5] text-sm">
-            <p>© 2026 A Mí Tampoco Me Explicaron</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { PublicNav } from '@/components/public/PublicNav';
+import { PublicFooter } from '@/components/public/PublicFooter';
+import { Section } from '@/components/public/Section';
 
 const SPOTIFY_SHOW_URL =
   process.env.NEXT_PUBLIC_SPOTIFY_URL || 'https://open.spotify.com/show/REEMPLAZA';
@@ -12,254 +15,213 @@ export const metadata = {
 export default function SobrePage() {
   return (
     <div className="min-h-screen bg-[#0c1f36] text-white">
-      {/* NAV */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <Link
-          href="/"
-          className="font-bold text-lg tracking-tight hover:text-[#e8ff40] transition-colors"
-        >
-          AMTME
-        </Link>
-        <div className="flex gap-6 text-sm">
-          <Link href="/episodios" className="text-[#9DC4D5] hover:text-white transition-colors">
-            Episodios
-          </Link>
-          <Link href="/lecturas" className="text-[#9DC4D5] hover:text-white transition-colors">
-            Lecturas
-          </Link>
-          <Link href="/sobre" className="text-[#e8ff40] font-semibold">
-            Sobre
-          </Link>
-        </div>
-      </nav>
+      <PublicNav activeRoute="/sobre" />
 
-      {/* HERO */}
-      <section className="max-w-3xl mx-auto px-6 py-16">
-        <p className="text-[#e8ff40] text-sm font-semibold uppercase tracking-widest mb-4">
-          La historia
-        </p>
-        <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4 font-josefin">
-          No te habla alguien que ya llegó
-        </h1>
-        <p className="text-[#9DC4D5] text-lg leading-relaxed max-w-2xl">
-          Te habla alguien que también está aprendiendo a nombrar lo que antes solo dolía.
-        </p>
+      {/* HERO — Editorial y sobrio */}
+      <section className="pt-32 pb-24 px-6 border-b border-white/10">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#e8ff40] mb-6">
+              La historia
+            </p>
+            <h1 className="text-5xl md:text-6xl font-josefin font-bold leading-tight mb-8">
+              No te habla alguien que ya llegó
+            </h1>
+          </div>
+
+          <p className="text-lg text-[#9DC4D5] leading-relaxed max-w-3xl mx-auto">
+            Te habla alguien que también está aprendiendo a nombrar lo que antes solo dolía.
+          </p>
+        </div>
       </section>
 
-      {/* ACERCA DE CHRISTIAN */}
-      <section className="max-w-3xl mx-auto px-6 py-16 border-t border-white/10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
-          <div className="md:col-span-2">
-            <h2 className="text-2xl font-bold mb-6 font-josefin">Christian Villamar</h2>
-            <div className="space-y-4 text-[#9DC4D5] leading-relaxed">
-              <p>
-                Creador de AMTME. Hospedera de conversaciones profundas. Practicante de tarot
-                simbólico. Alguien que aprendió tarde a nombrar lo que sentía.
-              </p>
-              <p>
-                Durante años guardé silencio sobre los patrones que repetía, las relaciones que
-                elegía, la identidad que construía. Cuando empecé a observar, a nombrar, a entender
-                — algo cambió.
-              </p>
-              <p>
-                AMTME nació de esa pregunta: ¿qué hacemos con todo lo que sentimos pero que nadie
-                nos enseñó a entender?
-              </p>
+      {/* CHRISTIAN */}
+      <Section background="light" border="none">
+        <div className="max-w-4xl mx-auto space-y-12">
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="md:col-span-2 space-y-6">
+              <div>
+                <h2 className="text-3xl font-josefin font-bold mb-6">Christian Villamar</h2>
+                <p className="text-[#9DC4D5] text-lg leading-relaxed mb-4">
+                  Creador de AMTME. Hospedera de conversaciones profundas. Practicante de tarot
+                  simbólico. Alguien que aprendió tarde a nombrar lo que sentía.
+                </p>
+                <p className="text-[#9DC4D5] text-lg leading-relaxed mb-4">
+                  Durante años guardé silencio sobre los patrones que repetía, las relaciones que
+                  elegía, la identidad que construía. Cuando empecé a observar, a nombrar, a
+                  entender — algo cambió.
+                </p>
+                <p className="text-[#9DC4D5] text-lg leading-relaxed">
+                  AMTME nació de esa pregunta: ¿qué hacemos con todo lo que sentimos pero que nadie
+                  nos enseñó a entender?
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 h-fit">
-            <div className="space-y-3 text-sm">
-              <div>
-                <p className="text-[#e8ff40] font-bold">34+</p>
-                <p className="text-[#9DC4D5]">episodios publicados</p>
-              </div>
-              <div>
-                <p className="text-[#e8ff40] font-bold">8,700+</p>
-                <p className="text-[#9DC4D5]">escuchas totales</p>
-              </div>
-              <div>
-                <p className="text-[#e8ff40] font-bold">15+</p>
-                <p className="text-[#9DC4D5]">países de escuchas</p>
+
+            <div className="bg-white/10 border border-white/10 rounded-xl p-8 h-fit">
+              <div className="space-y-6">
+                <div className="text-center">
+                  <p className="text-4xl font-bold text-[#e8ff40] mb-2">34+</p>
+                  <p className="text-sm text-[#9DC4D5] font-semibold">episodios publicados</p>
+                </div>
+                <div className="border-t border-white/10 pt-6 text-center">
+                  <p className="text-4xl font-bold text-[#e8ff40] mb-2">15+</p>
+                  <p className="text-sm text-[#9DC4D5] font-semibold">países de escuchas</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* QUÉ ES AMTME */}
-      <section className="bg-white/5 border-t border-white/10">
-        <div className="max-w-3xl mx-auto px-6 py-16">
-          <h2 className="text-3xl font-bold mb-12 font-josefin">Qué es AMTME</h2>
-          <div className="space-y-8">
-            <p className="text-[#9DC4D5] text-lg leading-relaxed">
+      {/* QUÉ ES / QUÉ NO ES */}
+      <Section background="dark" border="top">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-josefin font-bold mb-12 text-center">
+            Qué es AMTME
+          </h2>
+
+          <div className="space-y-10 mb-12">
+            <p className="text-lg text-[#9DC4D5] leading-relaxed text-center">
               A Mí Tampoco Me Explicaron nació porque nadie nos enseñó qué hacer cuando el amor
               duele, cuando un vínculo te confunde o cuando no reconoces la persona en la que te has
               convertido.
             </p>
-            <p className="text-[#9DC4D5] text-lg leading-relaxed">
+            <p className="text-lg text-[#9DC4D5] leading-relaxed text-center">
               Este es el espacio que hubiera querido encontrar cuando más lo necesitaba. No para que
               alguien te diga qué hacer. Para que puedas por fin nombrarlo.
             </p>
-            <div className="grid md:grid-cols-2 gap-8 pt-8 border-t border-white/10">
-              <div>
-                <h3 className="text-xl font-bold mb-4 text-[#e8ff40]">Qué sí es</h3>
-                <ul className="space-y-2 text-[#9DC4D5] text-sm">
-                  <li className="flex gap-2">
-                    <span>✓</span>
-                    <span>Un refugio simbólico</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>✓</span>
-                    <span>Una conversación honesta</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>✓</span>
-                    <span>Una forma de nombrar lo que antes dolía en silencio</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>✓</span>
-                    <span>Episodios sobre amor, apego, identidad, límites, duelo</span>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-4 text-[#e0211e]">Qué no es</h3>
-                <ul className="space-y-2 text-[#9DC4D5] text-sm">
-                  <li className="flex gap-2">
-                    <span>✗</span>
-                    <span>Terapia</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>✗</span>
-                    <span>Predicción</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>✗</span>
-                    <span>Coaching</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span>✗</span>
-                    <span>Promesas de sanación rápida</span>
-                  </li>
-                </ul>
-              </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 border-t border-white/10 pt-12">
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-white">Qué sí es</h3>
+              <ul className="space-y-4 text-[#9DC4D5] text-base leading-relaxed">
+                <li className="flex gap-4">
+                  <span className="text-[#e8ff40] flex-shrink-0 font-bold text-lg">✓</span>
+                  <span>Un refugio simbólico</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-[#e8ff40] flex-shrink-0 font-bold text-lg">✓</span>
+                  <span>Una conversación honesta</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-[#e8ff40] flex-shrink-0 font-bold text-lg">✓</span>
+                  <span>Una forma de nombrar lo que antes dolía en silencio</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-[#e8ff40] flex-shrink-0 font-bold text-lg">✓</span>
+                  <span>Episodios sobre amor, apego, identidad, límites, duelo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-white">Qué no es</h3>
+              <ul className="space-y-4 text-[#9DC4D5] text-base leading-relaxed">
+                <li className="flex gap-4">
+                  <span className="text-[#e0211e] flex-shrink-0 font-bold text-lg">✗</span>
+                  <span>Terapia</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-[#e0211e] flex-shrink-0 font-bold text-lg">✗</span>
+                  <span>Predicción</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-[#e0211e] flex-shrink-0 font-bold text-lg">✗</span>
+                  <span>Coaching</span>
+                </li>
+                <li className="flex gap-4">
+                  <span className="text-[#e0211e] flex-shrink-0 font-bold text-lg">✗</span>
+                  <span>Promesas de sanación rápida</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* CITA */}
-      <section className="max-w-3xl mx-auto px-6 py-16 border-t border-white/10">
-        <blockquote className="border-l-4 border-[#e8ff40] pl-6 font-special-elite text-2xl text-[#e8ff40] italic">
-          "Aquí no hay gurús. Hay conversación."
-        </blockquote>
-        <p className="text-[#9DC4D5] text-sm mt-6">— Christian Villamar, creador de AMTME</p>
-      </section>
+      {/* CITA SELLO */}
+      <Section background="transparent" border="top">
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          <blockquote className="text-2xl md:text-3xl font-special-elite text-[#e8ff40] italic leading-relaxed">
+            "Aquí no hay gurús. Hay conversación."
+          </blockquote>
+          <p className="text-[#9DC4D5] text-sm font-semibold">
+            — Christian Villamar, creador de AMTME
+          </p>
+        </div>
+      </Section>
 
-      {/* ESCUCHA Y EXPLORA */}
-      <section className="bg-white/5 border-t border-white/10">
-        <div className="max-w-3xl mx-auto px-6 py-16 text-center">
-          <h2 className="text-3xl font-bold mb-8 font-josefin">Escucha y explora</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
+      {/* TAROT COMO ESPEJO */}
+      <Section background="light" border="top">
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          <h2 className="text-3xl md:text-4xl font-josefin font-bold">El tarot como espejo</h2>
+
+          <p className="text-lg text-[#9DC4D5] leading-relaxed">
+            El tarot no predice el futuro. Te ayuda a entenderlo. En AMTME, el tarot es una
+            herramienta para la introspección, no para el escapismo. Es una forma de ver con más
+            claridad lo que ya está pasando.
+          </p>
+        </div>
+      </Section>
+
+      {/* CTA FINAL */}
+      <Section background="dark" border="top">
+        <div className="max-w-2xl mx-auto text-center space-y-8">
+          <h2 className="text-3xl md:text-4xl font-josefin font-bold">Comienza aquí</h2>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href={SPOTIFY_SHOW_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#e8ff40] text-[#0c1f36] font-semibold px-6 py-3 rounded-full hover:bg-[#d4eb3a] transition-colors"
+              className="bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-4 rounded-lg hover:bg-[#d4eb3a] transition-all duration-200"
             >
-              Escuchar episodios
+              Escuchar en Spotify
             </a>
             <Link
               href="/lecturas"
-              className="border border-white/20 text-white px-6 py-3 rounded-full hover:bg-white/10 transition-colors"
+              className="border border-[#e8ff40]/40 text-white px-8 py-4 rounded-lg hover:border-[#e8ff40] hover:bg-white/5 transition-all duration-200 font-semibold"
             >
-              Solicitar lectura
+              Solicitar lectura simbólica
             </Link>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* CONECTA */}
-      <section className="max-w-3xl mx-auto px-6 py-16 border-t border-white/10">
-        <h2 className="text-2xl font-bold mb-8 text-center font-josefin">Conecta</h2>
-        <div className="flex flex-col sm:flex-row justify-center gap-6">
-          <a
-            href="https://instagram.com/yosoyvillamar"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#9DC4D5] hover:text-white transition-colors text-center"
-          >
-            <p className="font-semibold mb-1">@yosoyvillamar</p>
-            <p className="text-sm">Personal</p>
-          </a>
-          <div className="hidden sm:block border-r border-white/10"></div>
-          <a
-            href="https://instagram.com/amitampocomeexplicaron"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#9DC4D5] hover:text-white transition-colors text-center"
-          >
-            <p className="font-semibold mb-1">@amitampocomeexplicaron</p>
-            <p className="text-sm">Podcast</p>
-          </a>
-        </div>
-      </section>
+      <Section background="transparent" border="top">
+        <div className="max-w-2xl mx-auto text-center space-y-8">
+          <h2 className="text-2xl font-josefin font-bold">Conecta</h2>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/10 px-6 py-12 bg-white/5">
-        <div className="max-w-3xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h4 className="font-bold mb-3">Contenido</h4>
-              <ul className="space-y-2 text-[#9DC4D5] text-sm">
-                <li>
-                  <Link href="/episodios" className="hover:text-white transition-colors">
-                    Episodios
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/lecturas" className="hover:text-white transition-colors">
-                    Lecturas simbólicas
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href={SPOTIFY_SHOW_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors"
-                  >
-                    Spotify
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3">Sobre</h4>
-              <ul className="space-y-2 text-[#9DC4D5] text-sm">
-                <li>
-                  <Link href="/sobre" className="hover:text-white transition-colors">
-                    Acerca de AMTME
-                  </Link>
-                </li>
-                <li>
-                  <a
-                    href="https://instagram.com/yosoyvillamar"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors"
-                  >
-                    @yosoyvillamar
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-white/10 pt-8 text-center text-[#9DC4D5] text-sm">
-            <p>© 2026 A Mí Tampoco Me Explicaron · Hecho con claridad y sin certezas vacías</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-8">
+            <a
+              href="https://instagram.com/yosoyvillamar"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#e8ff40] transition-colors"
+            >
+              <p className="font-semibold text-white mb-2">@yosoyvillamar</p>
+              <p className="text-sm text-[#9DC4D5]">Personal</p>
+            </a>
+
+            <div className="hidden sm:block border-r border-white/10"></div>
+
+            <a
+              href="https://instagram.com/amitampocomeexplicaron"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#e8ff40] transition-colors"
+            >
+              <p className="font-semibold text-white mb-2">@amitampocomeexplicaron</p>
+              <p className="text-sm text-[#9DC4D5]">Podcast</p>
+            </a>
           </div>
         </div>
-      </footer>
+      </Section>
+
+      <PublicFooter />
     </div>
   );
 }
