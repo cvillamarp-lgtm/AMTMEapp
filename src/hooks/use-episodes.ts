@@ -21,7 +21,18 @@ export function useEpisodes(filters?: EpisodeFilters) {
       const authClient = getSupabaseAuthBrowserClient();
       if (!authClient) throw new Error('No auth client');
 
-      let query = authClient.from('episodes').select('*').order('created_at', { ascending: false });
+      // Get current user to validate ownership
+      const {
+        data: { user },
+      } = await authClient.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // SECURITY: Filter episodes by current user_id to prevent IDOR
+      let query = authClient
+        .from('episodes')
+        .select('*')
+        .eq('user_id', user.id) // Only fetch episodes owned by current user
+        .order('created_at', { ascending: false });
 
       if (filters?.status) {
         query = query.filter('payload', 'ilike', `%"status":"${filters.status}"%`);

@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import {
   EpisodeWorkspace,
   EpisodeChecklistItem,
@@ -15,10 +17,12 @@ interface EpisodePageProps {
 }
 
 export default function EpisodePage({ params }: EpisodePageProps) {
+  const router = useRouter();
   const [episodeId, setEpisodeId] = useState<string>('');
   const [workspace, setWorkspace] = useState<EpisodeWorkspace | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Resolve params
   useMemo(() => {
@@ -30,17 +34,60 @@ export default function EpisodePage({ params }: EpisodePageProps) {
       });
   }, [params]);
 
-  // Initialize workspace on mount
-  useMemo(() => {
-    if (!episodeId) return;
+  // Get current authenticated user (SECURITY)
+  useEffect(() => {
+    const getAuthUser = async () => {
+      const authClient = getSupabaseAuthBrowserClient();
+      if (!authClient) {
+        setError('Authentication client unavailable');
+        setIsLoading(false);
+        return;
+      }
 
-    const initializeWorkspace = async () => {
+      const {
+        data: { user },
+      } = await authClient.auth.getUser();
+      if (!user) {
+        // Should be caught by middleware, but as defense in depth:
+        router.push('/auth/sign-in');
+        return;
+      }
+      setUserId(user.id);
+    };
+
+    getAuthUser();
+  }, [router]);
+
+  // Validate episode ownership before initializing workspace
+  useEffect(() => {
+    if (!episodeId || !userId) return;
+
+    const validateAndInitialize = async () => {
       try {
+        const authClient = getSupabaseAuthBrowserClient();
+        if (!authClient) throw new Error('Auth client unavailable');
+
+        // SECURITY: Verify episode exists and belongs to current user
+        const { data: episodeExists, error: queryError } = await authClient
+          .from('episodes')
+          .select('id, user_id')
+          .eq('id', episodeId)
+          .eq('user_id', userId)
+          .single();
+
+        if (queryError || !episodeExists) {
+          // Return 404-like error without revealing if episode exists
+          setError('Episode not found or access denied');
+          setIsLoading(false);
+          return;
+        }
+
+        // Episode ownership validated, initialize workspace
         const state = initializeWorkspaceState(episodeId);
         const newWorkspace: EpisodeWorkspace = {
           id: `workspace-${episodeId}`,
           episodeId,
-          ownerId: 'current-user-id',
+          ownerId: userId,
           state,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -55,8 +102,8 @@ export default function EpisodePage({ params }: EpisodePageProps) {
       }
     };
 
-    initializeWorkspace();
-  }, [episodeId]);
+    validateAndInitialize();
+  }, [episodeId, userId]);
 
   const handleChecklistItemToggle = useCallback(
     (itemId: string) => {
