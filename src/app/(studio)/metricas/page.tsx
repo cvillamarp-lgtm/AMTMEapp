@@ -317,7 +317,7 @@ Solo JSON. Espanol neutro.`;
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
+    <div className="space-y-6 pb-10">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold">Metricas</h1>

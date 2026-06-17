@@ -137,17 +137,17 @@ export function StudioShell({ children }: { children: ReactNode }) {
       )}
 
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-fixed border-r border-amtme-yellow/10">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-fixed border-r border-amtme-border">
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-amtme-yellow/10">
+          <div className="flex items-center justify-between h-16 px-6 border-b border-amtme-border">
             <h1 className="text-base font-display font-bold text-amtme-yellow tracking-tight">
               AMTME Studio
             </h1>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-3 py-4 space-y-1">
+          <nav className="flex-1 px-3 py-5 space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -158,29 +158,29 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-all duration-200',
+                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors duration-200',
                     isActive
-                      ? 'bg-amtme-yellow text-amtme-navy shadow-soft'
-                      : 'text-amtme-white/70 hover:bg-amtme-white/10 hover:text-amtme-white'
+                      ? 'bg-amtme-yellow text-amtme-navy font-semibold'
+                      : 'text-amtme-gray-400 hover:text-amtme-white hover:bg-amtme-white/5'
                   )}
                 >
-                  <Icon size={20} weight="regular" />
-                  {item.label}
+                  <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
+                  <span className="truncate">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
           {/* Footer con logout visible */}
-          <div className="px-4 py-4 border-t border-amtme-yellow/10">
+          <div className="px-3 py-4 border-t border-amtme-border">
             {authRequired && (
               <button
                 onClick={() => void signOut()}
                 disabled={signingOut}
-                className="flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium text-amtme-white/60 transition-all duration-200 hover:bg-amtme-white/10 hover:text-amtme-white disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-yellow"
+                className="flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium text-amtme-gray-400 transition-colors duration-200 hover:bg-amtme-white/5 hover:text-amtme-white disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-yellow"
               >
                 <SignOut size={18} weight="regular" />
-                {signingOut ? 'Cerrando sesión…' : 'Cerrar sesión'}
+                {signingOut ? 'Cerrando…' : 'Sesión'}
               </button>
             )}
           </div>
@@ -188,15 +188,15 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="flex-1 md:pl-64 min-h-screen bg-amtme-background">
-        <div className="h-full p-6 pb-24 md:pb-6 max-w-7xl mx-auto">
+      <main className="flex-1 md:pl-64 min-h-screen bg-amtme-navy">
+        <div className="h-full px-4 py-6 pb-24 md:pb-6 md:px-6 max-w-7xl mx-auto w-full">
           <div className="space-y-6">{children}</div>
         </div>
       </main>
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
       {mobileItems.length > 0 && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-amtme-yellow/10 z-fixed">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-amtme-border z-fixed">
           <div
             className={cn('gap-1 p-2', {
               'grid grid-cols-5': mobileItems.length === 5,
@@ -215,14 +215,14 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex flex-col items-center gap-1 px-2 py-2 rounded-md transition-all duration-200',
+                    'flex flex-col items-center gap-1 px-2 py-3 rounded-md transition-colors duration-200',
                     isActive
-                      ? 'bg-amtme-yellow text-amtme-navy shadow-soft'
-                      : 'text-amtme-white/70 hover:text-amtme-white'
+                      ? 'bg-amtme-yellow text-amtme-navy'
+                      : 'text-amtme-gray-400 hover:text-amtme-white hover:bg-amtme-white/5'
                   )}
                 >
-                  <Icon size={20} weight="regular" />
-                  <span className="text-xs font-medium">{item.label}</span>
+                  <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
+                  <span className="text-xs font-semibold line-clamp-1">{item.label}</span>
                 </Link>
               );
             })}

@@ -45,6 +45,7 @@ import {
   updateCalendarEvent,
 } from '@/lib/database';
 import type { CalendarEvent, EventType, EventStatus } from '@/types/database';
+import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/ui';
 
 // ---- helpers de fecha ----
 function todayStr() {
@@ -286,13 +287,13 @@ export default function CalendarioPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold">Calendario</h1>
-          <p className="text-sm text-muted-foreground mt-1">Centro operativo de distribucion</p>
-        </div>
+    <div className="space-y-6 pb-10">
+      <PageHeader
+        eyebrow="Distribución"
+        title="Calendario"
+        description="Centro operativo de publicaciones y distribución multicanal"
+      />
+      <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button
@@ -443,7 +444,7 @@ export default function CalendarioPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+        <LoadingSkeleton lines={4} />
       ) : view === 'operativo' ? (
         <div className="space-y-8">
           {/* SIGUIENTE ACCION */}
@@ -639,38 +640,24 @@ export default function CalendarioPage() {
 
           {/* EMPTY STATE GLOBAL */}
           {events.length === 0 && (
-            <div className="text-center py-16">
-              <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="font-medium text-primary mb-1">El calendario esta vacio</p>
-              <p className="text-sm text-muted-foreground mb-4">
-                Agenda tu primera publicacion. Cada semana necesita al menos un punto de
-                distribucion.
-              </p>
-              <Button
-                className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
-                onClick={() => setDialogOpen(true)}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Agendar primera publicacion
-              </Button>
-            </div>
+            <EmptyState
+              icon={<CalendarDays className="h-12 w-12" />}
+              title="El calendario está vacío"
+              description="Agenda tu primera publicación. Cada semana necesita al menos un punto de distribución"
+              action={{ label: 'Agendar primera publicación', onClick: () => setDialogOpen(true) }}
+            />
           )}
         </div>
       ) : (
         // VISTA POR MES
         <div className="space-y-8">
           {Object.keys(grouped).length === 0 ? (
-            <div className="text-center py-16">
-              <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Sin eventos</p>
-              <Button
-                className="mt-4 bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
-                onClick={() => setDialogOpen(true)}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Agendar
-              </Button>
-            </div>
+            <EmptyState
+              icon={<CalendarDays className="h-12 w-12" />}
+              title="Sin eventos"
+              description="Aún no hay publicaciones agendadas"
+              action={{ label: 'Agendar', onClick: () => setDialogOpen(true) }}
+            />
           ) : (
             Object.keys(grouped)
               .sort()
@@ -681,7 +668,7 @@ export default function CalendarioPage() {
                   </h2>
                   <div className="grid gap-2">
                     {grouped[month].map((ev) => (
-                      <Card key={ev.id}>
+                      <Card key={ev.id} className="border-amtme-border bg-amtme-navy/30">
                         <CardHeader className="pb-2">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">

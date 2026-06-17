@@ -77,16 +77,22 @@
 :root {
   /* AMTME Color Palette */
   --amtme-navy: #0c1f36;
+  --amtme-navy-deep: #071426;
   --amtme-yellow: #fee94b;
+  --amtme-lemon: #e8ff40;
   --amtme-red: #e0211e;
   --amtme-white: #f8f8f6;
+  --amtme-cream: #f4efe7;
   --amtme-charcoal: #0d0d0d;
+  --amtme-carbon: #0d0d0d;
+  --amtme-muted: #8a8f98;
 
   /* Semantic colors */
   --amtme-background: #0c1f36;
   --amtme-foreground: #f8f8f6;
   --amtme-accent: #fee94b;
   --amtme-accent-dark: #0c1f36;
+  --amtme-accent-light: #e8ff40;
   --amtme-destructive: #e0211e;
   --amtme-border: rgba(248, 248, 246, 0.1);
 
@@ -106,6 +112,12 @@
   --amtme-success: #10b981;
   --amtme-warning: #f59e0b;
   --amtme-info: #3b82f6;
+
+  /* Semantic (replaces hardcoded variables in components) */
+  --amtme-semantic-border: rgba(248, 248, 246, 0.1);
+  --amtme-semantic-surface: rgba(12, 31, 54, 0.5);
+  --amtme-semantic-muted: #8a8f98;
+  --amtme-semantic-text: #f8f8f6;
 
   /* Motion */
   --amtme-duration-fast: 150ms;

@@ -154,3 +154,153 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
 export function Divider({ className }: { className?: string }) {
   return <div className={joinClasses('h-px bg-black/[0.07] my-4', className)} />;
 }
+
+// ─── PageHeader ──────────────────────────────────────────────────────────────────
+export function PageHeader({
+  eyebrow,
+  title,
+  description,
+  actions,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  actions?: ReactNode;
+}) {
+  return (
+    <section className="rounded-lg border border-amtme-border bg-amtme-navy/30 px-6 py-7 shadow-md">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-3xl">
+          {eyebrow && (
+            <div className="text-xs uppercase tracking-[0.24em] text-amtme-muted">{eyebrow}</div>
+          )}
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-amtme-yellow sm:text-4xl">
+            {title}
+          </h2>
+          {description && (
+            <p className="mt-3 max-w-2xl text-base leading-7 text-amtme-gray-400">{description}</p>
+          )}
+        </div>
+        {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+      </div>
+    </section>
+  );
+}
+
+// ─── EmptyState ──────────────────────────────────────────────────────────────────
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  secondaryAction,
+}: {
+  icon?: ReactNode;
+  title: string;
+  description?: string;
+  action?: { label: string; onClick: () => void };
+  secondaryAction?: { label: string; href: string };
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-lg border border-amtme-border/40 bg-amtme-navy/20 px-6 py-12 text-center">
+      {icon && <div className="mb-4 text-3xl">{icon}</div>}
+      <h3 className="text-lg font-semibold text-amtme-white">{title}</h3>
+      {description && <p className="mt-2 max-w-sm text-sm text-amtme-gray-400">{description}</p>}
+      {(action || secondaryAction) && (
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+          {action && (
+            <Button variant="primary" onClick={action.onClick}>
+              {action.label}
+            </Button>
+          )}
+          {secondaryAction && (
+            <Button variant="ghost" href={secondaryAction.href}>
+              {secondaryAction.label}
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── LoadingSkeleton ─────────────────────────────────────────────────────────────
+export function LoadingSkeleton({ lines = 3, className }: { lines?: number; className?: string }) {
+  return (
+    <div className={joinClasses('space-y-3', className)}>
+      {Array.from({ length: lines }).map((_, i) => (
+        <div key={i} className="h-4 animate-pulse rounded bg-amtme-border" />
+      ))}
+    </div>
+  );
+}
+
+// ─── ErrorState ──────────────────────────────────────────────────────────────────
+export function ErrorState({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: { label: string; onClick: () => void };
+}) {
+  return (
+    <div className="flex flex-col items-start rounded-lg border border-amtme-red/30 bg-amtme-red/10 px-6 py-4">
+      <h3 className="font-semibold text-amtme-red">{title}</h3>
+      {description && <p className="mt-1 text-sm text-amtme-red/80">{description}</p>}
+      {action && (
+        <Button variant="danger" onClick={action.onClick} className="mt-4">
+          {action.label}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// ─── StatusBadge ────────────────────────────────────────────────────────────────
+export function StatusBadge({
+  status,
+}: {
+  status:
+    | 'Idea'
+    | 'En investigación'
+    | 'Guion'
+    | 'Grabación'
+    | 'Edición'
+    | 'Publicado'
+    | 'Distribuido'
+    | 'Medido'
+    | 'Archivado'
+    | 'Borrador'
+    | 'Listo'
+    | 'Pagado'
+    | 'Perdido';
+}) {
+  const statusColor: Record<typeof status, string> = {
+    Idea: 'bg-amtme-gray-200/20 text-amtme-gray-400',
+    'En investigación': 'bg-amtme-info/20 text-amtme-info',
+    Guion: 'bg-amtme-yellow/20 text-amtme-yellow',
+    Grabación: 'bg-amtme-warning/20 text-amtme-warning',
+    Edición: 'bg-amtme-yellow/30 text-amtme-yellow',
+    Publicado: 'bg-amtme-success/20 text-amtme-success',
+    Distribuido: 'bg-amtme-info/20 text-amtme-info',
+    Medido: 'bg-amtme-success/20 text-amtme-success',
+    Archivado: 'bg-amtme-gray-300/30 text-amtme-gray-300',
+    Borrador: 'bg-amtme-gray-200/20 text-amtme-gray-400',
+    Listo: 'bg-amtme-success/20 text-amtme-success',
+    Pagado: 'bg-amtme-success/20 text-amtme-success',
+    Perdido: 'bg-amtme-gray-300/30 text-amtme-gray-300',
+  };
+
+  return (
+    <span
+      className={joinClasses(
+        'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold',
+        statusColor[status]
+      )}
+    >
+      {status}
+    </span>
+  );
+}
