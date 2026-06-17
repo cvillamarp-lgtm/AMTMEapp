@@ -21,9 +21,15 @@ export function useMonetizationLeads(filters?: MonetizationLeadFilters) {
       const authClient = getSupabaseAuthBrowserClient();
       if (!authClient) throw new Error('No auth client');
 
+      const {
+        data: { user },
+      } = await authClient.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       let query = authClient
         .from('monetization_leads')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (filters?.status) {
