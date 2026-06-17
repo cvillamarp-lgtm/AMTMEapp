@@ -32,6 +32,7 @@ import { toast } from 'sonner';
 import { getScripts, createScript, updateScript, deleteScript } from '@/lib/database';
 import { callAI } from '@/lib/ai-studio';
 import type { Script, ScriptStatus } from '@/types/database';
+import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/ui';
 
 type ScriptBlock =
   | 'opening'
@@ -237,147 +238,141 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold">Guiones</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Producción narrativa AZTIYARTE — de la idea al audio
-          </p>
-        </div>
-        <Dialog
-          open={dialogOpen}
-          onOpenChange={(v) => {
-            if (generating) return;
-            setDialogOpen(v);
-            if (!v) resetForm();
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button
-              onClick={resetForm}
-              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Crear guion
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editing ? 'Editar guion' : 'Crear guion'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Título *</Label>
-                  <Input
-                    value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    placeholder="El momento que lo cambia todo"
-                  />
-                </div>
-                <div>
-                  <Label>ID Episodio *</Label>
-                  <Input
-                    value={form.episode_id}
-                    onChange={(e) => setForm({ ...form, episode_id: e.target.value })}
-                    placeholder="EP35"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Herida emocional</Label>
-                  <Input
-                    value={form.wound}
-                    onChange={(e) => setForm({ ...form, wound: e.target.value })}
-                    placeholder="miedo al abandono"
-                  />
-                </div>
-                <div>
-                  <Label>Símbolo central</Label>
-                  <Input
-                    value={form.symbol}
-                    onChange={(e) => setForm({ ...form, symbol: e.target.value })}
-                    placeholder="la puerta cerrada"
-                  />
-                </div>
-              </div>
+    <div className="space-y-6 pb-10">
+      <PageHeader
+        eyebrow="Narrativa"
+        title="Guiones"
+        description="Estructura AZTIYARTE — de idea emocional al guion completo"
+      />
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(v) => {
+          if (generating) return;
+          setDialogOpen(v);
+          if (!v) resetForm();
+        }}
+      >
+        <DialogTrigger asChild>
+          <Button
+            onClick={resetForm}
+            className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Crear guion
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editing ? 'Editar guion' : 'Crear guion'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>CTA</Label>
+                <Label>Título *</Label>
                 <Input
-                  value={form.cta}
-                  onChange={(e) => setForm({ ...form, cta: e.target.value })}
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="El momento que lo cambia todo"
                 />
               </div>
-
-              <Button
-                type="button"
-                onClick={generateWithAI}
-                disabled={generating}
-                className="w-full bg-amtme-navy text-white hover:bg-amtme-navy/90"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generando con IA...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Generar guion completo con IA
-                  </>
-                )}
-              </Button>
-
-              {blocks.map((b) => (
-                <div key={b.key}>
-                  <Label>{b.label}</Label>
-                  <Textarea
-                    value={form[b.key]}
-                    onChange={(e) => setForm({ ...form, [b.key]: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-              ))}
               <div>
-                <Label>Notas de voz</Label>
+                <Label>ID Episodio *</Label>
+                <Input
+                  value={form.episode_id}
+                  onChange={(e) => setForm({ ...form, episode_id: e.target.value })}
+                  placeholder="EP35"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Herida emocional</Label>
+                <Input
+                  value={form.wound}
+                  onChange={(e) => setForm({ ...form, wound: e.target.value })}
+                  placeholder="miedo al abandono"
+                />
+              </div>
+              <div>
+                <Label>Símbolo central</Label>
+                <Input
+                  value={form.symbol}
+                  onChange={(e) => setForm({ ...form, symbol: e.target.value })}
+                  placeholder="la puerta cerrada"
+                />
+              </div>
+            </div>
+            <div>
+              <Label>CTA</Label>
+              <Input value={form.cta} onChange={(e) => setForm({ ...form, cta: e.target.value })} />
+            </div>
+
+            <Button
+              type="button"
+              onClick={generateWithAI}
+              disabled={generating}
+              className="w-full bg-amtme-navy text-white hover:bg-amtme-navy/90"
+            >
+              {generating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generando con IA...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Generar guion completo con IA
+                </>
+              )}
+            </Button>
+
+            {blocks.map((b) => (
+              <div key={b.key}>
+                <Label>{b.label}</Label>
                 <Textarea
-                  value={form.voice_notes}
-                  onChange={(e) => setForm({ ...form, voice_notes: e.target.value })}
-                  rows={2}
+                  value={form[b.key]}
+                  onChange={(e) => setForm({ ...form, [b.key]: e.target.value })}
+                  rows={3}
                 />
               </div>
-              <div>
-                <Label>Estado</Label>
-                <Select
-                  value={form.status}
-                  onValueChange={(v) => setForm({ ...form, status: v as ScriptStatus })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {['borrador', 'revision', 'listo-grabar', 'grabado', 'archivado'].map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={generating}>
-                  {generating ? 'Espera...' : editing ? 'Guardar' : 'Crear'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+            ))}
+            <div>
+              <Label>Notas de voz</Label>
+              <Textarea
+                value={form.voice_notes}
+                onChange={(e) => setForm({ ...form, voice_notes: e.target.value })}
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label>Estado</Label>
+              <Select
+                value={form.status}
+                onValueChange={(v) => setForm({ ...form, status: v as ScriptStatus })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {['borrador', 'revision', 'listo-grabar', 'grabado', 'archivado'].map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={generating}>
+                {generating ? 'Espera...' : editing ? 'Guardar' : 'Crear'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {viewing && (
         <Dialog open={!!viewing} onOpenChange={() => setViewing(null)}>
@@ -409,30 +404,15 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+        <LoadingSkeleton lines={4} />
       ) : scripts.length === 0 ? (
-        <div className="text-center py-16">
-          <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Sin guiones todavía</p>
-          <p className="text-xs text-muted-foreground mt-1 mb-4">
-            Empieza desde un episodio en estado &quot;investigacion&quot; o crea uno nuevo
-          </p>
-          <div className="flex gap-2 justify-center">
-            <Link
-              href="/studio/episodios"
-              className="rounded-lg border border-black/10 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
-            >
-              Ver episodios
-            </Link>
-            <Button
-              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
-              onClick={() => setDialogOpen(true)}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Crear primero
-            </Button>
-          </div>
-        </div>
+        <EmptyState
+          icon={<FileText className="h-12 w-12" />}
+          title="Sin guiones todavía"
+          description="Comienza desde un episodio o crea uno nuevo para estructurar su narrativa"
+          action={{ label: 'Crear guion', onClick: () => setDialogOpen(true) }}
+          secondaryAction={{ label: 'Ver episodios', href: '/episodios' }}
+        />
       ) : (
         <div className="grid gap-4">
           {scripts.map((s) => {
@@ -450,7 +430,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
             const pct = Math.round((filled / scriptBlocks.length) * 100);
 
             return (
-              <Card key={s.id}>
+              <Card key={s.id} className="border-amtme-border bg-amtme-navy/30">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
