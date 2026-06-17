@@ -224,7 +224,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
   }
 
   const statusColors: Record<string, string> = {
-    publicado: 'bg-[#e8ff40] text-[#0c1f36]',
+    publicado: 'bg-amtme-yellow text-amtme-navy',
     grabacion: 'bg-blue-100 text-blue-800',
     edicion: 'bg-purple-100 text-purple-800',
     guion: 'bg-yellow-100 text-yellow-800',
@@ -273,7 +273,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
           <DialogTrigger asChild>
             <Button
               onClick={resetForm}
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
             >
               <Plus className="mr-2 h-4 w-4" /> Crear episodio
             </Button>
@@ -473,7 +473,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
           <Mic className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">Sin episodios todavía</p>
           <Button
-            className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+            className="mt-4 bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
             onClick={() => setDialogOpen(true)}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -506,7 +506,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                             {ep.status}
                           </span>
                           <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${ep.script ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-gray-100 text-gray-500'}`}
+                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${ep.script ? 'bg-amtme-yellow text-amtme-navy' : 'bg-gray-100 text-gray-500'}`}
                           >
                             {ep.script ? 'Con guion' : 'Sin guion'}
                           </span>
@@ -552,9 +552,9 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                             key={step}
                             className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
                               isCurrent
-                                ? 'bg-[#0c1f36] text-white'
+                                ? 'bg-amtme-navy text-white'
                                 : isDone
-                                  ? 'bg-[#e8ff40] text-[#0c1f36]'
+                                  ? 'bg-amtme-yellow text-amtme-navy'
                                   : 'bg-gray-100 text-gray-400'
                             }`}
                           >
@@ -574,7 +574,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                         {(ep.status === 'idea' || ep.status === 'investigacion') && (
                           <Link
                             href="/guiones"
-                            className="shrink-0 text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                            className="shrink-0 text-xs font-medium text-amtme-navy underline underline-offset-2 hover:no-underline"
                           >
                             Ir a guiones →
                           </Link>
@@ -582,7 +582,7 @@ Devuelve solo los 5 títulos numerados, uno por línea.`;
                         {ep.status === 'guion' && (
                           <Link
                             href="/revision-episodios"
-                            className="shrink-0 text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                            className="shrink-0 text-xs font-medium text-amtme-navy underline underline-offset-2 hover:no-underline"
                           >
                             Ir a revision →
                           </Link>

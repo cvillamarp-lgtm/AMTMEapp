@@ -155,7 +155,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               {activeLeads === 0 && (
-                <div className="p-3 rounded-lg bg-[#e8ff40]/10 border border-[#e8ff40]/30">
+                <div className="p-3 rounded-lg bg-amtme-cream border border-amtme-yellow/30">
                   <p className="text-sm font-medium text-primary">
                     Sin leads activos en Monetizacion.
                   </p>

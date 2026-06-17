@@ -56,20 +56,20 @@ export default async function EpisodiosPage() {
   const episodes = await getAllEpisodes();
 
   return (
-    <div className="min-h-screen bg-[#0c1f36] text-white">
+    <div className="min-h-screen bg-amtme-navy text-white">
       <PublicNav activeRoute="/episodios" />
 
       {/* HERO — Editorial */}
       <section className="pt-32 pb-20 px-6 border-b border-white/10">
         <div className="max-w-5xl mx-auto space-y-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#e8ff40] mb-4">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-amtme-yellow mb-4">
               Escúchalos todos
             </p>
             <h1 className="text-5xl md:text-6xl font-josefin font-bold leading-tight mb-6">
               Episodios
             </h1>
-            <p className="text-lg text-[#9DC4D5] leading-relaxed max-w-3xl">
+            <p className="text-lg text-amtme-gray-400 leading-relaxed max-w-3xl">
               Conversaciones honestas sobre amor, apego, identidad, límites y todo eso que nadie nos
               explicó.
             </p>
@@ -79,7 +79,7 @@ export default async function EpisodiosPage() {
             href={SPOTIFY_SHOW_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-4 rounded-lg hover:bg-[#d4eb3a] transition-all duration-200"
+            className="inline-block bg-amtme-yellow text-amtme-navy font-semibold px-8 py-4 rounded-lg hover:bg-amtme-yellow/90 transition-all duration-200"
           >
             Escuchar en Spotify
           </a>
@@ -100,22 +100,22 @@ export default async function EpisodiosPage() {
               >
                 <div className="flex items-start gap-6">
                   <div className="flex-shrink-0 pt-1">
-                    <span className="text-3xl font-bold text-[#e8ff40]">
+                    <span className="text-3xl font-bold text-amtme-yellow">
                       {ep.episode_number || '?'}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-white group-hover:text-[#e8ff40] transition-colors mb-2">
+                    <h3 className="text-lg font-semibold text-white group-hover:text-amtme-yellow transition-colors mb-2">
                       {ep.title || 'Sin título'}
                     </h3>
                     <div className="flex flex-col gap-2">
-                      {ep.theme && <p className="text-[#9DC4D5] text-sm">{ep.theme}</p>}
+                      {ep.theme && <p className="text-amtme-gray-400 text-sm">{ep.theme}</p>}
                       {ep.description && (
-                        <p className="text-[#9DC4D5] text-sm line-clamp-2">{ep.description}</p>
+                        <p className="text-amtme-gray-400 text-sm line-clamp-2">{ep.description}</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex-shrink-0 text-[#e8ff40] text-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex-shrink-0 text-amtme-yellow text-xl opacity-0 group-hover:opacity-100 transition-opacity">
                     →
                   </div>
                 </div>
@@ -124,14 +124,14 @@ export default async function EpisodiosPage() {
           </div>
         ) : (
           <div className="text-center py-24">
-            <p className="text-[#9DC4D5] text-lg mb-8">
+            <p className="text-amtme-gray-400 text-lg mb-8">
               Los episodios se cargan desde Spotify. Explora todos aquí:
             </p>
             <a
               href={SPOTIFY_SHOW_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-[#e8ff40] text-[#0c1f36] font-semibold px-8 py-4 rounded-lg hover:bg-[#d4eb3a] transition-all duration-200"
+              className="inline-block bg-amtme-yellow text-amtme-navy font-semibold px-8 py-4 rounded-lg hover:bg-amtme-yellow/90 transition-all duration-200"
             >
               Ver en Spotify
             </a>

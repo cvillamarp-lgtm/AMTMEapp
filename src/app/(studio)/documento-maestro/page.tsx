@@ -149,7 +149,7 @@ export default function DocumentoMaestroPage() {
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">
               Documento Maestro
             </div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
               Materia prima editorial
             </h2>
             <p className="mt-0.5 text-xs text-black/40">
@@ -182,7 +182,7 @@ export default function DocumentoMaestroPage() {
                 <button
                   key={section.id}
                   onClick={() => selectSection(section)}
-                  className={`w-full rounded-3xl border px-4 py-4 text-left transition ${selectedId === section.id ? 'border-[#0C1F36] bg-[#0C1F36] text-white shadow-[0_12px_30px_rgba(0,31,54,0.18)]' : 'border-black/8 bg-[#F5F2EA] text-[#0C1F36] hover:bg-white'}`}
+                  className={`w-full rounded-3xl border px-4 py-4 text-left transition ${selectedId === section.id ? 'border-[#0C1F36] bg-amtme-navy text-white shadow-[0_12px_30px_rgba(0,31,54,0.18)]' : 'border-black/8 bg-amtme-cream text-amtme-navy hover:bg-white'}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -222,7 +222,7 @@ export default function DocumentoMaestroPage() {
                 <div className="text-xs uppercase tracking-[0.22em] text-black/40">
                   Sección activa
                 </div>
-                <h3 className="mt-1 text-xl font-semibold text-[#0C1F36]">{draft.title}</h3>
+                <h3 className="mt-1 text-xl font-semibold text-amtme-navy">{draft.title}</h3>
               </div>
               <div className="flex items-center gap-2">
                 <Badge tone={STATUS_TONE[draft.status]}>{draft.status}</Badge>
@@ -329,20 +329,20 @@ export default function DocumentoMaestroPage() {
             </div>
 
             {/* Destino editorial */}
-            <div className="rounded-2xl border border-[#0C1F36]/10 bg-[#F5F2EA] p-4">
+            <div className="rounded-2xl border border-[#0C1F36]/10 bg-amtme-cream p-4">
               <div className="text-xs uppercase tracking-[0.18em] text-black/40 mb-3">
                 Destino editorial
               </div>
               <div className="flex flex-wrap gap-2">
                 <Link
                   href="/studio/episodios"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-[#0C1F36] hover:text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-amtme-navy hover:bg-amtme-navy hover:text-white transition-colors"
                 >
                   → Convertir en episodio
                 </Link>
                 <Link
                   href="/guiones"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-[#0C1F36] hover:text-white transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#0C1F36]/20 bg-white px-3 py-1.5 text-xs font-medium text-amtme-navy hover:bg-amtme-navy hover:text-white transition-colors"
                 >
                   → Ir a guiones
                 </Link>
@@ -359,13 +359,13 @@ export default function DocumentoMaestroPage() {
             <div className="flex gap-2">
               <Link
                 href="/studio/episodios"
-                className="rounded-xl border border-black/10 bg-[#F5F2EA] px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-white transition-colors"
+                className="rounded-xl border border-black/10 bg-amtme-cream px-3 py-1.5 text-xs font-medium text-amtme-navy hover:bg-white transition-colors"
               >
                 Ver episodios
               </Link>
               <Link
                 href="/guiones"
-                className="rounded-xl border border-black/10 bg-[#F5F2EA] px-3 py-1.5 text-xs font-medium text-[#0C1F36] hover:bg-white transition-colors"
+                className="rounded-xl border border-black/10 bg-amtme-cream px-3 py-1.5 text-xs font-medium text-amtme-navy hover:bg-white transition-colors"
               >
                 Ver guiones
               </Link>
@@ -378,7 +378,7 @@ export default function DocumentoMaestroPage() {
       {newOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-[#0C1F36]">Nueva sección</h3>
+            <h3 className="text-lg font-semibold text-amtme-navy">Nueva sección</h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <Field label="Título *">
                 <Input
@@ -434,7 +434,7 @@ export default function DocumentoMaestroPage() {
               <button
                 onClick={createNew}
                 disabled={saving}
-                className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium bg-amtme-navy text-white rounded-xl hover:bg-amtme-navy/90 transition-colors disabled:opacity-50"
               >
                 {saving ? 'Creando...' : 'Crear sección'}
               </button>

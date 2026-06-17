@@ -94,7 +94,7 @@ export default function HistoricoPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Histórico</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
               Material de referencia
             </h2>
           </div>
@@ -121,7 +121,7 @@ export default function HistoricoPage() {
             {!search && (
               <button
                 onClick={openNew}
-                className="mt-2 text-[#0C1F36] underline underline-offset-2"
+                className="mt-2 text-amtme-navy underline underline-offset-2"
               >
                 Archivar primer elemento
               </button>
@@ -130,10 +130,10 @@ export default function HistoricoPage() {
         ) : (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((item) => (
-              <div key={item.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
+              <div key={item.id} className="rounded-3xl border border-black/8 bg-amtme-cream p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="text-base font-semibold text-[#0C1F36]">{item.name}</h3>
+                    <h3 className="text-base font-semibold text-amtme-navy">{item.name}</h3>
                     <p className="mt-0.5 text-xs text-black/40">{item.type}</p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
@@ -179,7 +179,7 @@ export default function HistoricoPage() {
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-[#0C1F36]">
+            <h3 className="text-lg font-semibold text-amtme-navy">
               {editing ? 'Editar elemento' : 'Archivar elemento'}
             </h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -257,7 +257,7 @@ export default function HistoricoPage() {
               <button
                 onClick={save}
                 disabled={saving}
-                className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium bg-amtme-navy text-white rounded-xl hover:bg-amtme-navy/90 transition-colors disabled:opacity-50"
               >
                 {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Archivar'}
               </button>

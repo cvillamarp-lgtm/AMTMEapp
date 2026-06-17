@@ -324,7 +324,7 @@ Devuelve exactamente en este formato:
             onClick={() => setPackageTab('generator')}
             className={
               packageTab === 'generator'
-                ? 'bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold'
+                ? 'bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold'
                 : ''
             }
           >
@@ -335,7 +335,7 @@ Devuelve exactamente en este formato:
             <DialogTrigger asChild>
               <Button
                 onClick={resetForm}
-                className="bg-[#0c1f36] text-white hover:bg-[#1a3a5c] font-semibold"
+                className="bg-amtme-navy text-white hover:bg-amtme-navy/90 font-semibold"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva pieza
@@ -395,7 +395,7 @@ Devuelve exactamente en este formato:
                   type="button"
                   onClick={generateContent}
                   disabled={generatingContent}
-                  className="w-full bg-[#0c1f36] text-white hover:bg-[#1a3a5c]"
+                  className="w-full bg-amtme-navy text-white hover:bg-amtme-navy/90"
                 >
                   {generatingContent ? (
                     <>
@@ -472,10 +472,10 @@ Devuelve exactamente en este formato:
 
       {/* GENERADOR DE PAQUETE */}
       {packageTab === 'generator' && (
-        <div className="mb-8 rounded-2xl border border-[#e8ff40]/30 bg-[#0c1f36]/5 p-6">
+        <div className="mb-8 rounded-2xl border border-amtme-yellow/30 bg-amtme-navy/5 p-6">
           <div className="flex items-center gap-2 mb-1">
-            <Package className="h-5 w-5 text-[#0c1f36]" />
-            <h2 className="text-lg font-semibold text-[#0c1f36]">Generador de paquete AMTME</h2>
+            <Package className="h-5 w-5 text-amtme-navy" />
+            <h2 className="text-lg font-semibold text-amtme-navy">Generador de paquete AMTME</h2>
           </div>
           <p className="text-sm text-muted-foreground mb-4">
             Pega un guion, nota o resumen de episodio. Obtenes hooks, captions, frases, ideas de
@@ -494,7 +494,7 @@ Devuelve exactamente en este formato:
               <Button
                 onClick={handleGeneratePackage}
                 disabled={generatingPackage}
-                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+                className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
               >
                 {generatingPackage ? (
                   <>
@@ -522,7 +522,7 @@ Devuelve exactamente en este formato:
               {pkg && (
                 <Button
                   variant="outline"
-                  className="border-[#0c1f36] text-[#0c1f36] hover:bg-[#0c1f36] hover:text-white"
+                  className="border-amtme-navy text-amtme-navy hover:bg-amtme-navy hover:text-white"
                   onClick={() => {
                     void navigator.clipboard.writeText(
                       `Hooks:\n${pkg.hooks.join('\n')}\n\nCaptions:\n${pkg.captions.join('\n')}\n\nCTA: ${pkg.cta}`
@@ -626,14 +626,14 @@ Devuelve exactamente en este formato:
               <p className="text-muted-foreground">Sin contenido todavia</p>
               <div className="mt-4 flex justify-center gap-2">
                 <Button
-                  className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+                  className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
                   onClick={() => setPackageTab('generator')}
                 >
                   <Package className="mr-2 h-4 w-4" />
                   Generar paquete
                 </Button>
                 <Button
-                  className="bg-[#0c1f36] text-white hover:bg-[#1a3a5c]"
+                  className="bg-amtme-navy text-white hover:bg-amtme-navy/90"
                   onClick={() => setDialogOpen(true)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
@@ -666,7 +666,7 @@ Devuelve exactamente en este formato:
                                 {c.format}
                               </span>
                               <span
-                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.status === 'publicado' ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-gray-100 text-gray-700'}`}
+                                className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.status === 'publicado' ? 'bg-amtme-yellow text-amtme-navy' : 'bg-gray-100 text-gray-700'}`}
                               >
                                 {c.status}
                               </span>

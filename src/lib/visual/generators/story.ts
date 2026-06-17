@@ -157,7 +157,7 @@ export function generateStoryIg916Svg(
   );
 
   const overlay = qaOverlay
-    ? `<rect x="${safeMargin}" y="${safeMargin}" width="${width - safeMargin * 2}" height="${height - safeMargin * 2}" fill="none" stroke="#FF5B5B" stroke-width="2" stroke-dasharray="10 8"/>`
+    ? `<rect x="${safeMargin}" y="${safeMargin}" width="${width - safeMargin * 2}" height="${height - safeMargin * 2}" fill="none" stroke="#E0211E" stroke-width="2" stroke-dasharray="10 8"/>`
     : '';
 
   const svg = `

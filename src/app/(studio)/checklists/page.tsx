@@ -81,7 +81,7 @@ export default function ChecklistsPage() {
   }
 
   const statusColor = (s: string) => {
-    if (s === 'Listo') return 'bg-[#e8ff40] text-[#0c1f36]';
+    if (s === 'Listo') return 'bg-amtme-yellow text-amtme-navy';
     if (s === 'En proceso') return 'bg-blue-100 text-blue-800';
     return 'bg-gray-100 text-gray-600';
   };
@@ -153,14 +153,14 @@ export default function ChecklistsPage() {
                         onClick={() => toggleItem(cl, item.id)}
                         className={`w-full flex items-start gap-2 rounded-xl px-3 py-2 text-left text-sm transition-colors ${
                           item.completed
-                            ? 'bg-[#0c1f36] text-white'
+                            ? 'bg-amtme-navy text-white'
                             : item.critical
-                              ? 'bg-red-50 text-[#0c1f36] hover:bg-red-100'
-                              : 'bg-[#F5F2EA] text-[#0c1f36] hover:bg-white border border-black/5'
+                              ? 'bg-red-50 text-amtme-navy hover:bg-red-100'
+                              : 'bg-amtme-cream text-amtme-navy hover:bg-white border border-black/5'
                         }`}
                       >
                         {item.completed ? (
-                          <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-[#e8ff40]" />
+                          <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5 text-amtme-yellow" />
                         ) : (
                           <Circle
                             className={`h-4 w-4 shrink-0 mt-0.5 ${item.critical ? 'text-red-400' : 'text-muted-foreground'}`}
@@ -183,7 +183,7 @@ export default function ChecklistsPage() {
                   {/* Criterios de listo */}
                   {isExpanded && cl.readyCriteria && (
                     <div className="rounded-xl border border-black/8 bg-white p-3 text-xs space-y-2">
-                      <p className="font-semibold text-[#0c1f36]">Lista cuando:</p>
+                      <p className="font-semibold text-amtme-navy">Lista cuando:</p>
                       <p className="text-muted-foreground leading-relaxed">{cl.readyCriteria}</p>
                       {cl.errorsToAvoid && (
                         <>

@@ -160,7 +160,7 @@ export default function RevisionEpisodiosPage() {
             <Button
               onClick={handleBatch}
               disabled={batchRunning}
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               {batchRunning

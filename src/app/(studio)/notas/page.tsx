@@ -299,17 +299,17 @@ export default function NotasPage() {
       {/* Panel izquierdo */}
       <div className="flex w-72 shrink-0 flex-col gap-3">
         {/* Modo energia */}
-        <div className="rounded-xl border border-[#e8ff40]/40 bg-[#e8ff40]/5 p-3">
+        <div className="rounded-xl border border-amtme-yellow/40 bg-amtme-yellow/5 p-3">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
-              <Zap className="h-3.5 w-3.5 text-[#0c1f36]" />
-              <span className="text-xs font-semibold text-[#0c1f36]">Energia creativa</span>
+              <Zap className="h-3.5 w-3.5 text-amtme-navy" />
+              <span className="text-xs font-semibold text-amtme-navy">Energia creativa</span>
             </div>
             <button
               className={`text-xs px-2 py-0.5 rounded-full font-medium transition-colors ${
                 energiaMode
-                  ? 'bg-[#0c1f36] text-white'
-                  : 'bg-white border border-[#0c1f36]/20 text-[#0c1f36]'
+                  ? 'bg-amtme-navy text-white'
+                  : 'bg-white border border-amtme-navy/20 text-amtme-navy'
               }`}
               onClick={() => setEnergiaMode((v) => !v)}
             >
@@ -319,11 +319,11 @@ export default function NotasPage() {
           {energiaMode ? (
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground font-medium">Modo baja energia:</p>
-              <p className="text-xs text-[#0c1f36] leading-relaxed">
+              <p className="text-xs text-amtme-navy leading-relaxed">
                 {MODOS_BAJA_ENERGIA[diaIndex % MODOS_BAJA_ENERGIA.length]}
               </p>
               <p className="text-xs text-muted-foreground font-medium mt-2">Plan minimo viable:</p>
-              <p className="text-xs text-[#0c1f36] leading-relaxed">
+              <p className="text-xs text-amtme-navy leading-relaxed">
                 {PLAN_MINIMO_VIABLE[diaIndex % PLAN_MINIMO_VIABLE.length]}
               </p>
             </div>
@@ -343,7 +343,7 @@ export default function NotasPage() {
           <Button
             onClick={handleNew}
             disabled={saving || !authenticated}
-            className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] px-3"
+            className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 px-3"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -365,9 +365,9 @@ export default function NotasPage() {
           {loading ? (
             <p className="text-xs text-center text-muted-foreground py-4">Cargando...</p>
           ) : !authenticated ? (
-            <div className="rounded-xl border border-[#0c1f36]/10 bg-[#F5F1E8] p-4 text-center">
+            <div className="rounded-xl border border-amtme-navy/10 bg-[#F5F1E8] p-4 text-center">
               <Lock className="mx-auto mb-2 h-4 w-4 text-muted-foreground" />
-              <p className="text-xs font-semibold text-[#0c1f36]">Inicia sesion</p>
+              <p className="text-xs font-semibold text-amtme-navy">Inicia sesion</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Las notas son privadas por usuario. Inicia sesion para crear, ver y editar tus
                 notas.
@@ -380,11 +380,11 @@ export default function NotasPage() {
               <button
                 key={n.id}
                 onClick={() => select(n)}
-                className={`w-full rounded-2xl border p-3 text-left transition-all ${selected?.id === n.id ? 'border-[#0c1f36] bg-[#0c1f36] text-white' : 'border-black/7 bg-white hover:bg-[#F5F1E8]'}`}
+                className={`w-full rounded-2xl border p-3 text-left transition-all ${selected?.id === n.id ? 'border-amtme-navy bg-amtme-navy text-white' : 'border-black/7 bg-white hover:bg-[#F5F1E8]'}`}
               >
                 <div className="flex items-start justify-between gap-1">
                   <span
-                    className={`truncate text-sm font-semibold ${selected?.id === n.id ? 'text-white' : 'text-[#0c1f36]'}`}
+                    className={`truncate text-sm font-semibold ${selected?.id === n.id ? 'text-white' : 'text-amtme-navy'}`}
                   >
                     {n.title || 'Sin titulo'}
                   </span>
@@ -425,7 +425,7 @@ export default function NotasPage() {
                     <Lock className="h-3 w-3" /> Privada
                   </span>
                 ) : (
-                  <span className="text-xs bg-[#e8ff40]/20 px-2 py-0.5 rounded-full text-[#0c1f36] flex items-center gap-1">
+                  <span className="text-xs bg-amtme-yellow/20 px-2 py-0.5 rounded-full text-amtme-navy flex items-center gap-1">
                     <BookOpen className="h-3 w-3" /> Publicable
                   </span>
                 )}
@@ -453,7 +453,7 @@ export default function NotasPage() {
                       size="sm"
                       onClick={handleSave}
                       disabled={saving}
-                      className="bg-[#0c1f36] text-white"
+                      className="bg-amtme-navy text-white"
                     >
                       <Save className="h-4 w-4 mr-1" />
                       {saving ? 'Guardando...' : 'Guardar'}
@@ -463,7 +463,7 @@ export default function NotasPage() {
                   <Button
                     size="sm"
                     onClick={() => setEditing(true)}
-                    className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+                    className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
                   >
                     Editar
                   </Button>
@@ -476,7 +476,7 @@ export default function NotasPage() {
                   <Input
                     value={draft.title}
                     onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-                    className="border-0 bg-transparent px-0 text-2xl font-bold text-[#0c1f36] focus-visible:ring-0 shadow-none"
+                    className="border-0 bg-transparent px-0 text-2xl font-bold text-amtme-navy focus-visible:ring-0 shadow-none"
                     placeholder="Título"
                   />
                   <div className="flex gap-3">
@@ -520,7 +520,7 @@ export default function NotasPage() {
                 </div>
               ) : (
                 <div className="cursor-text" onClick={() => setEditing(true)}>
-                  <h1 className="text-2xl font-bold tracking-tight text-[#0c1f36]">
+                  <h1 className="text-2xl font-bold tracking-tight text-amtme-navy">
                     {selected.title}
                   </h1>
                   <div className="mt-1 flex gap-2 text-xs text-muted-foreground">
@@ -528,7 +528,7 @@ export default function NotasPage() {
                     <span>·</span>
                     <span>{selected.status}</span>
                   </div>
-                  <div className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[#0c1f36]">
+                  <div className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-amtme-navy">
                     {selected.content || (
                       <span className="italic text-muted-foreground">Haz clic para editar</span>
                     )}
@@ -539,14 +539,14 @@ export default function NotasPage() {
           </>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center text-center text-muted-foreground p-8">
-            <p className="text-lg font-semibold text-[#0c1f36]">
+            <p className="text-lg font-semibold text-amtme-navy">
               {authenticated ? 'Selecciona una nota' : 'Inicia sesion para ver tus notas'}
             </p>
             <p className="text-sm mt-1">
               {authenticated ? 'o crea una nueva' : 'Las notas son privadas por usuario'}
             </p>
             <Button
-              className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+              className="mt-4 bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
               onClick={handleNew}
               disabled={!authenticated || saving}
             >

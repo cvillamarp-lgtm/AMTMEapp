@@ -33,18 +33,18 @@ export default function EstrategiaPage() {
           <Card key={i}>
             <CardHeader className="pb-2 pt-4 px-4">
               <CardDescription>{kpi.label}</CardDescription>
-              <CardTitle className="text-2xl text-[#0c1f36]">{kpi.value}</CardTitle>
+              <CardTitle className="text-2xl text-amtme-navy">{kpi.value}</CardTitle>
               <p className="text-xs text-muted-foreground">{kpi.from}</p>
             </CardHeader>
           </Card>
         ))}
       </div>
-      <Card className="mb-6 border-[#e8ff40] border-2">
+      <Card className="mb-6 border-amtme-yellow border-2">
         <CardHeader>
           <CardTitle className="text-base">Formula Ganadora de Titulos</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="font-mono text-sm bg-[#0c1f36] text-[#e8ff40] p-3 rounded-lg">
+          <p className="font-mono text-sm bg-amtme-navy text-amtme-yellow p-3 rounded-lg">
             [Keyword] + [Beneficio] + [Gancho Emocional] max 70 caracteres
           </p>
           <div className="mt-4 space-y-2">
@@ -111,7 +111,7 @@ export default function EstrategiaPage() {
               },
             ].map((w) => (
               <div key={w.week} className="border rounded-lg p-3 flex items-start gap-3">
-                <span className="bg-[#0c1f36] text-[#e8ff40] text-xs font-bold px-2 py-1 rounded shrink-0">
+                <span className="bg-amtme-navy text-amtme-yellow text-xs font-bold px-2 py-1 rounded shrink-0">
                   S{w.week}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -165,7 +165,7 @@ export default function EstrategiaPage() {
           <CardDescription>{checked.length}/9 completadas</CardDescription>
           <div className="h-1.5 bg-muted rounded-full mt-2">
             <div
-              className="h-1.5 bg-[#e8ff40] rounded-full transition-all"
+              className="h-1.5 bg-amtme-yellow rounded-full transition-all"
               style={{ width: `${(checked.length / 9) * 100}%` }}
             />
           </div>
@@ -198,12 +198,12 @@ export default function EstrategiaPage() {
                 className="flex items-start gap-3 w-full text-left p-2 rounded-lg hover:bg-muted transition-colors"
               >
                 {checked.includes(i) ? (
-                  <CheckSquare className="h-4 w-4 text-[#0c1f36] shrink-0 mt-0.5" />
+                  <CheckSquare className="h-4 w-4 text-amtme-navy shrink-0 mt-0.5" />
                 ) : (
                   <Square className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                 )}
                 <div>
-                  <span className="text-xs font-semibold text-[#0c1f36]">{item.day}: </span>
+                  <span className="text-xs font-semibold text-amtme-navy">{item.day}: </span>
                   <span
                     className={`text-sm ${checked.includes(i) ? 'line-through text-muted-foreground' : ''}`}
                   >

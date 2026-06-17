@@ -454,7 +454,7 @@ Solo JSON. Espanol neutro.`;
             <DialogTrigger asChild>
               <Button
                 onClick={resetForm}
-                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+                className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Registrar metrica
@@ -627,7 +627,7 @@ Solo JSON. Espanol neutro.`;
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-[#0c1f36]" />
+                      <TrendingUp className="h-5 w-5 text-amtme-navy" />
                       <CardTitle className="text-base">Mejor mes registrado</CardTitle>
                     </div>
                   </CardHeader>
@@ -657,7 +657,7 @@ Solo JSON. Espanol neutro.`;
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Repeat2 className="h-5 w-5 text-[#0c1f36]" />
+                      <Repeat2 className="h-5 w-5 text-amtme-navy" />
                       <CardTitle className="text-base">Episodio con mejor respuesta</CardTitle>
                     </div>
                   </CardHeader>
@@ -695,7 +695,7 @@ Solo JSON. Espanol neutro.`;
                             {bestEpisode.insight}
                           </p>
                         )}
-                        <p className="text-xs font-medium text-[#0c1f36] mt-2">
+                        <p className="text-xs font-medium text-amtme-navy mt-2">
                           Considera repetir el angulo o formato de este episodio
                         </p>
                       </div>
@@ -706,7 +706,7 @@ Solo JSON. Espanol neutro.`;
 
               {/* 3. RECOMENDACION IA ACTIVA */}
               {latestReport && (
-                <Card className="border-[#e8ff40] bg-[#e8ff40]/10">
+                <Card className="border-amtme-yellow bg-amtme-cream">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5" />
@@ -736,7 +736,7 @@ Solo JSON. Espanol neutro.`;
                           .querySelector('[data-value="reportes"]')
                           ?.dispatchEvent(new MouseEvent('click'));
                       }}
-                      className="text-xs text-[#0c1f36] underline"
+                      className="text-xs text-amtme-navy underline"
                     >
                       Ver reporte completo
                     </Link>
@@ -748,7 +748,7 @@ Solo JSON. Espanol neutro.`;
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5 text-[#0c1f36]" />
+                    <Lightbulb className="h-5 w-5 text-amtme-navy" />
                     <CardTitle className="text-base">Cuaderno de decisiones</CardTitle>
                   </div>
                   <CardDescription>
@@ -815,7 +815,7 @@ Solo JSON. Espanol neutro.`;
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/metricas/spotify"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#1ed760] bg-[#1ed760]/10 px-4 py-2 text-sm font-medium text-[#0c1f36] hover:bg-[#1ed760]/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#1ed760] bg-[#1ed760]/10 px-4 py-2 text-sm font-medium text-amtme-navy hover:bg-[#1ed760]/20 transition-colors"
                 >
                   Importar desde Spotify <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
@@ -851,7 +851,7 @@ Solo JSON. Espanol neutro.`;
               <CardContent className="py-12 text-center">
                 <p className="text-muted-foreground mb-4">Sin metricas mensuales registradas</p>
                 <Button
-                  className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+                  className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
                   onClick={() => setDialogOpen(true)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
@@ -907,7 +907,7 @@ Solo JSON. Espanol neutro.`;
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground">Ingresos</p>
-                          <p className="text-2xl font-semibold text-[#0c1f36]">
+                          <p className="text-2xl font-semibold text-amtme-navy">
                             ${m.revenue.toFixed(0)}
                           </p>
                         </div>
@@ -953,7 +953,7 @@ Solo JSON. Espanol neutro.`;
                     Registra los datos de reproducciones, DMs y conversiones por episodio
                   </p>
                   <Button
-                    className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+                    className="mt-4 bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
                     onClick={() => {
                       resetEpForm();
                       setEpDialogOpen(true);
@@ -1050,19 +1050,19 @@ Solo JSON. Espanol neutro.`;
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="rounded-xl bg-[#F5F2EA] p-4">
+                      <div className="rounded-xl bg-amtme-cream p-4">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           Diagnostico
                         </p>
                         <p className="text-sm">{r.diagnosis}</p>
                       </div>
-                      <div className="rounded-xl bg-[#F5F2EA] p-4">
+                      <div className="rounded-xl bg-amtme-cream p-4">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           Patron de crecimiento
                         </p>
                         <p className="text-sm">{r.growth_pattern}</p>
                       </div>
-                      <div className="rounded-xl bg-[#F5F2EA] p-4">
+                      <div className="rounded-xl bg-amtme-cream p-4">
                         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                           Mejor contenido
                         </p>
@@ -1075,13 +1075,13 @@ Solo JSON. Espanol neutro.`;
                         <p className="text-sm">{r.alert}</p>
                       </div>
                     </div>
-                    <div className="rounded-xl bg-[#e8ff40]/20 border border-[#e8ff40] p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-[#0c1f36] mb-1">
+                    <div className="rounded-xl bg-amtme-yellow/20 border border-amtme-yellow p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-amtme-navy mb-1">
                         Recomendacion 7 dias
                       </p>
                       <p className="text-sm font-medium">{r.recommendation_7d}</p>
                     </div>
-                    <div className="rounded-xl bg-[#0c1f36] text-white p-4">
+                    <div className="rounded-xl bg-amtme-navy text-white p-4">
                       <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mb-1">
                         Hipotesis proximo episodio
                       </p>

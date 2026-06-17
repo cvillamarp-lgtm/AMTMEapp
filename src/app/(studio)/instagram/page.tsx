@@ -6,11 +6,11 @@ export default function InstagramPage() {
   return (
     <div className="space-y-5 pb-24">
       <div>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#0C1F36]/40">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amtme-navy/40">
           Distribución
         </div>
-        <h1 className="mt-1 text-[28px] font-bold tracking-[-0.03em] text-[#0C1F36]">Instagram</h1>
-        <p className="mt-1 text-[13px] text-[#6B7B8C]">
+        <h1 className="mt-1 text-[28px] font-bold tracking-[-0.03em] text-amtme-navy">Instagram</h1>
+        <p className="mt-1 text-[13px] text-amtme-gray-500">
           Publica imágenes directamente desde Studio OS.
         </p>
       </div>
@@ -18,10 +18,10 @@ export default function InstagramPage() {
       <Card>
         <div className="flex flex-col items-center py-12 text-center">
           <div className="text-5xl">📸</div>
-          <h2 className="mt-4 text-[18px] font-bold text-[#0C1F36]">
+          <h2 className="mt-4 text-[18px] font-bold text-amtme-navy">
             Conecta tu cuenta de Instagram
           </h2>
-          <p className="mt-2 max-w-sm text-[13px] text-[#6B7B8C]">
+          <p className="mt-2 max-w-sm text-[13px] text-amtme-gray-500">
             Necesitas un Access Token y User ID de Instagram Graph API para publicar directamente
             desde aquí.
           </p>
@@ -36,10 +36,10 @@ export default function InstagramPage() {
           </div>
 
           <div className="mt-6 rounded-2xl border border-[#FEE94B] bg-[#FEE94B]/10 px-5 py-4 text-left max-w-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#0C1F36]/50">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-amtme-navy/50">
               Cómo obtener credenciales
             </p>
-            <ol className="mt-2 space-y-1 text-[12px] text-[#0C1F36]">
+            <ol className="mt-2 space-y-1 text-[12px] text-amtme-navy">
               <li>1. Ve a Facebook Developers y crea una app</li>
               <li>2. Agrega el producto "Instagram Graph API"</li>
               <li>3. Genera un Access Token de larga duración</li>

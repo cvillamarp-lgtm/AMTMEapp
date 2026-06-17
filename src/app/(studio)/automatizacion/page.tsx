@@ -113,7 +113,7 @@ export default function AutomatizacionPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Automatización</div>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
               Reglas y disparadores
             </h2>
           </div>
@@ -130,16 +130,16 @@ export default function AutomatizacionPage() {
         ) : rules.length === 0 ? (
           <div className="mt-8 text-center text-sm text-black/40">
             <p>No hay reglas de automatización.</p>
-            <button onClick={openNew} className="mt-2 text-[#0C1F36] underline underline-offset-2">
+            <button onClick={openNew} className="mt-2 text-amtme-navy underline underline-offset-2">
               Crear primera regla
             </button>
           </div>
         ) : (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {rules.map((rule) => (
-              <div key={rule.id} className="rounded-3xl border border-black/8 bg-[#F5F2EA] p-4">
+              <div key={rule.id} className="rounded-3xl border border-black/8 bg-amtme-cream p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-lg font-semibold text-[#0C1F36]">{rule.name}</h3>
+                  <h3 className="text-lg font-semibold text-amtme-navy">{rule.name}</h3>
                   <div className="flex shrink-0 items-center gap-1.5">
                     <Badge tone={STATUS_TONE[rule.status]}>{rule.status}</Badge>
                     <button
@@ -202,7 +202,7 @@ export default function AutomatizacionPage() {
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-semibold text-[#0C1F36]">
+            <h3 className="text-lg font-semibold text-amtme-navy">
               {editing ? 'Editar regla' : 'Nueva regla de automatización'}
             </h3>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -293,7 +293,7 @@ export default function AutomatizacionPage() {
               <button
                 onClick={save}
                 disabled={saving}
-                className="px-4 py-2 text-sm font-medium bg-[#0C1F36] text-white rounded-xl hover:bg-[#0C1F36]/90 transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium bg-amtme-navy text-white rounded-xl hover:bg-amtme-navy/90 transition-colors disabled:opacity-50"
               >
                 {saving ? 'Guardando...' : editing ? 'Actualizar' : 'Crear regla'}
               </button>

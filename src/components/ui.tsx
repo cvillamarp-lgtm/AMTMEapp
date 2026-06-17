@@ -29,16 +29,16 @@ export function Button({
     'inline-flex items-center justify-center gap-2 whitespace-nowrap select-none cursor-pointer',
     'rounded-xl px-4 py-2 text-[13px] font-semibold leading-none tracking-[-0.01em]',
     'transition-all duration-150 ease-out',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#0C1F36]/30',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amtme-navy/30',
     'disabled:pointer-events-none disabled:opacity-40',
   ].join(' ');
 
   const variants: Record<string, string> = {
     primary:
-      'bg-[#0C1F36] text-white hover:bg-[#09182a] active:scale-[0.97] shadow-[0_1px_3px_rgba(12,31,54,0.18)]',
-    secondary: 'bg-black/[0.06] text-[#0C1F36] hover:bg-black/[0.10] active:scale-[0.97]',
-    ghost: 'bg-transparent text-[#0C1F36] hover:bg-black/[0.05] active:scale-[0.97]',
-    danger: 'bg-[#E0211E] text-white hover:bg-[#c01c1a] active:scale-[0.97]',
+      'bg-amtme-navy text-white hover:bg-amtme-navy/80 active:scale-[0.97] shadow-[0_1px_3px_rgba(12,31,54,0.18)]',
+    secondary: 'bg-black/[0.06] text-amtme-navy hover:bg-black/[0.10] active:scale-[0.97]',
+    ghost: 'bg-transparent text-amtme-navy hover:bg-black/[0.05] active:scale-[0.97]',
+    danger: 'bg-amtme-red text-white hover:bg-amtme-red/80 active:scale-[0.97]',
   };
 
   const classes = joinClasses(base, variants[variant], className);
@@ -63,7 +63,7 @@ export function Card({ children, className }: { children: ReactNode; className?:
     <section
       className={joinClasses(
         'rounded-[20px] border border-black/[0.07] bg-white p-6',
-        'shadow-[0_2px_8px_rgba(12,31,54,0.06),0_0_1px_rgba(12,31,54,0.06)]',
+        'shadow-sm',
         className
       )}
     >
@@ -81,11 +81,11 @@ export function Badge({
   tone?: 'neutral' | 'good' | 'warning' | 'danger' | 'accent';
 }) {
   const tones: Record<string, string> = {
-    neutral: 'bg-black/[0.06] text-[#0C1F36]',
+    neutral: 'bg-black/[0.06] text-amtme-navy',
     good: 'bg-emerald-50 text-emerald-700',
-    warning: 'bg-[#FEE94B] text-[#0C1F36]',
-    danger: 'bg-red-50 text-[#C0201E]',
-    accent: 'bg-[#FEE94B] text-[#0C1F36]',
+    warning: 'bg-amtme-yellow text-amtme-navy',
+    danger: 'bg-red-50 text-red-700',
+    accent: 'bg-amtme-yellow text-amtme-navy',
   };
 
   return (
@@ -112,11 +112,11 @@ export function Field({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#0C1F36]/50">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-amtme-navy/50">
         {label}
       </span>
       {children}
-      {hint ? <span className="text-[11px] text-[#6B7B8C]">{hint}</span> : null}
+      {hint ? <span className="text-[11px] text-amtme-gray-500">{hint}</span> : null}
     </label>
   );
 }
@@ -124,10 +124,10 @@ export function Field({
 // ─── Inputs ──────────────────────────────────────────────────────────────────────
 const inputBase = [
   'w-full rounded-xl border border-black/[0.10] bg-black/[0.025]',
-  'px-3.5 py-2.5 text-[14px] text-[#0C1F36]',
-  'placeholder:text-[#6B7B8C]/60',
+  'px-3.5 py-2.5 text-[14px] text-amtme-navy',
+  'placeholder:text-amtme-gray-500/60',
   'outline-none transition-all duration-150',
-  'focus:border-[#0C1F36]/25 focus:bg-white focus:shadow-[0_0_0_3px_rgba(12,31,54,0.08)]',
+  'focus:border-amtme-navy/25 focus:bg-white focus:shadow-[0_0_0_3px_rgba(12,31,54,0.08)]',
   'disabled:opacity-50',
 ].join(' ');
 

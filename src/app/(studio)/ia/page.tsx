@@ -171,7 +171,9 @@ export default function IAPage() {
         <div className="text-xs uppercase tracking-[0.22em] text-black/40">
           IA / Asistente editorial
         </div>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#0C1F36]">IA para AMTME</h1>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight text-amtme-navy">
+          IA para AMTME
+        </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-black/60">
           Asistente editorial para revisar, estructurar y convertir contenido real. Elige un preset,
           ajusta el prompt en la consola y genera.
@@ -191,7 +193,7 @@ export default function IAPage() {
           <Link
             key={l.href}
             href={l.href}
-            className="rounded-lg border border-black/10 bg-[#F5F2EA] px-2.5 py-1 font-medium text-[#0C1F36] hover:bg-white transition-colors"
+            className="rounded-lg border border-black/10 bg-amtme-cream px-2.5 py-1 font-medium text-amtme-navy hover:bg-white transition-colors"
           >
             {l.label} →
           </Link>
@@ -210,10 +212,10 @@ export default function IAPage() {
               className="flex flex-col gap-3 rounded-2xl border border-black/8 bg-white p-4"
             >
               <div className="flex items-start justify-between gap-2">
-                <h3 className="text-sm font-semibold leading-snug text-[#0C1F36]">
+                <h3 className="text-sm font-semibold leading-snug text-amtme-navy">
                   {preset.title}
                 </h3>
-                <span className="shrink-0 rounded-full bg-[#e8ff40] px-2 py-0.5 text-[10px] font-medium text-[#0C1F36]">
+                <span className="shrink-0 rounded-full bg-amtme-yellow px-2 py-0.5 text-[10px] font-medium text-amtme-navy">
                   Listo
                 </span>
               </div>
@@ -231,14 +233,14 @@ export default function IAPage() {
               <div className="mt-auto flex gap-2 pt-1">
                 <button
                   onClick={() => loadPreset(preset)}
-                  className="flex-1 rounded-xl bg-[#0C1F36] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#0C1F36]/90"
+                  className="flex-1 rounded-xl bg-amtme-navy px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amtme-navy/90"
                 >
                   Usar en consola
                 </button>
                 {preset.href && (
                   <Link
                     href={preset.href}
-                    className="rounded-xl border border-black/10 px-3 py-1.5 text-xs font-medium text-[#0C1F36] transition-colors hover:bg-[#F5F2EA]"
+                    className="rounded-xl border border-black/10 px-3 py-1.5 text-xs font-medium text-amtme-navy transition-colors hover:bg-amtme-cream"
                   >
                     Ir →
                   </Link>
@@ -262,7 +264,7 @@ export default function IAPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-xs uppercase tracking-[0.22em] text-black/40">Consola IA</div>
-              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#0C1F36]">
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-amtme-navy">
                 Generacion directa
               </h2>
             </div>
@@ -326,8 +328,8 @@ export default function IAPage() {
         <div className="space-y-5">
           <Card>
             <div className="text-xs uppercase tracking-[0.22em] text-black/40">Resultado</div>
-            <div className="mt-4 min-h-[360px] rounded-3xl border border-black/8 bg-[#F5F2EA] p-4 text-sm leading-6 text-[#0C1F36]">
-              {response.error ? <p className="text-[#E0211E]">{response.error}</p> : null}
+            <div className="mt-4 min-h-[360px] rounded-3xl border border-black/8 bg-amtme-cream p-4 text-sm leading-6 text-amtme-navy">
+              {response.error ? <p className="text-amtme-red">{response.error}</p> : null}
               {!response.error && !response.result ? (
                 <p className="text-black/45">
                   Selecciona un preset de arriba o escribe un prompt y genera.
@@ -340,7 +342,7 @@ export default function IAPage() {
             {response.result && (
               <button
                 onClick={() => void navigator.clipboard.writeText(response.result)}
-                className="mt-3 text-xs font-medium text-[#0C1F36] underline underline-offset-2 hover:no-underline"
+                className="mt-3 text-xs font-medium text-amtme-navy underline underline-offset-2 hover:no-underline"
               >
                 Copiar resultado
               </button>
@@ -352,27 +354,27 @@ export default function IAPage() {
               Estado de conexion
             </div>
             <div className="mt-4 grid gap-3 text-sm text-black/60">
-              <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl bg-amtme-cream px-4 py-3">
                 <span>Proveedor primario</span>
-                <span className="font-medium text-[#0C1F36]">
+                <span className="font-medium text-amtme-navy">
                   {getProviderLabel(state.config.aiPrimaryProvider)}
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl bg-amtme-cream px-4 py-3">
                 <span>Proveedor fallback</span>
-                <span className="font-medium text-[#0C1F36]">
+                <span className="font-medium text-amtme-navy">
                   {getProviderLabel(state.config.aiFallbackProvider)}
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl bg-amtme-cream px-4 py-3">
                 <span>Modelo Grok</span>
-                <span className="font-medium text-[#0C1F36]">
+                <span className="font-medium text-amtme-navy">
                   {state.config.aiPreferredModelByProvider.grok}
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-2xl bg-[#F5F2EA] px-4 py-3">
+              <div className="flex items-center justify-between rounded-2xl bg-amtme-cream px-4 py-3">
                 <span>Modelo Gemini</span>
-                <span className="font-medium text-[#0C1F36]">
+                <span className="font-medium text-amtme-navy">
                   {state.config.aiPreferredModelByProvider.gemini}
                 </span>
               </div>
@@ -380,7 +382,7 @@ export default function IAPage() {
           </Card>
 
           {/* Link al editor tecnico */}
-          <div className="rounded-2xl border border-black/8 bg-[#F5F2EA] p-4">
+          <div className="rounded-2xl border border-black/8 bg-amtme-cream p-4">
             <div className="text-xs uppercase tracking-[0.18em] text-black/40 mb-2">
               Editor tecnico de la app
             </div>
@@ -390,7 +392,7 @@ export default function IAPage() {
             </p>
             <Link
               href="/ia/editor"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#0C1F36] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#0C1F36]/90"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-amtme-navy px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amtme-navy/90"
             >
               Abrir editor tecnico →
             </Link>

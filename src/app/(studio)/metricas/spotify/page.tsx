@@ -102,7 +102,7 @@ export default function MetricasSpotifyPage() {
         onDrop={handleDrop}
         className={`relative rounded-xl border-2 border-dashed transition-colors p-8 text-center mb-4 ${
           dragging
-            ? 'border-[#e8ff40] bg-[#e8ff40]/10'
+            ? 'border-amtme-yellow bg-amtme-cream'
             : 'border-border bg-muted/20 hover:border-muted-foreground/40'
         }`}
       >

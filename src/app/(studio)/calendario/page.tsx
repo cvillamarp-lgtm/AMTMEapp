@@ -222,7 +222,7 @@ export default function CalendarioPage() {
   const statusColor: Record<string, string> = {
     pendiente: 'bg-gray-100 text-gray-600',
     'en-proceso': 'bg-blue-50 text-blue-700',
-    listo: 'bg-[#e8ff40] text-[#0c1f36]',
+    listo: 'bg-amtme-yellow text-amtme-navy',
     publicado: 'bg-green-100 text-green-700',
     medido: 'bg-purple-50 text-purple-700',
     archivado: 'bg-gray-50 text-gray-400',
@@ -297,13 +297,13 @@ export default function CalendarioPage() {
           <div className="flex rounded-lg border border-border overflow-hidden">
             <button
               onClick={() => setView('operativo')}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'operativo' ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-background text-muted-foreground hover:bg-muted'}`}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'operativo' ? 'bg-amtme-yellow text-amtme-navy' : 'bg-background text-muted-foreground hover:bg-muted'}`}
             >
               Operativo
             </button>
             <button
               onClick={() => setView('mes')}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'mes' ? 'bg-[#e8ff40] text-[#0c1f36]' : 'bg-background text-muted-foreground hover:bg-muted'}`}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${view === 'mes' ? 'bg-amtme-yellow text-amtme-navy' : 'bg-background text-muted-foreground hover:bg-muted'}`}
             >
               Por mes
             </button>
@@ -312,7 +312,7 @@ export default function CalendarioPage() {
             <DialogTrigger asChild>
               <Button
                 onClick={resetForm}
-                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+                className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Agendar
@@ -448,10 +448,10 @@ export default function CalendarioPage() {
         <div className="space-y-8">
           {/* SIGUIENTE ACCION */}
           {siguienteAccion && (
-            <div className="rounded-xl border border-[#e8ff40]/60 bg-[#e8ff40]/10 p-4">
+            <div className="rounded-xl border border-amtme-yellow/60 bg-amtme-cream p-4">
               <div className="flex items-center gap-2 mb-2">
-                <ArrowRight className="h-4 w-4 text-[#0c1f36]" />
-                <span className="text-xs font-semibold uppercase tracking-widest text-[#0c1f36]">
+                <ArrowRight className="h-4 w-4 text-amtme-navy" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-amtme-navy">
                   Siguiente accion
                 </span>
               </div>
@@ -647,7 +647,7 @@ export default function CalendarioPage() {
                 distribucion.
               </p>
               <Button
-                className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+                className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
                 onClick={() => setDialogOpen(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -664,7 +664,7 @@ export default function CalendarioPage() {
               <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">Sin eventos</p>
               <Button
-                className="mt-4 bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+                className="mt-4 bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
                 onClick={() => setDialogOpen(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />

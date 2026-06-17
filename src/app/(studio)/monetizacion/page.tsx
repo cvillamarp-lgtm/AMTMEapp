@@ -209,7 +209,7 @@ Devuelve exactamente:
   const urgente = pendingFollowUp[0] || null;
 
   const statusColor: Record<string, string> = {
-    pagado: 'bg-[#e8ff40] text-[#0c1f36]',
+    pagado: 'bg-amtme-yellow text-amtme-navy',
     entregado: 'bg-green-100 text-green-800',
     perdido: 'bg-red-100 text-red-800',
     interesado: 'bg-blue-100 text-blue-800',
@@ -227,7 +227,7 @@ Devuelve exactamente:
           <DialogTrigger asChild>
             <Button
               onClick={resetForm}
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
             >
               <Plus className="mr-2 h-4 w-4" />
               Crear lead
@@ -347,23 +347,23 @@ Devuelve exactamente:
       {/* Panel de oportunidad de hoy */}
       <div className="grid gap-4 md:grid-cols-2 mb-6">
         {/* Oportunidad activa */}
-        <Card className="border-[#e8ff40]/40 bg-[#e8ff40]/5">
+        <Card className="border-amtme-yellow/40 bg-amtme-yellow/5">
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-[#0c1f36]" />
+              <CheckCircle2 className="h-4 w-4 text-amtme-navy" />
               <CardTitle className="text-base">Oportunidad de hoy</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {urgente ? (
               <>
-                <p className="text-sm font-medium text-[#0c1f36]">{urgente.name}</p>
+                <p className="text-sm font-medium text-amtme-navy">{urgente.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {urgente.offer} — sin proxima accion definida
                 </p>
                 <Button
                   size="sm"
-                  className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] text-xs mt-1"
+                  className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 text-xs mt-1"
                   onClick={() => handleEdit(urgente)}
                 >
                   Definir siguiente paso
@@ -390,7 +390,7 @@ Devuelve exactamente:
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-[#0c1f36] leading-relaxed">
+            <p className="text-sm text-amtme-navy leading-relaxed">
               {CTA_SUAVES[new Date().getDay() % CTA_SUAVES.length]}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
@@ -409,7 +409,7 @@ Devuelve exactamente:
           {SERVICIOS_DISPONIBLES.map((s) => (
             <Card key={s.nombre} className="border-border/50">
               <CardContent className="pt-4 pb-4">
-                <p className="text-sm font-semibold text-[#0c1f36]">{s.nombre}</p>
+                <p className="text-sm font-semibold text-amtme-navy">{s.nombre}</p>
                 <p className="text-xs text-muted-foreground mt-1">{s.descripcion}</p>
                 <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
                   <span>{s.precio}</span>
@@ -474,7 +474,7 @@ Devuelve exactamente:
               Cuando alguien exprese interes en un servicio, registralo aqui para darle seguimiento.
             </p>
             <Button
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
               onClick={() => setDialogOpen(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -517,7 +517,7 @@ Devuelve exactamente:
                   <div className="col-span-2">
                     <span className="text-muted-foreground">Siguiente paso: </span>
                     {l.next_action ? (
-                      <span className="text-[#0c1f36]">{l.next_action}</span>
+                      <span className="text-amtme-navy">{l.next_action}</span>
                     ) : (
                       <span className="text-amber-600 font-medium">
                         Sin definir — requiere atencion
@@ -530,7 +530,7 @@ Devuelve exactamente:
                     <p className="text-xs font-medium text-muted-foreground mb-1">
                       Mensaje generado:
                     </p>
-                    <p className="text-[#0c1f36] leading-relaxed">{aiMessages[l.id]}</p>
+                    <p className="text-amtme-navy leading-relaxed">{aiMessages[l.id]}</p>
                     <Button
                       size="sm"
                       variant="ghost"

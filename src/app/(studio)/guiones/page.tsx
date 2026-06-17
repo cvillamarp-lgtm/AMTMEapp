@@ -232,7 +232,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
   const statusColor: Record<string, string> = {
     borrador: 'bg-gray-100 text-gray-700',
     revision: 'bg-yellow-100 text-yellow-800',
-    'listo-grabar': 'bg-[#e8ff40] text-[#0c1f36]',
+    'listo-grabar': 'bg-amtme-yellow text-amtme-navy',
     grabado: 'bg-green-100 text-green-800',
   };
 
@@ -256,7 +256,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
           <DialogTrigger asChild>
             <Button
               onClick={resetForm}
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a] font-semibold"
+              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold"
             >
               <Plus className="mr-2 h-4 w-4" />
               Crear guion
@@ -315,7 +315,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                 type="button"
                 onClick={generateWithAI}
                 disabled={generating}
-                className="w-full bg-[#0c1f36] text-white hover:bg-[#1a3a5c]"
+                className="w-full bg-amtme-navy text-white hover:bg-amtme-navy/90"
               >
                 {generating ? (
                   <>
@@ -389,7 +389,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
               {blocks.map(
                 (b) =>
                   viewing[b.key] && (
-                    <div key={b.key} className="border-l-2 border-[#e8ff40] pl-4">
+                    <div key={b.key} className="border-l-2 border-amtme-yellow pl-4">
                       <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
                         {b.label}
                       </p>
@@ -398,7 +398,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                   )
               )}
               {viewing.cta && (
-                <div className="border-l-2 border-[#0c1f36] pl-4">
+                <div className="border-l-2 border-amtme-navy pl-4">
                   <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">CTA</p>
                   <p>{viewing.cta}</p>
                 </div>
@@ -425,7 +425,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
               Ver episodios
             </Link>
             <Button
-              className="bg-[#e8ff40] text-[#0c1f36] hover:bg-[#d4eb3a]"
+              className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
               onClick={() => setDialogOpen(true)}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -494,7 +494,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                     </div>
                     <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-[#e8ff40]' : pct >= 50 ? 'bg-[#0c1f36]' : 'bg-gray-300'}`}
+                        className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-amtme-yellow' : pct >= 50 ? 'bg-amtme-navy' : 'bg-gray-300'}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -502,7 +502,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                       {scriptBlocks.map((b) => (
                         <span
                           key={b}
-                          className={`text-[10px] px-1 py-0.5 rounded ${s[b] ? 'bg-[#0c1f36] text-white' : 'bg-gray-100 text-gray-400'}`}
+                          className={`text-[10px] px-1 py-0.5 rounded ${s[b] ? 'bg-amtme-navy text-white' : 'bg-gray-100 text-gray-400'}`}
                         >
                           {b === 'opening'
                             ? 'Apertura'
@@ -529,7 +529,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                     {(s.status === 'borrador' || s.status === 'revision') && (
                       <Link
                         href="/revision-episodios"
-                        className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                        className="text-xs font-medium text-amtme-navy underline underline-offset-2 hover:no-underline"
                       >
                         Ir a revisión →
                       </Link>
@@ -537,7 +537,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                     {s.status === 'listo-grabar' && (
                       <Link
                         href="/contenido"
-                        className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                        className="text-xs font-medium text-amtme-navy underline underline-offset-2 hover:no-underline"
                       >
                         Ir a contenido →
                       </Link>
@@ -545,7 +545,7 @@ Devuelve el guion dividido en 8 secciones con estas etiquetas exactas:
                     {s.status === 'grabado' && (
                       <Link
                         href="/contenido"
-                        className="text-xs font-medium text-[#0c1f36] underline underline-offset-2 hover:no-underline"
+                        className="text-xs font-medium text-amtme-navy underline underline-offset-2 hover:no-underline"
                       >
                         Producir contenido →
                       </Link>
