@@ -6,12 +6,13 @@ import { useNextBestActions } from '@/hooks/use-next-best-actions';
 import { useEpisodes, useContentPieces, useMonetizationLeads } from '@/hooks';
 import { NextBestActionWidget } from '@/components/next-best-action-widget';
 import { EpisodeList } from '@/components/lists';
+import { PageHeader, LoadingSkeleton, Button } from '@/components/ui';
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="mt-1 text-4xl font-bold text-primary tracking-tight">{value}</p>
+    <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
+      <p className="text-sm text-amtme-gray-400">{label}</p>
+      <p className="mt-2 text-4xl font-bold text-amtme-yellow tracking-tight">{value}</p>
     </div>
   );
 }
@@ -40,23 +41,16 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 pb-10">
-      {/* Hero */}
-      <div className="rounded-2xl border border-amtme-lemon/60 bg-amtme-cream p-6 shadow-sm">
-        <span className="inline-flex items-center rounded-full bg-amtme-lemon px-3 py-1 text-xs font-semibold text-black mb-4">
-          Nueva identidad activa
-        </span>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-primary">
-          AMTME Studio OS
-        </h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Sistema operativo editorial, documental y operativo para gestionar AMTME desde una sola
-          fuente central.
-        </p>
-      </div>
+      {/* Header */}
+      <PageHeader
+        eyebrow="Sistema operativo"
+        title="AMTME Studio OS"
+        description="Gestiona episodios, contenido, métricas y monetización desde una fuente central."
+      />
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Cargando datos desde Supabase...
+        <div className="space-y-4">
+          <LoadingSkeleton lines={4} />
         </div>
       ) : (
         <>
@@ -72,95 +66,71 @@ export default function DashboardPage() {
           <div className="grid gap-4 lg:grid-cols-2">
             <NextBestActionWidget actions={nextBestActions} />
 
-            <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-              <h2 className="font-semibold text-primary">Acciones rápidas</h2>
-              <p className="text-sm text-muted-foreground mb-4">Navega a donde necesitas</p>
+            <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
+              <h2 className="font-semibold text-amtme-yellow mb-1">Accesos rápidos</h2>
+              <p className="text-sm text-amtme-gray-400 mb-4">Navega a donde necesitas</p>
               <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href="/documento-maestro"
-                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
-                >
-                  Documento maestro
-                </Link>
-                <Link
-                  href="/studio/episodios"
-                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
-                >
-                  Episodios
-                </Link>
-                <Link
-                  href="/guiones"
-                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
-                >
-                  Guiones
-                </Link>
-                <Link
-                  href="/contenido"
-                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
-                >
-                  Contenido
-                </Link>
-                <Link
-                  href="/calendario"
-                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
-                >
-                  Calendario
-                </Link>
-                <Link
-                  href="/checklists"
-                  className="rounded-md border border-border bg-background p-3 text-center text-sm font-medium text-primary hover:bg-muted transition-colors"
-                >
-                  Checklists
-                </Link>
+                {[
+                  { href: '/documento-maestro', label: 'Documento maestro' },
+                  { href: '/studio/episodios', label: 'Episodios' },
+                  { href: '/guiones', label: 'Guiones' },
+                  { href: '/contenido', label: 'Contenido' },
+                  { href: '/calendario', label: 'Calendario' },
+                  { href: '/checklists', label: 'Checklists' },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-md border border-amtme-border/60 bg-amtme-navy/50 px-3 py-3 text-center text-sm font-medium text-amtme-white hover:bg-amtme-navy/80 hover:text-amtme-yellow transition-colors duration-200"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
             </div>
 
-            <div className="rounded-xl border border-amtme-lemon/40 bg-amtme-cream p-5 shadow-sm">
+            <div className="rounded-lg border border-amtme-yellow/30 bg-amtme-navy/30 p-5 shadow-soft">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h2 className="font-semibold text-primary">IA útil ahora</h2>
-                  <p className="text-sm text-muted-foreground">Genera contenido con asistencia</p>
+                  <h2 className="font-semibold text-amtme-yellow">IA útil ahora</h2>
+                  <p className="text-sm text-amtme-gray-400">Genera contenido con asistencia</p>
                 </div>
-                <Sparkle size={20} className="text-amtme-lemon" />
+                <Sparkle size={20} className="text-amtme-yellow shrink-0" />
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-amtme-gray-400 mb-4">
                 Editor de IA, guiones, descripciones y más
               </p>
-              <Link
-                href="/ia/editor"
-                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                <Sparkle size={16} /> Abrir editor IA
-              </Link>
+              <Button variant="primary" href="/ia/editor">
+                <Sparkle size={16} weight="fill" />
+                Abrir editor IA
+              </Button>
             </div>
           </div>
 
           {/* Energía creativa */}
-          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-start justify-between">
+          <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
+            <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="font-semibold text-primary">Energia y sostén</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Recomendacion sostenible de hoy
-                </p>
+                <h2 className="font-semibold text-amtme-yellow">Energía y sostén</h2>
+                <p className="text-sm text-amtme-gray-400 mt-1">Recomendación sostenible de hoy</p>
               </div>
-              <Leaf size={20} className="text-primary" />
+              <Leaf size={20} className="text-amtme-yellow shrink-0" />
             </div>
-            <div className="mt-4 space-y-2">
-              <div className="p-3 rounded-lg bg-muted/30">
-                <p className="text-sm font-medium text-primary">Modo normal: produce.</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Si tienes energia, avanza en el episodio actual. Si no, ve a Notas y activa el
-                  modo baja energia.
+            <div className="space-y-2">
+              <div className="p-3 rounded-lg bg-amtme-white/5 border border-amtme-border/40">
+                <p className="text-sm font-medium text-amtme-white">Modo normal: produce.</p>
+                <p className="text-sm text-amtme-gray-400 mt-1">
+                  Si tienes energía, avanza en el episodio actual. Si no, ve a Notas y activa el
+                  modo baja energía.
                 </p>
               </div>
               {activeLeads === 0 && (
-                <div className="p-3 rounded-lg bg-amtme-cream border border-amtme-yellow/30">
-                  <p className="text-sm font-medium text-primary">
-                    Sin leads activos en Monetizacion.
+                <div className="p-3 rounded-lg bg-amtme-yellow/10 border border-amtme-yellow/30">
+                  <p className="text-sm font-medium text-amtme-yellow">
+                    Sin leads activos en Monetización.
                   </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Cuando alguien exprese interes, registralo. No hace falta buscarlo; el contenido
+                  <p className="text-sm text-amtme-gray-300 mt-1">
+                    Cuando alguien exprese interés, regístralo. No hace falta buscarlo; el contenido
                     lo atrae.
                   </p>
                 </div>
@@ -169,9 +139,9 @@ export default function DashboardPage() {
           </div>
 
           {/* Episodios recientes */}
-          <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-            <h2 className="font-semibold text-primary">Producción actual</h2>
-            <p className="text-sm text-muted-foreground mb-4">Episodios recientes desde Supabase</p>
+          <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
+            <h2 className="font-semibold text-amtme-yellow mb-1">Producción actual</h2>
+            <p className="text-sm text-amtme-gray-400 mb-4">Episodios recientes desde Supabase</p>
             <EpisodeList limit={5} />
           </div>
         </>
