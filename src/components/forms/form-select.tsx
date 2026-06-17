@@ -15,17 +15,21 @@ export function FormSelect({
   helperText,
   options,
   className = '',
+  id,
   ...props
 }: FormSelectProps) {
+  const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+
   return (
     <div className="space-y-2">
       {label && (
-        <label className="text-sm font-medium text-gray-700">
+        <label htmlFor={selectId} className="text-sm font-medium text-gray-700">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
       <select
+        id={selectId}
         className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
           error ? 'border-red-500' : ''
         } ${className}`}
