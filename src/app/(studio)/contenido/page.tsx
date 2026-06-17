@@ -51,6 +51,7 @@ import {
 } from '@/lib/database';
 import type { ContentPiece, Channel, ContentFormat, ContentStatus } from '@/types/database';
 import { callAI, generatePublicationPackage, type PublicationPackage } from '@/lib/ai-studio';
+import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/ui';
 
 // --- PackageSection helper ---
 function PackageSection({ title, items }: { title: string; items: string[] }) {
@@ -309,165 +310,157 @@ Devuelve exactamente en este formato:
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-semibold">Contenido</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Gestión multicanal y paquetes de publicación
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant={packageTab === 'generator' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setPackageTab('generator')}
-            className={
-              packageTab === 'generator'
-                ? 'bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold'
-                : ''
-            }
-          >
-            <Package className="mr-2 h-4 w-4" />
-            Generar paquete
-          </Button>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                onClick={resetForm}
-                className="bg-amtme-navy text-white hover:bg-amtme-navy/90 font-semibold"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Nueva pieza
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{editing ? 'Editar contenido' : 'Crear contenido'}</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Canal *</Label>
-                    <Select
-                      value={form.channel}
-                      onValueChange={(v) => setForm({ ...form, channel: v as Channel })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Canal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[
-                          'instagram',
-                          'tiktok',
-                          'youtube-shorts',
-                          'threads',
-                          'spotify',
-                          'email',
-                        ].map((c) => (
+    <div className="space-y-6 pb-10">
+      <PageHeader
+        eyebrow="Multicanal"
+        title="Contenido"
+        description="Piezas de contenido y generador de paquetes de publicación"
+      />
+      <div className="flex items-center justify-end gap-2">
+        <Button
+          variant={packageTab === 'generator' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setPackageTab('generator')}
+          className={
+            packageTab === 'generator'
+              ? 'bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90 font-semibold'
+              : ''
+          }
+        >
+          <Package className="mr-2 h-4 w-4" />
+          Generar paquete
+        </Button>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              onClick={resetForm}
+              className="bg-amtme-navy text-white hover:bg-amtme-navy/90 font-semibold"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Nueva pieza
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editing ? 'Editar contenido' : 'Crear contenido'}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Canal *</Label>
+                  <Select
+                    value={form.channel}
+                    onValueChange={(v) => setForm({ ...form, channel: v as Channel })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Canal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['instagram', 'tiktok', 'youtube-shorts', 'threads', 'spotify', 'email'].map(
+                        (c) => (
                           <SelectItem key={c} value={c}>
                             {c}
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Formato *</Label>
-                    <Select
-                      value={form.format}
-                      onValueChange={(v) => setForm({ ...form, format: v as ContentFormat })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Formato" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {['reel', 'carrusel', 'story', 'short', 'post-texto', 'email'].map((f) => (
-                          <SelectItem key={f} value={f}>
-                            {f}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  onClick={generateContent}
-                  disabled={generatingContent}
-                  className="w-full bg-amtme-navy text-white hover:bg-amtme-navy/90"
-                >
-                  {generatingContent ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Generando con IA...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Generar contenido con IA
-                    </>
-                  )}
-                </Button>
-                <div>
-                  <Label>Tema *</Label>
-                  <Input
-                    value={form.theme}
-                    onChange={(e) => setForm({ ...form, theme: e.target.value })}
-                  />
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <Label>Hook *</Label>
-                  <Textarea
-                    value={form.hook}
-                    onChange={(e) => setForm({ ...form, hook: e.target.value })}
-                    rows={2}
-                  />
-                </div>
-                <div>
-                  <Label>Texto principal *</Label>
-                  <Textarea
-                    value={form.main_text}
-                    onChange={(e) => setForm({ ...form, main_text: e.target.value })}
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Label>CTA *</Label>
-                  <Textarea
-                    value={form.cta}
-                    onChange={(e) => setForm({ ...form, cta: e.target.value })}
-                    rows={2}
-                  />
-                </div>
-                <div>
-                  <Label>Estado</Label>
+                  <Label>Formato *</Label>
                   <Select
-                    value={form.status}
-                    onValueChange={(v) => setForm({ ...form, status: v as ContentStatus })}
+                    value={form.format}
+                    onValueChange={(v) => setForm({ ...form, format: v as ContentFormat })}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Formato" />
                     </SelectTrigger>
                     <SelectContent>
-                      {['borrador', 'listo', 'publicado', 'medido'].map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
+                      {['reel', 'carrusel', 'story', 'short', 'post-texto', 'email'].map((f) => (
+                        <SelectItem key={f} value={f}>
+                          {f}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <DialogFooter>
-                  <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button type="submit">{editing ? 'Guardar' : 'Crear'}</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </div>
+              <Button
+                type="button"
+                onClick={generateContent}
+                disabled={generatingContent}
+                className="w-full bg-amtme-navy text-white hover:bg-amtme-navy/90"
+              >
+                {generatingContent ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generando con IA...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generar contenido con IA
+                  </>
+                )}
+              </Button>
+              <div>
+                <Label>Tema *</Label>
+                <Input
+                  value={form.theme}
+                  onChange={(e) => setForm({ ...form, theme: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Hook *</Label>
+                <Textarea
+                  value={form.hook}
+                  onChange={(e) => setForm({ ...form, hook: e.target.value })}
+                  rows={2}
+                />
+              </div>
+              <div>
+                <Label>Texto principal *</Label>
+                <Textarea
+                  value={form.main_text}
+                  onChange={(e) => setForm({ ...form, main_text: e.target.value })}
+                  rows={4}
+                />
+              </div>
+              <div>
+                <Label>CTA *</Label>
+                <Textarea
+                  value={form.cta}
+                  onChange={(e) => setForm({ ...form, cta: e.target.value })}
+                  rows={2}
+                />
+              </div>
+              <div>
+                <Label>Estado</Label>
+                <Select
+                  value={form.status}
+                  onValueChange={(v) => setForm({ ...form, status: v as ContentStatus })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {['borrador', 'listo', 'publicado', 'medido'].map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="secondary" onClick={() => setDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit">{editing ? 'Guardar' : 'Crear'}</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* GENERADOR DE PAQUETE */}
@@ -619,28 +612,15 @@ Devuelve exactamente en este formato:
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Cargando...</div>
+            <LoadingSkeleton lines={4} />
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16">
-              <Image className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Sin contenido todavia</p>
-              <div className="mt-4 flex justify-center gap-2">
-                <Button
-                  className="bg-amtme-yellow text-amtme-navy hover:bg-amtme-yellow/90"
-                  onClick={() => setPackageTab('generator')}
-                >
-                  <Package className="mr-2 h-4 w-4" />
-                  Generar paquete
-                </Button>
-                <Button
-                  className="bg-amtme-navy text-white hover:bg-amtme-navy/90"
-                  onClick={() => setDialogOpen(true)}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nueva pieza
-                </Button>
-              </div>
-            </div>
+            <EmptyState
+              icon={<Image className="h-12 w-12" />}
+              title="Sin contenido todavía"
+              description="Crea nuevas piezas o genera un paquete de publicación"
+              action={{ label: 'Nueva pieza', onClick: () => setDialogOpen(true) }}
+              secondaryAction={{ label: 'Generar paquete', href: '#' }}
+            />
           ) : (
             <div className="grid gap-4">
               <AnimatePresence mode="popLayout">
@@ -653,7 +633,7 @@ Devuelve exactamente en este formato:
                     exit={{ opacity: 0, scale: 0.97 }}
                     transition={{ duration: 0.15 }}
                   >
-                    <Card>
+                    <Card className="border-amtme-border bg-amtme-navy/30">
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
