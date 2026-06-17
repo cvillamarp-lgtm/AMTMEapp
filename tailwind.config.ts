@@ -12,7 +12,6 @@ const config: Config = {
           yellow: '#fee94b',
           red: '#e0211e',
           'white': '#f8f8f6',
-          cream: '#f5f2ea',
           charcoal: '#0d0d0d',
           // Semantic aliases
           background: '#0c1f36',

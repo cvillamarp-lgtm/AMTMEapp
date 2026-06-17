@@ -95,18 +95,8 @@ export function PublicFooter() {
         </div>
 
         {/* Divider y Copyright */}
-        <div className="border-t border-white/10 pt-8">
-          <div className="text-center text-[#9DC4D5] text-xs mb-4">
-            <p>© 2026 A Mí Tampoco Me Explicaron · Hecho con claridad y sin certezas vacías</p>
-          </div>
-          <div className="text-center">
-            <Link
-              href="/auth/sign-in"
-              className="text-[#9DC4D5]/50 text-xs hover:text-[#9DC4D5] transition-colors"
-            >
-              Studio
-            </Link>
-          </div>
+        <div className="border-t border-white/10 pt-8 text-center text-[#9DC4D5] text-xs">
+          <p>© 2026 A Mí Tampoco Me Explicaron · Hecho con claridad y sin certezas vacías</p>
         </div>
       </div>
     </footer>
