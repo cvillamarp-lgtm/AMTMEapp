@@ -247,9 +247,9 @@ export function ErrorState({
   action?: { label: string; onClick: () => void };
 }) {
   return (
-    <div className="flex flex-col items-start rounded-lg border border-amtme-red/30 bg-amtme-red/10 px-6 py-4">
+    <div className="flex flex-col items-start rounded-xl border border-amtme-red/20 bg-amtme-red/5 px-6 py-4">
       <h3 className="font-semibold text-amtme-red">{title}</h3>
-      {description && <p className="mt-1 text-sm text-amtme-red/80">{description}</p>}
+      {description && <p className="mt-1 text-sm text-amtme-red/70">{description}</p>}
       {action && (
         <Button variant="danger" onClick={action.onClick} className="mt-4">
           {action.label}
@@ -297,7 +297,7 @@ export function StatusBadge({
   return (
     <span
       className={joinClasses(
-        'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold',
+        'inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold transition-colors duration-200',
         statusColor[status]
       )}
     >
