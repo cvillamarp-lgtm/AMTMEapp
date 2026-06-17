@@ -9,15 +9,21 @@ const config: Config = {
         // AMTME Brand Colors
         amtme: {
           navy: '#0c1f36',
+          'navy-deep': '#071426',
           yellow: '#fee94b',
+          lemon: '#e8ff40',
           red: '#e0211e',
-          'white': '#f8f8f6',
+          white: '#f8f8f6',
+          cream: '#f4efe7',
           charcoal: '#0d0d0d',
+          carbon: '#0d0d0d',
+          muted: '#8a8f98',
           // Semantic aliases
           background: '#0c1f36',
           foreground: '#f8f8f6',
           accent: '#fee94b',
           'accent-dark': '#0c1f36',
+          'accent-light': '#e8ff40',
           destructive: '#e0211e',
           border: 'rgba(248, 248, 246, 0.1)',
           // Grays
@@ -32,9 +38,14 @@ const config: Config = {
           'gray-800': '#1f2937',
           'gray-900': '#111827',
           // Functional
-          'success': '#10b981',
-          'warning': '#f59e0b',
-          'info': '#3b82f6',
+          success: '#10b981',
+          warning: '#f59e0b',
+          info: '#3b82f6',
+          // Semantic (replace hardcoded CSS variables)
+          'semantic-border': 'rgba(248, 248, 246, 0.1)',
+          'semantic-surface': 'rgba(12, 31, 54, 0.5)',
+          'semantic-muted': '#8a8f98',
+          'semantic-text': '#f8f8f6',
         },
         // Shadcn compatibility
         background: 'hsl(var(--background))',
@@ -80,7 +91,14 @@ const config: Config = {
         '3xl': '16px',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: [
+          'var(--font-inter)',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'sans-serif',
+        ],
         display: ['var(--font-josefin)', 'system-ui', 'sans-serif'],
         body: ['var(--font-body)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
