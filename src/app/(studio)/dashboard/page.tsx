@@ -10,9 +10,9 @@ import { PageHeader, LoadingSkeleton, Button } from '@/components/ui';
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
-      <p className="text-sm text-amtme-gray-400">{label}</p>
-      <p className="mt-2 text-4xl font-bold text-amtme-yellow tracking-tight">{value}</p>
+    <div className="rounded-xl border border-black/[0.05] bg-white p-6 shadow-xs hover:shadow-soft transition-shadow duration-200">
+      <p className="text-sm text-amtme-gray-600">{label}</p>
+      <p className="mt-3 text-4xl font-bold text-amtme-navy tracking-tight">{value}</p>
     </div>
   );
 }
@@ -66,9 +66,9 @@ export default function DashboardPage() {
           <div className="grid gap-4 lg:grid-cols-2">
             <NextBestActionWidget actions={nextBestActions} />
 
-            <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
-              <h2 className="font-semibold text-amtme-yellow mb-1">Accesos rápidos</h2>
-              <p className="text-sm text-amtme-gray-400 mb-4">Navega a donde necesitas</p>
+            <div className="rounded-xl border border-black/[0.05] bg-white p-6 shadow-xs">
+              <h2 className="font-semibold text-amtme-navy mb-1">Accesos rápidos</h2>
+              <p className="text-sm text-amtme-gray-600 mb-4">Navega a donde necesitas</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { href: '/documento-maestro', label: 'Documento maestro' },
@@ -81,7 +81,7 @@ export default function DashboardPage() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="rounded-md border border-amtme-border/60 bg-amtme-navy/50 px-3 py-3 text-center text-sm font-medium text-amtme-white hover:bg-amtme-navy/80 hover:text-amtme-yellow transition-colors duration-200"
+                    className="rounded-lg border border-black/[0.08] bg-white px-3 py-3 text-center text-sm font-medium text-amtme-navy hover:bg-black/[0.03] transition-colors duration-200"
                   >
                     {item.label}
                   </Link>
@@ -89,15 +89,15 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-amtme-yellow/30 bg-amtme-navy/30 p-5 shadow-soft">
+            <div className="rounded-xl border border-amtme-yellow/20 bg-amtme-yellow/5 p-6 shadow-xs">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h2 className="font-semibold text-amtme-yellow">IA útil ahora</h2>
-                  <p className="text-sm text-amtme-gray-400">Genera contenido con asistencia</p>
+                  <h2 className="font-semibold text-amtme-navy">IA útil ahora</h2>
+                  <p className="text-sm text-amtme-gray-600">Genera contenido con asistencia</p>
                 </div>
                 <Sparkle size={20} className="text-amtme-yellow shrink-0" />
               </div>
-              <p className="text-sm text-amtme-gray-400 mb-4">
+              <p className="text-sm text-amtme-gray-600 mb-4">
                 Editor de IA, guiones, descripciones y más
               </p>
               <Button variant="primary" href="/ia/editor">
@@ -108,28 +108,28 @@ export default function DashboardPage() {
           </div>
 
           {/* Energía creativa */}
-          <div className="rounded-lg border border-amtme-border bg-amtme-navy/30 p-5 shadow-soft">
+          <div className="rounded-xl border border-black/[0.05] bg-white p-6 shadow-xs">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="font-semibold text-amtme-yellow">Energía y sostén</h2>
-                <p className="text-sm text-amtme-gray-400 mt-1">Recomendación sostenible de hoy</p>
+                <h2 className="font-semibold text-amtme-navy">Energía y sostén</h2>
+                <p className="text-sm text-amtme-gray-600 mt-1">Recomendación sostenible de hoy</p>
               </div>
               <Leaf size={20} className="text-amtme-yellow shrink-0" />
             </div>
             <div className="space-y-2">
-              <div className="p-3 rounded-lg bg-amtme-white/5 border border-amtme-border/40">
-                <p className="text-sm font-medium text-amtme-white">Modo normal: produce.</p>
-                <p className="text-sm text-amtme-gray-400 mt-1">
+              <div className="p-3 rounded-lg bg-black/[0.02] border border-black/[0.08]">
+                <p className="text-sm font-medium text-amtme-navy">Modo normal: produce.</p>
+                <p className="text-sm text-amtme-gray-600 mt-1">
                   Si tienes energía, avanza en el episodio actual. Si no, ve a Notas y activa el
                   modo baja energía.
                 </p>
               </div>
               {activeLeads === 0 && (
-                <div className="p-3 rounded-lg bg-amtme-yellow/10 border border-amtme-yellow/30">
-                  <p className="text-sm font-medium text-amtme-yellow">
+                <div className="p-3 rounded-lg bg-amtme-yellow/10 border border-amtme-yellow/20">
+                  <p className="text-sm font-medium text-amtme-navy">
                     Sin leads activos en Monetización.
                   </p>
-                  <p className="text-sm text-amtme-gray-300 mt-1">
+                  <p className="text-sm text-amtme-gray-600 mt-1">
                     Cuando alguien exprese interés, regístralo. No hace falta buscarlo; el contenido
                     lo atrae.
                   </p>
