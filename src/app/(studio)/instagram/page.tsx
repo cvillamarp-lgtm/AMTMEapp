@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, Badge, Button, Input, Field } from '@/components/ui';
-import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/ui';
 
 export default function InstagramPage() {
   return (

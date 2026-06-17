@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/ui';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
 import { useStudio } from '@/components/studio-provider';
 import { generateVisualPrompt, generateVisualSpec } from '@/lib/studio-generators';
