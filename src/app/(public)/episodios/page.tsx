@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 import { PublicNav } from '@/components/public/PublicNav';
 import { PublicFooter } from '@/components/public/PublicFooter';
@@ -18,6 +17,14 @@ interface EpisodeRow {
     theme?: string;
     description?: string;
   };
+}
+
+interface Episode {
+  id: string;
+  episode_number?: number;
+  title?: string;
+  theme?: string;
+  description?: string;
 }
 
 async function getAllEpisodes() {
@@ -83,7 +90,7 @@ export default async function EpisodiosPage() {
       <Section background="transparent" border="none">
         {episodes.length > 0 ? (
           <div className="space-y-4">
-            {episodes.map((ep: any) => (
+            {episodes.map((ep: Episode) => (
               <a
                 key={ep.id}
                 href={SPOTIFY_SHOW_URL}

@@ -30,7 +30,6 @@ import { getSupabaseAuthBrowserClient } from '@/lib/supabase/auth-browser';
 import { isAuthRequired } from '@/lib/supabase/env';
 import { useIdleLogout } from '@/hooks/use-idle-logout';
 import { GlobalCommandPalette } from '@/components/global-command-palette';
-import type { ReactNode as RN } from 'react';
 
 const ALL_NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: House },
