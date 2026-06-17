@@ -21,9 +21,7 @@ describe('useIdleLogout', () => {
   });
 
   it('initializes with disabled state', () => {
-    const { result } = renderHook(() =>
-      useIdleLogout({ enabled: false })
-    );
+    const { result } = renderHook(() => useIdleLogout({ enabled: false }));
     expect(result.current.showWarning).toBe(false);
     expect(result.current.remainingSeconds).toBe(0);
   });
