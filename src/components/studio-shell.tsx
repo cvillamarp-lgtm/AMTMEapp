@@ -99,9 +99,9 @@ export function StudioShell({ children }: { children: ReactNode }) {
           aria-modal="true"
           aria-labelledby="idle-title"
           aria-describedby="idle-desc"
-          className="fixed inset-0 z-modal flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-sm rounded-lg bg-amtme-white p-6 shadow-lg border border-amtme-border">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-premium border border-black/[0.05]">
             <div className="flex items-start gap-3">
               <Warning size={22} weight="fill" className="mt-0.5 shrink-0 text-amtme-yellow" />
               <div>
@@ -121,13 +121,13 @@ export function StudioShell({ children }: { children: ReactNode }) {
             <div className="mt-5 flex gap-3">
               <button
                 onClick={keepSession}
-                className="flex-1 rounded-md bg-amtme-yellow text-amtme-navy px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:bg-amtme-yellow/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-navy"
+                className="flex-1 rounded-lg bg-amtme-navy text-white px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:bg-amtme-navy/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amtme-yellow focus-visible:ring-offset-2"
               >
                 Mantener sesión
               </button>
               <button
                 onClick={() => void signOutNow()}
-                className="rounded-md border border-amtme-gray-300 px-4 py-2.5 text-sm font-semibold text-amtme-navy transition-all duration-200 hover:bg-amtme-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-yellow"
+                className="rounded-lg border border-black/[0.08] px-4 py-2.5 text-sm font-semibold text-amtme-navy transition-all duration-200 hover:bg-black/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amtme-yellow focus-visible:ring-offset-2"
               >
                 Cerrar sesión
               </button>
@@ -137,17 +137,17 @@ export function StudioShell({ children }: { children: ReactNode }) {
       )}
 
       {/* ── Sidebar desktop ─────────────────────────────────────────────── */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-amtme-navy z-fixed border-r border-amtme-border">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-white z-fixed border-r border-black/[0.05]">
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Logo */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-amtme-border">
-            <h1 className="text-base font-display font-bold text-amtme-yellow tracking-tight">
+          <div className="flex items-center justify-between h-16 px-6 border-b border-black/[0.05]">
+            <h1 className="text-base font-display font-bold text-amtme-navy tracking-tight">
               AMTME Studio
             </h1>
           </div>
 
           {/* Nav */}
-          <nav className="flex-1 px-3 py-5 space-y-2">
+          <nav className="flex-1 px-3 py-5 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -158,10 +158,10 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-md transition-colors duration-200',
+                    'flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors duration-200',
                     isActive
-                      ? 'bg-amtme-yellow text-amtme-navy font-semibold'
-                      : 'text-amtme-gray-400 hover:text-amtme-white hover:bg-amtme-white/5'
+                      ? 'bg-amtme-yellow/15 text-amtme-navy font-semibold'
+                      : 'text-amtme-gray-600 hover:text-amtme-navy hover:bg-black/[0.03]'
                   )}
                 >
                   <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
@@ -172,12 +172,12 @@ export function StudioShell({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Footer con logout visible */}
-          <div className="px-3 py-4 border-t border-amtme-border">
+          <div className="px-3 py-4 border-t border-black/[0.05]">
             {authRequired && (
               <button
                 onClick={() => void signOut()}
                 disabled={signingOut}
-                className="flex w-full items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium text-amtme-gray-400 transition-colors duration-200 hover:bg-amtme-white/5 hover:text-amtme-white disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amtme-yellow"
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-amtme-gray-600 transition-colors duration-200 hover:bg-black/[0.03] hover:text-amtme-navy disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amtme-yellow focus-visible:ring-offset-2"
               >
                 <SignOut size={18} weight="regular" />
                 {signingOut ? 'Cerrando…' : 'Sesión'}
@@ -188,7 +188,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
       </aside>
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="flex-1 md:pl-64 min-h-screen bg-amtme-navy">
+      <main className="flex-1 md:pl-64 min-h-screen bg-white">
         <div className="h-full px-4 py-6 pb-24 md:pb-6 md:px-6 max-w-7xl mx-auto w-full">
           <div className="space-y-6">{children}</div>
         </div>
@@ -196,7 +196,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
 
       {/* ── Mobile bottom nav ───────────────────────────────────────────── */}
       {mobileItems.length > 0 && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-amtme-navy border-t border-amtme-border z-fixed">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-black/[0.05] z-fixed">
           <div
             className={cn('gap-1 p-2', {
               'grid grid-cols-5': mobileItems.length === 5,
@@ -215,10 +215,10 @@ export function StudioShell({ children }: { children: ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex flex-col items-center gap-1 px-2 py-3 rounded-md transition-colors duration-200',
+                    'flex flex-col items-center gap-1 px-2 py-3 rounded-lg transition-colors duration-200',
                     isActive
-                      ? 'bg-amtme-yellow text-amtme-navy'
-                      : 'text-amtme-gray-400 hover:text-amtme-white hover:bg-amtme-white/5'
+                      ? 'bg-amtme-yellow/15 text-amtme-navy'
+                      : 'text-amtme-gray-600 hover:text-amtme-navy hover:bg-black/[0.03]'
                   )}
                 >
                   <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
