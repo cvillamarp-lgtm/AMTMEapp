@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { PageHeader, LoadingSkeleton, EmptyState } from '@/components/ui';
 import { Card, CardContent } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Badge } from '@/components/shadcn/badge';
@@ -141,7 +142,7 @@ export default function RevisionEpisodiosPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto pb-20 md:pb-8">
+    <div className="space-y-6 pb-10">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-semibold text-foreground">
