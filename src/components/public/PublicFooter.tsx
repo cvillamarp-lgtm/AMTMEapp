@@ -94,9 +94,17 @@ export function PublicFooter() {
           </div>
         </div>
 
-        {/* Divider y Copyright */}
+        {/* Divider y Copyright con link discreto al Studio */}
         <div className="border-t border-white/10 pt-8 text-center text-[#9DC4D5] text-xs">
-          <p>© 2026 A Mí Tampoco Me Explicaron · Hecho con claridad y sin certezas vacías</p>
+          <p className="mb-3">
+            © 2026 A Mí Tampoco Me Explicaron · Hecho con claridad y sin certezas vacías
+          </p>
+          <Link
+            href="/dashboard"
+            className="inline-block text-white/20 hover:text-white/40 transition-colors text-[11px] tracking-wider"
+          >
+            ESTUDIO
+          </Link>
         </div>
       </div>
     </footer>
