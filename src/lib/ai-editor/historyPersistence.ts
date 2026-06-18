@@ -95,13 +95,13 @@ export async function loadHistoryEntries(limit = 50): Promise<{
     };
   }
 
-  const { data, error } = await (client
+  const { data, error } = await client
     .from('ai_history')
     .select('payload, created_at')
-    .eq('user_id' as any, userId)
+    .eq('user_id', userId)
     .eq('workspace_key', AI_HISTORY_WORKSPACE)
     .order('created_at', { ascending: false })
-    .limit(limit) as any);
+    .limit(limit);
 
   if (error) {
     return {

@@ -33,12 +33,12 @@ function getServiceClientOrThrow() {
 
 export async function loadStudioStateFromRemote(userId: string): Promise<StudioStatePayload> {
   const client = getServiceClientOrThrow();
-  const { data, error } = await (client
+  const { data, error } = await client
     .from('studio_state')
     .select('payload, updated_at')
-    .eq('user_id' as any, userId)
+    .eq('user_id', userId)
     .eq('key', getStudioStateKey())
-    .maybeSingle() as any);
+    .maybeSingle();
 
   if (error) {
     throw new Error(error.message);
@@ -65,20 +65,19 @@ export async function saveStudioStateToRemote(
   const updatedAt = new Date().toISOString();
   const nextState = parseStudioStateOrThrow(state);
 
-  const { data, error } = await (client
+  const { data, error } = await client
     .from('studio_state')
     .upsert(
       {
         key: getStudioStateKey(),
         user_id: userId,
         payload: nextState as unknown as Json,
-        schema_version: STUDIO_STATE_SCHEMA_VERSION,
         updated_at: updatedAt,
-      } as any,
+      },
       { onConflict: 'user_id,key' }
     )
     .select('updated_at')
-    .single() as any);
+    .single();
 
   if (error) {
     throw new Error(error.message);

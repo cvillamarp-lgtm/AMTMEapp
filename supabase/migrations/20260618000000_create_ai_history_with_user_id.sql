@@ -1,5 +1,6 @@
 -- Create ai_history table with user_id and RLS
 -- Replaces legacy owner_id pattern with proper per-user isolation
+-- Note: if table already exists, add missing columns for schema upgrade
 
 create table if not exists public.ai_history (
   id uuid primary key default gen_random_uuid(),
@@ -10,6 +11,10 @@ create table if not exists public.ai_history (
   updated_at timestamptz not null default now(),
   unique(user_id, workspace_key, created_at)
 );
+
+-- Upgrade existing table if needed
+alter table public.ai_history add column if not exists workspace_key text default 'editor-ia';
+alter table public.ai_history add column if not exists updated_at timestamptz default now();
 
 -- Indexes for performance
 create index if not exists ai_history_user_id_idx on public.ai_history(user_id);

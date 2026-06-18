@@ -44,8 +44,18 @@ describe('studio-persistence', () => {
       aiPrimaryProvider: 'groq',
       aiFallbackProvider: 'claude',
       aiEnabled: true,
-      aiPreferredModelByProvider: { groq: 'llama-3.1-8b-instant', claude: 'claude-3-sonnet', gemini: 'gemini-2.0-flash', grok: 'grok-2' },
-      aiVisibleModelsByProvider: { groq: ['llama-3.1-8b-instant'], claude: ['claude-3-sonnet'], gemini: ['gemini-2.0-flash'], grok: ['grok-2'] },
+      aiPreferredModelByProvider: {
+        groq: 'llama-3.1-8b-instant',
+        claude: 'claude-3-sonnet',
+        gemini: 'gemini-2.0-flash',
+        grok: 'grok-2',
+      },
+      aiVisibleModelsByProvider: {
+        groq: ['llama-3.1-8b-instant'],
+        claude: ['claude-3-sonnet'],
+        gemini: ['gemini-2.0-flash'],
+        grok: ['grok-2'],
+      },
       aiSystemPrompt: '',
       aiTone: 'neutral',
       aiImageModel: 'dall-e-3',
@@ -90,9 +100,7 @@ describe('studio-persistence', () => {
         }),
       };
 
-      vi.mocked(supabaseServer.getSupabaseServiceRoleClient).mockReturnValue(
-        mockClient as any
-      );
+      vi.mocked(supabaseServer.getSupabaseServiceRoleClient).mockReturnValue(mockClient as any);
       vi.mocked(supabaseEnv.getStudioStateKey).mockReturnValue('primary');
 
       await loadStudioStateFromRemote(mockUserId);
@@ -126,9 +134,7 @@ describe('studio-persistence', () => {
         }),
       };
 
-      vi.mocked(supabaseServer.getSupabaseServiceRoleClient).mockReturnValue(
-        mockClient as any
-      );
+      vi.mocked(supabaseServer.getSupabaseServiceRoleClient).mockReturnValue(mockClient as any);
       vi.mocked(supabaseEnv.getStudioStateKey).mockReturnValue('primary');
 
       await saveStudioStateToRemote(mockUserId, mockState);

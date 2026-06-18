@@ -29,7 +29,7 @@ async function getRecentEpisodes() {
       .order('created_at', { ascending: false })
       .limit(3);
 
-    return (data || []).map((r: EpisodeRow) => r.payload);
+    return (data || []).map((r: any) => r.payload);
   } catch {
     return [];
   }
