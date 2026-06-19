@@ -42,6 +42,13 @@ import {
   getMetricsEpisode,
   createMetricEpisode,
 } from '@/lib/database';
+import {
+  migrateMetricsLocalStorageToSupabase,
+  getDecisionNote,
+  getAIReports,
+  saveDecisionNote,
+  saveAIReports,
+} from '@/lib/metrics-persistence';
 import type { MetricMonthly, MetricEpisode, Episode } from '@/types/database';
 
 type AIReport = {
@@ -62,9 +69,6 @@ type DecisionNote = {
   next_decision: string;
   updated_at: string;
 };
-
-const DECISION_KEY = 'amtme-decision-notes';
-const REPORTS_KEY = 'amtme-metric-reports';
 
 export default function MetricasPage() {
   const [metrics, setMetrics] = useState<MetricMonthly[]>([]);
@@ -122,10 +126,15 @@ export default function MetricasPage() {
       setMetrics(d);
       setMetricsEpisode(ep);
       setEpisodes(eps);
-      const saved = localStorage.getItem(REPORTS_KEY);
-      if (saved) setReports(JSON.parse(saved));
-      const notes = localStorage.getItem(DECISION_KEY);
-      if (notes) setDecisionNotes(JSON.parse(notes));
+
+      const reportsResult = await getAIReports();
+      if (reportsResult.data.length > 0) {
+        setReports(reportsResult.data as AIReport[]);
+      }
+      const notesResult = await getDecisionNote();
+      if (notesResult.data) {
+        setDecisionNotes(notesResult.data as DecisionNote);
+      }
     } catch {
       toast.error('Error al cargar metricas');
     } finally {
@@ -134,8 +143,11 @@ export default function MetricasPage() {
   }, []);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    // Migrate metrics from localStorage to Supabase once per session
+    migrateMetricsLocalStorageToSupabase().then(() => {
+      load();
+    });
+  }, []);
 
   // --- episodios pendientes de medir ---
   const measuredEpisodeIds = new Set(metricsEpisode.map((m) => m.episode_id));
@@ -228,11 +240,11 @@ export default function MetricasPage() {
     }
   }
 
-  function saveDecisionNotes() {
+  async function saveDecisionNotes() {
     setSavingNotes(true);
     const updated = { ...decisionNotes, updated_at: new Date().toISOString() };
     setDecisionNotes(updated);
-    localStorage.setItem(DECISION_KEY, JSON.stringify(updated));
+    await saveDecisionNote(updated);
     setTimeout(() => setSavingNotes(false), 600);
     toast.success('Notas guardadas');
   }
@@ -278,7 +290,7 @@ Solo JSON. Espanol neutro.`;
       };
       const updated = [report, ...reports.filter((r) => r.month !== m.month)];
       setReports(updated);
-      localStorage.setItem(REPORTS_KEY, JSON.stringify(updated));
+      await saveAIReports(updated);
       toast.success(`Reporte generado para ${m.month}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al generar reporte');
