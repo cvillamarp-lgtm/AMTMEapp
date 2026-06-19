@@ -1,11 +1,21 @@
 import { addChangeLogEntry, getChangeLog } from './changeLog';
 import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
+import { getSupabaseAuthServerClient } from '@/lib/supabase/auth-server';
 import type { ChangeHistoryEntry } from './types';
 import { ChangeHistoryEntrySchema } from './types';
 import type { Json } from '@/lib/supabase/database.types';
 
-const AI_HISTORY_OWNER_ID = process.env.AI_EDITOR_HISTORY_OWNER_ID ?? 'ai-editor';
 const AI_HISTORY_WORKSPACE = process.env.AI_EDITOR_HISTORY_WORKSPACE_KEY ?? 'editor-ia';
+
+async function getUserIdOrThrow(): Promise<string> {
+  const client = await getSupabaseAuthServerClient();
+  if (!client) throw new Error('Supabase auth no configurado');
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user?.id) throw new Error('Usuario no autenticado: no se puede persistir historial');
+  return user.id;
+}
 
 type PersistenceResult = {
   persistenceType: 'persistent' | 'session';
@@ -25,11 +35,23 @@ export async function saveHistoryEntry(entry: ChangeHistoryEntry): Promise<Persi
     };
   }
 
+  let userId: string;
+  try {
+    userId = await getUserIdOrThrow();
+  } catch (e) {
+    return {
+      persistenceType: 'session',
+      source: 'memory',
+      reason: `No autenticado: ${e instanceof Error ? e.message : 'usuario no disponible'}`,
+    };
+  }
+
   const { error } = await client.from('ai_history').insert({
-    owner_id: AI_HISTORY_OWNER_ID,
+    user_id: userId,
     workspace_key: AI_HISTORY_WORKSPACE,
     payload: entry as unknown as Json,
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 
   if (error) {
     return {
@@ -62,10 +84,22 @@ export async function loadHistoryEntries(limit = 50): Promise<{
     };
   }
 
+  let userId: string;
+  try {
+    userId = await getUserIdOrThrow();
+  } catch (e) {
+    return {
+      entries: getChangeLog(),
+      persistenceType: 'session',
+      source: 'memory',
+      reason: `No autenticado: ${e instanceof Error ? e.message : 'usuario no disponible'}`,
+    };
+  }
+
   const { data, error } = await client
     .from('ai_history')
     .select('payload, created_at')
-    .eq('owner_id', AI_HISTORY_OWNER_ID)
+    .eq('user_id', userId)
     .eq('workspace_key', AI_HISTORY_WORKSPACE)
     .order('created_at', { ascending: false })
     .limit(limit);

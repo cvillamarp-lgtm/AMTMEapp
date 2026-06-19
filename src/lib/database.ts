@@ -299,10 +299,13 @@ export async function createScript(
 export async function updateScript(id: string, updates: Partial<Script>): Promise<Script> {
   const sb = getClient();
   if (!sb) throw new Error('Supabase no configurado');
+  const userId = await getActiveUserId();
+  if (!userId) throw new Error('No autenticado: no se puede actualizar script');
   const { data, error } = await sb
     .from('scripts')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id)
+    .eq('user_id', userId)
     .select()
     .single();
   if (error) throw error;

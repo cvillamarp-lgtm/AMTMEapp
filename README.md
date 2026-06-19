@@ -9,11 +9,30 @@ npm install
 npm run dev
 ```
 
-## Verificacion tecnica
+## Development & Verification
 
+### Development Workflow
+For detailed development instructions, see [DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
+### Core Commands
 ```bash
-npm run verify
+# Type check
+npx tsc --noEmit
+
+# Run tests
+npx vitest run
+
+# Lint code
+npx eslint src --max-warnings 0
+
+# Format check
+npx prettier --check "src/**/*.{ts,tsx,css}"
+
+# Production build
+npx next build
 ```
+
+**Note:** Use direct `npx` commands instead of `npm run` to avoid authentication issues with development tools.
 
 ## Enfoque
 

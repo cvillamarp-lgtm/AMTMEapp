@@ -4,8 +4,6 @@ import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
 import type { StudioState } from '@/lib/studio-types';
 
-const STUDIO_STATE_SCHEMA_VERSION = 1;
-
 type StudioStatePayload = {
   state: StudioState | null;
   updatedAt: string | null;
@@ -31,12 +29,12 @@ function getServiceClientOrThrow() {
   return client;
 }
 
-export async function loadStudioStateFromRemote(ownerId: string): Promise<StudioStatePayload> {
+export async function loadStudioStateFromRemote(userId: string): Promise<StudioStatePayload> {
   const client = getServiceClientOrThrow();
   const { data, error } = await client
     .from('studio_state')
     .select('payload, updated_at')
-    .eq('owner_id', ownerId)
+    .eq('user_id', userId)
     .eq('key', getStudioStateKey())
     .maybeSingle();
 
@@ -58,7 +56,7 @@ export async function loadStudioStateFromRemote(ownerId: string): Promise<Studio
 }
 
 export async function saveStudioStateToRemote(
-  ownerId: string,
+  userId: string,
   state: StudioState
 ): Promise<{ updatedAt: string }> {
   const client = getServiceClientOrThrow();
@@ -70,12 +68,11 @@ export async function saveStudioStateToRemote(
     .upsert(
       {
         key: getStudioStateKey(),
-        owner_id: ownerId,
+        user_id: userId,
         payload: nextState as unknown as Json,
-        schema_version: STUDIO_STATE_SCHEMA_VERSION,
         updated_at: updatedAt,
       },
-      { onConflict: 'owner_id,key' }
+      { onConflict: 'user_id,key' }
     )
     .select('updated_at')
     .single();

@@ -36,7 +36,8 @@ async function getAllEpisodes() {
       .or(CHRISTIAN_UUID_FILTER)
       .order('payload->>episode_number', { ascending: false });
 
-    return (data || []).map((r: EpisodeRow) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data || []).map((r: any) => ({
       id: r.id,
       ...r.payload,
     }));
