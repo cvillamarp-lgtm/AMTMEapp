@@ -4,8 +4,6 @@ import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
 import type { StudioState } from '@/lib/studio-types';
 
-const STUDIO_STATE_SCHEMA_VERSION = 1;
-
 type StudioStatePayload = {
   state: StudioState | null;
   updatedAt: string | null;

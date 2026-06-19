@@ -97,6 +97,7 @@ export async function upsertMetricNote(input: UpsertInput): Promise<MetricNoteRe
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await client
       .from('metrics_notes')
       .upsert(

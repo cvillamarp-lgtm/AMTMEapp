@@ -70,9 +70,6 @@ type DecisionNote = {
   updated_at: string;
 };
 
-const DECISION_KEY = 'amtme-decision-notes';
-const REPORTS_KEY = 'amtme-metric-reports';
-
 export default function MetricasPage() {
   const [metrics, setMetrics] = useState<MetricMonthly[]>([]);
   const [metricsEpisode, setMetricsEpisode] = useState<MetricEpisode[]>([]);

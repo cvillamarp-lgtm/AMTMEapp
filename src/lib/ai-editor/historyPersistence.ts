@@ -46,6 +46,7 @@ export async function saveHistoryEntry(entry: ChangeHistoryEntry): Promise<Persi
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await client.from('ai_history').insert({
     user_id: userId,
     workspace_key: AI_HISTORY_WORKSPACE,
