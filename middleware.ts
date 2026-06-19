@@ -7,7 +7,11 @@ function isAuthPath(pathname: string) {
 }
 
 function isPublicRoute(pathname: string) {
-  return pathname === '/' || pathname.startsWith('/api/public');
+  return (
+    pathname === '/' ||
+    pathname.startsWith('/episodios') ||
+    pathname.startsWith('/api/public')
+  );
 }
 
 function isPublicAsset(pathname: string) {
