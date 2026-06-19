@@ -97,7 +97,6 @@ export async function upsertMetricNote(input: UpsertInput): Promise<MetricNoteRe
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await client
       .from('metrics_notes')
       .upsert(
@@ -107,6 +106,7 @@ export async function upsertMetricNote(input: UpsertInput): Promise<MetricNoteRe
           item_key: input.item_key,
           month_key: input.month_key ?? null,
           payload: input.payload,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         { onConflict: 'user_id,kind,item_key' }
       )
