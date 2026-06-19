@@ -6,7 +6,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // AMTME Brand Colors
+        // AMTME Brand Colors — Top-level aliases for direct use
+        navy: '#0c1f36',
+        lime: '#fee94b',
+        cream: '#f5f2ea',
+        bluegray: '#90a4b8',
+        ink: '#111111',
+        // Namespace for grouped access
         amtme: {
           navy: '#0c1f36',
           'navy-deep': '#071426',
