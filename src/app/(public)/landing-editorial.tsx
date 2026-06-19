@@ -18,19 +18,57 @@ export function LandingEditorial() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'rgba(245, 242, 234, 0.85)' }}>
+      <header
+        className="sticky top-0 z-50 border-b"
+        style={{
+          borderColor: 'rgba(12, 31, 54, 0.1)',
+          backgroundColor: 'rgba(245, 242, 234, 0.85)',
+        }}
+      >
         <div className="mx-auto flex h-20 max-w-[1320px] items-center justify-between px-6 lg:px-12">
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-bold text-xl tracking-tight" style={{ color: '#0c1f36' }}>AMTME</span>
-            <span className="hidden text-[10px] uppercase tracking-[0.2em]" style={{ color: '#687680 ' }}>podcast</span>
+            <span className="font-bold text-xl tracking-tight" style={{ color: '#0c1f36' }}>
+              AMTME
+            </span>
+            <span
+              className="hidden text-[10px] uppercase tracking-[0.2em]"
+              style={{ color: '#687680 ' }}
+            >
+              podcast
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
-            <button onClick={() => scrollToSection('featured')} className="relative py-2 hover:opacity-70">Inicio</button>
-            <button onClick={() => scrollToSection('episodios')} className="relative py-2 hover:opacity-70">Episodios</button>
-            <button onClick={() => scrollToSection('manifiesto')} className="relative py-2 hover:opacity-70">Sobre AMTME</button>
-            <button onClick={() => scrollToSection('christian')} className="relative py-2 hover:opacity-70">Christian</button>
-            <button onClick={() => scrollToSection('newsletter')} className="relative py-2 hover:opacity-70">Newsletter</button>
+            <button
+              onClick={() => scrollToSection('featured')}
+              className="relative py-2 hover:opacity-70"
+            >
+              Inicio
+            </button>
+            <button
+              onClick={() => scrollToSection('episodios')}
+              className="relative py-2 hover:opacity-70"
+            >
+              Episodios
+            </button>
+            <button
+              onClick={() => scrollToSection('manifiesto')}
+              className="relative py-2 hover:opacity-70"
+            >
+              Sobre AMTME
+            </button>
+            <button
+              onClick={() => scrollToSection('christian')}
+              className="relative py-2 hover:opacity-70"
+            >
+              Christian
+            </button>
+            <button
+              onClick={() => scrollToSection('newsletter')}
+              className="relative py-2 hover:opacity-70"
+            >
+              Newsletter
+            </button>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -46,7 +84,10 @@ export function LandingEditorial() {
               className="hidden md:inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-transform hover:-translate-y-[2px]"
               style={{ backgroundColor: '#0c1f36', color: '#f5f2ea' }}
             >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#fee94b' }}></span>
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: '#fee94b' }}
+              ></span>
               Escuchar ahora
             </button>
             <button
@@ -62,14 +103,47 @@ export function LandingEditorial() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <nav className="border-t md:hidden" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}>
+          <nav
+            className="border-t md:hidden"
+            style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}
+          >
             <div className="space-y-3 px-6 py-4">
-              <button onClick={() => scrollToSection('featured')} className="block w-full text-left text-sm font-medium py-2 hover:opacity-70">Inicio</button>
-              <button onClick={() => scrollToSection('episodios')} className="block w-full text-left text-sm font-medium py-2 hover:opacity-70">Episodios</button>
-              <button onClick={() => scrollToSection('manifiesto')} className="block w-full text-left text-sm font-medium py-2 hover:opacity-70">Sobre AMTME</button>
-              <button onClick={() => scrollToSection('christian')} className="block w-full text-left text-sm font-medium py-2 hover:opacity-70">Christian</button>
-              <button onClick={() => scrollToSection('newsletter')} className="block w-full text-left text-sm font-medium py-2 hover:opacity-70">Newsletter</button>
-              <Link to="/studio" className="block w-full text-left text-sm font-medium py-2 hover:opacity-70">Studio</Link>
+              <button
+                onClick={() => scrollToSection('featured')}
+                className="block w-full text-left text-sm font-medium py-2 hover:opacity-70"
+              >
+                Inicio
+              </button>
+              <button
+                onClick={() => scrollToSection('episodios')}
+                className="block w-full text-left text-sm font-medium py-2 hover:opacity-70"
+              >
+                Episodios
+              </button>
+              <button
+                onClick={() => scrollToSection('manifiesto')}
+                className="block w-full text-left text-sm font-medium py-2 hover:opacity-70"
+              >
+                Sobre AMTME
+              </button>
+              <button
+                onClick={() => scrollToSection('christian')}
+                className="block w-full text-left text-sm font-medium py-2 hover:opacity-70"
+              >
+                Christian
+              </button>
+              <button
+                onClick={() => scrollToSection('newsletter')}
+                className="block w-full text-left text-sm font-medium py-2 hover:opacity-70"
+              >
+                Newsletter
+              </button>
+              <Link
+                href="/studio"
+                className="block w-full text-left text-sm font-medium py-2 hover:opacity-70"
+              >
+                Studio
+              </Link>
             </div>
           </nav>
         )}
@@ -77,23 +151,42 @@ export function LandingEditorial() {
 
       <main>
         {/* Hero */}
-        <section style={{ borderBottomColor: 'rgba(12, 31, 54, 0.1)' }} className="relative overflow-hidden border-b">
+        <section
+          style={{ borderBottomColor: 'rgba(12, 31, 54, 0.1)' }}
+          className="relative overflow-hidden border-b"
+        >
           <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-6 pb-20 pt-16 lg:grid-cols-12 lg:gap-8 lg:px-12 lg:pb-32 lg:pt-24">
             <div className="lg:col-span-7">
-              <div className="mb-8 flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                <span className="h-px w-10" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+              <div
+                className="mb-8 flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                style={{ color: '#687680' }}
+              >
+                <span
+                  className="h-px w-10"
+                  style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                ></span>
                 Episodio 014 · Nuevo
               </div>
-              <h1 className="font-bold text-[clamp(2.4rem,7vw,6.8rem)] leading-[1.05]" style={{ color: '#0c1f36' }}>
+              <h1
+                className="font-bold text-[clamp(2.4rem,7vw,6.8rem)] leading-[1.05]"
+                style={{ color: '#0c1f36' }}
+              >
                 A mí tampoco me explicaron{' '}
                 <span className="relative inline-block">
                   cómo se suelta
-                  <span className="absolute bottom-1 left-0 right-0 h-3" style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}></span>
+                  <span
+                    className="absolute bottom-1 left-0 right-0 h-3"
+                    style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                  ></span>
                 </span>{' '}
                 lo que todavía duele.
               </h1>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed" style={{ color: 'rgba(12, 31, 54, 0.75)' }}>
-                Un podcast para entender el amor, el apego, los vínculos, la dignidad y todo eso que sentimos, pero que nadie nos enseñó a nombrar.
+              <p
+                className="mt-8 max-w-xl text-lg leading-relaxed"
+                style={{ color: 'rgba(12, 31, 54, 0.75)' }}
+              >
+                Un podcast para entender el amor, el apego, los vínculos, la dignidad y todo eso que
+                sentimos, pero que nadie nos enseñó a nombrar.
               </p>
 
               <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -124,51 +217,103 @@ export function LandingEditorial() {
                 </button>
               </div>
 
-              <dl className="mt-16 grid max-w-md grid-cols-3 gap-6 border-t pt-8 text-sm" style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}>
+              <dl
+                className="mt-16 grid max-w-md grid-cols-3 gap-6 border-t pt-8 text-sm"
+                style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
+              >
                 <div>
-                  <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>Temporadas</dt>
+                  <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
+                    Temporadas
+                  </dt>
                   <dd className="mt-1 font-bold text-2xl">03</dd>
                 </div>
                 <div>
-                  <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>Episodios</dt>
+                  <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
+                    Episodios
+                  </dt>
                   <dd className="mt-1 font-bold text-2xl">42</dd>
                 </div>
                 <div>
-                  <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>Oyentes</dt>
+                  <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
+                    Oyentes
+                  </dt>
                   <dd className="mt-1 font-bold text-2xl">120K+</dd>
                 </div>
               </dl>
             </div>
 
             <div className="relative lg:col-span-5">
-              <div className="absolute -left-6 top-12 z-0 hidden h-72 w-72 rounded-full blur-[120px] lg:block" style={{ backgroundColor: 'rgba(254, 233, 75, 0.7)' }}></div>
-              <div className="relative z-10 overflow-hidden rounded-3xl border" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'white' }}>
+              <div
+                className="absolute -left-6 top-12 z-0 hidden h-72 w-72 rounded-full blur-[120px] lg:block"
+                style={{ backgroundColor: 'rgba(254, 233, 75, 0.7)' }}
+              ></div>
+              <div
+                className="relative z-10 overflow-hidden rounded-3xl border"
+                style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'white' }}
+              >
                 <img
                   src="/christian-hero.jpg"
                   alt="Christian Villamar"
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 z-20 hidden rounded-2xl px-5 py-4 text-white md:block" style={{ backgroundColor: '#0c1f36' }}>
-                <div className="text-[10px] uppercase tracking-[0.2em]" style={{ color: '#fee94b' }}>Host</div>
+              <div
+                className="absolute -bottom-4 -right-4 z-20 hidden rounded-2xl px-5 py-4 text-white md:block"
+                style={{ backgroundColor: '#0c1f36' }}
+              >
+                <div
+                  className="text-[10px] uppercase tracking-[0.2em]"
+                  style={{ color: '#fee94b' }}
+                >
+                  Host
+                </div>
                 <div className="mt-1 font-bold text-lg">Christian Villamar</div>
               </div>
             </div>
           </div>
 
           {/* Marquee */}
-          <div className="overflow-hidden border-t" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#0c1f36', color: '#f5f2ea' }}>
+          <div
+            className="overflow-hidden border-t"
+            style={{
+              borderColor: 'rgba(12, 31, 54, 0.1)',
+              backgroundColor: '#0c1f36',
+              color: '#f5f2ea',
+            }}
+          >
             <div className="flex animate-[scroll_40s_linear_infinite] whitespace-nowrap py-5">
-              {['Amor vs apego', 'Dignidad', 'Volver a uno mismo', 'Duelo emocional', 'Límites', 'Rechazo', 'Ansiedad afectiva', 'Tarot como espejo'].map((tema, i) => (
+              {[
+                'Amor vs apego',
+                'Dignidad',
+                'Volver a uno mismo',
+                'Duelo emocional',
+                'Límites',
+                'Rechazo',
+                'Ansiedad afectiva',
+                'Tarot como espejo',
+              ].map((tema, i) => (
                 <span key={i} className="mx-10 font-bold text-2xl tracking-wide">
                   {tema}
-                  <span className="ml-10" style={{ color: '#fee94b' }}>✦</span>
+                  <span className="ml-10" style={{ color: '#fee94b' }}>
+                    ✦
+                  </span>
                 </span>
               ))}
-              {['Amor vs apego', 'Dignidad', 'Volver a uno mismo', 'Duelo emocional', 'Límites', 'Rechazo', 'Ansiedad afectiva', 'Tarot como espejo'].map((tema, i) => (
+              {[
+                'Amor vs apego',
+                'Dignidad',
+                'Volver a uno mismo',
+                'Duelo emocional',
+                'Límites',
+                'Rechazo',
+                'Ansiedad afectiva',
+                'Tarot como espejo',
+              ].map((tema, i) => (
                 <span key={`r-${i}`} className="mx-10 font-bold text-2xl tracking-wide">
                   {tema}
-                  <span className="ml-10" style={{ color: '#fee94b' }}>✦</span>
+                  <span className="ml-10" style={{ color: '#fee94b' }}>
+                    ✦
+                  </span>
                 </span>
               ))}
             </div>
@@ -179,22 +324,37 @@ export function LandingEditorial() {
         <section id="featured" className="px-6 py-24 lg:px-12 lg:py-32">
           <div className="mx-auto max-w-[1320px]">
             <div>
-              <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+              <div
+                className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                style={{ color: '#687680' }}
+              >
+                <span
+                  className="h-px w-8"
+                  style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                ></span>
                 Episodio destacado
               </div>
               <h2 className="mt-5 font-bold text-4xl lg:text-6xl">Lo que está sonando ahora</h2>
             </div>
 
-            <div className="mt-12 grid grid-cols-1 overflow-hidden rounded-3xl text-white lg:grid-cols-12" style={{ backgroundColor: '#111111' }}>
+            <div
+              className="mt-12 grid grid-cols-1 overflow-hidden rounded-3xl text-white lg:grid-cols-12"
+              style={{ backgroundColor: '#111111' }}
+            >
               <div className="relative lg:col-span-5">
                 <img
                   src="/episode-cover-1.jpg"
                   alt="Por qué vuelves aunque ya lo sabes"
                   className="aspect-square h-full w-full object-cover"
                 />
-                <div className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold" style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}>
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#0c1f36' }}></span>
+                <div
+                  className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
+                >
+                  <span
+                    className="h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: '#0c1f36' }}
+                  ></span>
                   NUEVO · EP 014
                 </div>
               </div>
@@ -204,14 +364,21 @@ export function LandingEditorial() {
                   <div className="text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
                     Apego · Dignidad · 48 min
                   </div>
-                  <h3 className="mt-4 font-bold text-4xl lg:text-6xl">Por qué vuelves aunque ya lo sabes</h3>
+                  <h3 className="mt-4 font-bold text-4xl lg:text-6xl">
+                    Por qué vuelves aunque ya lo sabes
+                  </h3>
                   <p className="mt-6 max-w-xl" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    Esa cosa rara donde la mente entiende, el cuerpo recuerda y la historia vuelve a llamarte a la puerta. Un episodio sobre el ciclo, el cuerpo y lo que realmente se está soltando cuando crees que estás soltando.
+                    Esa cosa rara donde la mente entiende, el cuerpo recuerda y la historia vuelve a
+                    llamarte a la puerta. Un episodio sobre el ciclo, el cuerpo y lo que realmente
+                    se está soltando cuando crees que estás soltando.
                   </p>
                 </div>
 
                 <div className="space-y-6">
-                  <div className="overflow-hidden rounded-2xl border" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'white' }}>
+                  <div
+                    className="overflow-hidden rounded-2xl border"
+                    style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'white' }}
+                  >
                     <iframe
                       title="Spotify Player"
                       src="https://open.spotify.com/embed/episode/PLACEHOLDER?utm_source=generator"
@@ -224,7 +391,10 @@ export function LandingEditorial() {
                     ></iframe>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+                  <div
+                    className="flex flex-wrap items-center justify-between gap-4 border-t pt-6"
+                    style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
+                  >
                     <Link
                       href="/episodios/por-que-vuelves-aunque-ya-lo-sabes"
                       className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold hover:opacity-90"
@@ -238,7 +408,10 @@ export function LandingEditorial() {
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                        style={{ borderColor: 'rgba(255, 255, 255, 0.2)', color: 'rgba(255, 255, 255, 0.8)' }}
+                        style={{
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 0.8)',
+                        }}
                       >
                         Spotify
                       </a>
@@ -247,7 +420,10 @@ export function LandingEditorial() {
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                        style={{ borderColor: 'rgba(255, 255, 255, 0.2)', color: 'rgba(255, 255, 255, 0.8)' }}
+                        style={{
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 0.8)',
+                        }}
                       >
                         Apple Podcasts
                       </a>
@@ -256,7 +432,10 @@ export function LandingEditorial() {
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                        style={{ borderColor: 'rgba(255, 255, 255, 0.2)', color: 'rgba(255, 255, 255, 0.8)' }}
+                        style={{
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 0.8)',
+                        }}
                       >
                         YouTube
                       </a>
@@ -265,7 +444,10 @@ export function LandingEditorial() {
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                        style={{ borderColor: 'rgba(255, 255, 255, 0.2)', color: 'rgba(255, 255, 255, 0.8)' }}
+                        style={{
+                          borderColor: 'rgba(255, 255, 255, 0.2)',
+                          color: 'rgba(255, 255, 255, 0.8)',
+                        }}
                       >
                         iVoox
                       </a>
@@ -278,12 +460,22 @@ export function LandingEditorial() {
         </section>
 
         {/* Manifiesto Section */}
-        <section id="manifiesto" className="border-y px-6 py-24 lg:px-12 lg:py-32" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}>
+        <section
+          id="manifiesto"
+          className="border-y px-6 py-24 lg:px-12 lg:py-32"
+          style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}
+        >
           <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-16 lg:grid-cols-12">
             <div className="lg:col-span-4">
               <div>
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                  <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+                <div
+                  className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                  style={{ color: '#687680' }}
+                >
+                  <span
+                    className="h-px w-8"
+                    style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                  ></span>
                   Qué es AMTME
                 </div>
               </div>
@@ -291,21 +483,32 @@ export function LandingEditorial() {
                 Una casa para los que sintieron{' '}
                 <span className="relative inline-block">
                   demasiado
-                  <span className="absolute bottom-1 left-0 right-0 h-3" style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}></span>
+                  <span
+                    className="absolute bottom-1 left-0 right-0 h-3"
+                    style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                  ></span>
                 </span>
                 .
               </h2>
             </div>
 
-            <div className="space-y-6 text-lg leading-relaxed lg:col-span-7 lg:col-start-6" style={{ color: 'rgba(12, 31, 54, 0.8)' }}>
+            <div
+              className="space-y-6 text-lg leading-relaxed lg:col-span-7 lg:col-start-6"
+              style={{ color: 'rgba(12, 31, 54, 0.8)' }}
+            >
               <p>
-                AMTME es un espacio para quienes han sentido demasiado, han explicado demasiado, han esperado demasiado y un día necesitan volver a escucharse.
+                AMTME es un espacio para quienes han sentido demasiado, han explicado demasiado, han
+                esperado demasiado y un día necesitan volver a escucharse.
               </p>
               <p style={{ color: 'rgba(12, 31, 54, 0.65)' }}>
-                No viene a darte respuestas perfectas. Viene a acompañarte mientras encuentras las tuyas. Aquí no hablamos desde el pedestal — hablamos desde el camino, con honestidad, vulnerabilidad y una mirada simbólica que usa el tarot como espejo de conciencia.
+                No viene a darte respuestas perfectas. Viene a acompañarte mientras encuentras las
+                tuyas. Aquí no hablamos desde el pedestal — hablamos desde el camino, con
+                honestidad, vulnerabilidad y una mirada simbólica que usa el tarot como espejo de
+                conciencia.
               </p>
               <p style={{ color: 'rgba(12, 31, 54, 0.65)' }}>
-                No prometemos arreglarte. Te recordamos que no estás roto: estás entendiendo tarde lo que nadie te enseñó a tiempo.
+                No prometemos arreglarte. Te recordamos que no estás roto: estás entendiendo tarde
+                lo que nadie te enseñó a tiempo.
               </p>
             </div>
           </div>
@@ -316,13 +519,21 @@ export function LandingEditorial() {
           <div className="mx-auto max-w-[1320px]">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                  <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+                <div
+                  className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                  style={{ color: '#687680' }}
+                >
+                  <span
+                    className="h-px w-8"
+                    style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                  ></span>
                   Temas
                 </div>
                 <h2 className="mt-5 font-bold text-4xl lg:text-6xl">Lo que abordamos.</h2>
               </div>
-              <span className="text-sm" style={{ color: '#687680' }}>09 territorios emocionales</span>
+              <span className="text-sm" style={{ color: '#687680' }}>
+                09 territorios emocionales
+              </span>
             </div>
 
             <div className="mt-12 flex flex-wrap gap-3">
@@ -369,8 +580,14 @@ export function LandingEditorial() {
           <div className="mx-auto max-w-[1320px]">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                  <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+                <div
+                  className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                  style={{ color: '#687680' }}
+                >
+                  <span
+                    className="h-px w-8"
+                    style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                  ></span>
                   Catálogo
                 </div>
                 <h2 className="mt-5 font-bold text-4xl lg:text-6xl">Episodios recientes.</h2>
@@ -382,7 +599,10 @@ export function LandingEditorial() {
               >
                 <span className="relative inline-block">
                   Ver todos los episodios →
-                  <span className="absolute bottom-0 left-0 right-0 h-2" style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}></span>
+                  <span
+                    className="absolute bottom-0 left-0 right-0 h-2"
+                    style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                  ></span>
                 </span>
               </Link>
             </div>
@@ -431,7 +651,10 @@ export function LandingEditorial() {
                       alt={ep.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <span className="absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}>
+                    <span
+                      className="absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
+                      style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}
+                    >
                       EP {ep.ep}
                     </span>
                     <span
@@ -446,7 +669,10 @@ export function LandingEditorial() {
                   </Link>
 
                   <div className="flex flex-1 flex-col p-7">
-                    <div className="text-xs uppercase tracking-[0.18em]" style={{ color: '#687680' }}>
+                    <div
+                      className="text-xs uppercase tracking-[0.18em]"
+                      style={{ color: '#687680' }}
+                    >
                       {ep.tags} · {ep.time}
                     </div>
                     <h3 className="mt-3 font-bold text-2xl leading-tight">
@@ -454,18 +680,36 @@ export function LandingEditorial() {
                         {ep.title}
                       </Link>
                     </h3>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed" style={{ color: 'rgba(12, 31, 54, 0.65)' }}>
+                    <p
+                      className="mt-3 flex-1 text-sm leading-relaxed"
+                      style={{ color: 'rgba(12, 31, 54, 0.65)' }}
+                    >
                       {ep.desc}
                     </p>
 
-                    <div className="mt-6 flex items-center justify-between border-t pt-5" style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}>
-                      <Link href={`/episodios/${ep.slug}`} className="text-sm font-semibold hover:opacity-70">
+                    <div
+                      className="mt-6 flex items-center justify-between border-t pt-5"
+                      style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
+                    >
+                      <Link
+                        href={`/episodios/${ep.slug}`}
+                        className="text-sm font-semibold hover:opacity-70"
+                      >
                         Escuchar →
                       </Link>
                       <div className="flex gap-1.5">
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: '#fee94b' }}></span>
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: '#0c1f36' }}></span>
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: '#e74c3c' }}></span>
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: '#fee94b' }}
+                        ></span>
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: '#0c1f36' }}
+                        ></span>
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: '#e74c3c' }}
+                        ></span>
                       </div>
                     </div>
                   </div>
@@ -476,14 +720,23 @@ export function LandingEditorial() {
         </section>
 
         {/* Manifesto Navy */}
-        <section className="relative overflow-hidden px-6 py-32 text-white lg:px-12 lg:py-44" style={{ backgroundColor: '#0c1f36' }}>
-          <div className="absolute inset-0 opacity-[0.04]" style={{
-            backgroundImage: 'radial-gradient(circle at 20% 30%, white 1px, transparent 1px)',
-            backgroundSize: '24px 24px',
-          }}></div>
+        <section
+          className="relative overflow-hidden px-6 py-32 text-white lg:px-12 lg:py-44"
+          style={{ backgroundColor: '#0c1f36' }}
+        >
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 20% 30%, white 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          ></div>
 
           <div className="relative mx-auto max-w-[1100px] text-center">
-            <div className="mb-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em]" style={{ color: '#fee94b' }}>
+            <div
+              className="mb-10 inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em]"
+              style={{ color: '#fee94b' }}
+            >
               <span className="h-px w-8" style={{ backgroundColor: '#fee94b' }}></span>
               Manifiesto
             </div>
@@ -493,7 +746,10 @@ export function LandingEditorial() {
               Era una{' '}
               <span className="relative inline-block">
                 herida intentando
-                <span className="absolute bottom-1 left-0 right-0 h-3" style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}></span>
+                <span
+                  className="absolute bottom-1 left-0 right-0 h-3"
+                  style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                ></span>
               </span>
               <br />
               explicar por qué dolía tanto.
@@ -525,7 +781,10 @@ export function LandingEditorial() {
         <section id="christian" className="px-6 py-24 lg:px-12 lg:py-32">
           <div className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="order-2 lg:order-1 lg:col-span-5">
-              <div className="overflow-hidden rounded-3xl border" style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}>
+              <div
+                className="overflow-hidden rounded-3xl border"
+                style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
+              >
                 <img
                   src="/christian-back.jpg"
                   alt="Christian Villamar de espaldas"
@@ -536,20 +795,31 @@ export function LandingEditorial() {
 
             <div className="order-1 lg:order-2 lg:col-span-7">
               <div>
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                  <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+                <div
+                  className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                  style={{ color: '#687680' }}
+                >
+                  <span
+                    className="h-px w-8"
+                    style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                  ></span>
                   Sobre Christian
                 </div>
               </div>
               <h2 className="mt-5 font-bold text-4xl leading-[0.95] lg:text-6xl">
                 No hablo desde el pedestal. Hablo desde el camino.
               </h2>
-              <div className="mt-8 space-y-5 text-lg leading-relaxed" style={{ color: 'rgba(12, 31, 54, 0.75)' }}>
+              <div
+                className="mt-8 space-y-5 text-lg leading-relaxed"
+                style={{ color: 'rgba(12, 31, 54, 0.75)' }}
+              >
                 <p>
-                  Soy Christian Villamar. AMTME nace de todo eso que también tuve que aprender tarde: amar sin desaparecer, soltar sin romperme y volver a mí sin pedir permiso.
+                  Soy Christian Villamar. AMTME nace de todo eso que también tuve que aprender
+                  tarde: amar sin desaparecer, soltar sin romperme y volver a mí sin pedir permiso.
                 </p>
                 <p style={{ color: 'rgba(12, 31, 54, 0.6)' }}>
-                  Llevo años conversando sobre vínculos, apego, ansiedad afectiva y dignidad emocional. No para darte fórmulas — para acompañarte mientras entiendes las tuyas.
+                  Llevo años conversando sobre vínculos, apego, ansiedad afectiva y dignidad
+                  emocional. No para darte fórmulas — para acompañarte mientras entiendes las tuyas.
                 </p>
               </div>
 
@@ -586,16 +856,26 @@ export function LandingEditorial() {
         {/* Newsletter */}
         <section id="newsletter" className="px-6 py-24 lg:px-12 lg:py-32">
           <div className="mx-auto max-w-[1320px]">
-            <div className="grid grid-cols-1 overflow-hidden rounded-[2rem] lg:grid-cols-12" style={{ backgroundColor: '#fee94b' }}>
+            <div
+              className="grid grid-cols-1 overflow-hidden rounded-[2rem] lg:grid-cols-12"
+              style={{ backgroundColor: '#fee94b' }}
+            >
               <div className="p-10 lg:col-span-7 lg:p-16">
-                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: 'rgba(12, 31, 54, 0.6)' }}>
+                <div
+                  className="text-xs uppercase tracking-[0.25em]"
+                  style={{ color: 'rgba(12, 31, 54, 0.6)' }}
+                >
                   Carta emocional
                 </div>
-                <h2 className="mt-4 font-bold text-4xl leading-[0.95] lg:text-6xl" style={{ color: '#0c1f36' }}>
+                <h2
+                  className="mt-4 font-bold text-4xl leading-[0.95] lg:text-6xl"
+                  style={{ color: '#0c1f36' }}
+                >
                   Recibe una carta cuando haya algo que valga la pena decir.
                 </h2>
                 <p className="mt-6 max-w-xl text-lg" style={{ color: 'rgba(12, 31, 54, 0.75)' }}>
-                  Reflexiones, episodios nuevos y recordatorios para no volver a negociarte por migajas. Sin spam. Sin ruido. Solo cuando importa.
+                  Reflexiones, episodios nuevos y recordatorios para no volver a negociarte por
+                  migajas. Sin spam. Sin ruido. Solo cuando importa.
                 </p>
 
                 <form className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -623,16 +903,25 @@ export function LandingEditorial() {
                 </p>
               </div>
 
-              <div className="relative hidden border-l lg:col-span-5 lg:block" style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}>
+              <div
+                className="relative hidden border-l lg:col-span-5 lg:block"
+                style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
+              >
                 <div className="flex h-full flex-col justify-between p-12">
-                  <div className="font-bold text-[8rem] leading-none" style={{ color: 'rgba(12, 31, 54, 0.9)' }}>
+                  <div
+                    className="font-bold text-[8rem] leading-none"
+                    style={{ color: 'rgba(12, 31, 54, 0.9)' }}
+                  >
                     "
                   </div>
                   <div>
                     <p className="font-bold text-3xl leading-tight" style={{ color: '#0c1f36' }}>
                       Sentirse acompañado también es una forma de sanar.
                     </p>
-                    <div className="mt-6 text-xs uppercase tracking-[0.2em]" style={{ color: 'rgba(12, 31, 54, 0.6)' }}>
+                    <div
+                      className="mt-6 text-xs uppercase tracking-[0.2em]"
+                      style={{ color: 'rgba(12, 31, 54, 0.6)' }}
+                    >
                       — Una oyente · México
                     </div>
                   </div>
@@ -643,12 +932,21 @@ export function LandingEditorial() {
         </section>
 
         {/* Platforms */}
-        <section className="border-t px-6 py-20 lg:px-12" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}>
+        <section
+          className="border-t px-6 py-20 lg:px-12"
+          style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}
+        >
           <div className="mx-auto max-w-[1320px]">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                  <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+                <div
+                  className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
+                  style={{ color: '#687680' }}
+                >
+                  <span
+                    className="h-px w-8"
+                    style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
+                  ></span>
                   Plataformas
                 </div>
                 <h2 className="mt-5 font-bold text-3xl lg:text-4xl">Escucha donde quieras.</h2>
@@ -675,7 +973,10 @@ export function LandingEditorial() {
                     <div className="font-bold text-lg" style={{ color: '#0c1f36' }}>
                       {p.name}
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider" style={{ color: '#687680' }}>
+                    <div
+                      className="text-[10px] uppercase tracking-wider"
+                      style={{ color: '#687680' }}
+                    >
                       {p.sub}
                     </div>
                   </div>
@@ -701,9 +1002,15 @@ export function LandingEditorial() {
       </main>
 
       {/* Footer */}
-      <footer className="px-6 pb-10 pt-24 text-white lg:px-12" style={{ backgroundColor: '#0c1f36' }}>
+      <footer
+        className="px-6 pb-10 pt-24 text-white lg:px-12"
+        style={{ backgroundColor: '#0c1f36' }}
+      >
         <div className="mx-auto max-w-[1320px]">
-          <div className="grid grid-cols-1 gap-12 border-b pb-16 lg:grid-cols-12" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
+          <div
+            className="grid grid-cols-1 gap-12 border-b pb-16 lg:grid-cols-12"
+            style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
+          >
             <div className="lg:col-span-5">
               <div className="font-bold text-3xl">AMTME</div>
               <p className="mt-6 max-w-md font-bold text-2xl leading-tight">
@@ -713,7 +1020,10 @@ export function LandingEditorial() {
                 <br />
                 <span className="relative inline-block">
                   pero que nadie nos explicó.
-                  <span className="absolute bottom-1 left-0 right-0 h-3" style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}></span>
+                  <span
+                    className="absolute bottom-1 left-0 right-0 h-3"
+                    style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                  ></span>
                 </span>
               </p>
             </div>
@@ -774,10 +1084,18 @@ export function LandingEditorial() {
                 <li>hola@amtme.com</li>
                 <li>Prensa y colaboraciones</li>
                 <li>
-                  <a href="https://instagram.com/YOSOYVILLAMAR" target="_blank" rel="noreferrer" className="relative inline-block">
+                  <a
+                    href="https://instagram.com/YOSOYVILLAMAR"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="relative inline-block"
+                  >
                     <span className="relative inline-block">
                       @YOSOYVILLAMAR
-                      <span className="absolute bottom-0 left-0 right-0 h-2" style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}></span>
+                      <span
+                        className="absolute bottom-0 left-0 right-0 h-2"
+                        style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                      ></span>
                     </span>
                   </a>
                 </li>
@@ -785,7 +1103,10 @@ export function LandingEditorial() {
             </div>
           </div>
 
-          <div className="flex flex-col items-start justify-between gap-4 pt-8 text-xs md:flex-row md:items-center" style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+          <div
+            className="flex flex-col items-start justify-between gap-4 pt-8 text-xs md:flex-row md:items-center"
+            style={{ color: 'rgba(255, 255, 255, 0.5)' }}
+          >
             <div>© 2026 A Mí Tampoco Me Explicaron · Christian Villamar</div>
             <div className="flex gap-6">
               <a href="#" className="hover:text-white transition-colors">
