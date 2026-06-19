@@ -37,6 +37,12 @@ export function Header() {
             <span className="h-1.5 w-1.5 rounded-full bg-lime" />
             Escuchar ahora
           </a>
+          <a
+            href="/studio"
+            className="hidden md:inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:border-navy hover:bg-navy hover:text-cream"
+          >
+            Entrar a Studio
+          </a>
           <button
             type="button"
             aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
@@ -69,6 +75,13 @@ export function Header() {
             >
               <span className="h-1.5 w-1.5 rounded-full bg-lime" />
               Escuchar ahora
+            </a>
+            <a
+              href="/studio"
+              onClick={() => setOpen(false)}
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-navy/20 px-5 py-3 text-sm font-semibold text-navy hover:bg-navy hover:text-cream"
+            >
+              Entrar a Studio
             </a>
           </nav>
         </div>

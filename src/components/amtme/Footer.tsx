@@ -58,6 +58,14 @@ export function Footer() {
                   {BRAND.handle}
                 </a>
               </li>
+              <li className="pt-2 border-t border-cream/20 mt-5">
+                <a
+                  href="/studio"
+                  className="text-cream font-semibold hover:text-lime transition-colors"
+                >
+                  Entrar a Studio →
+                </a>
+              </li>
             </ul>
           </div>
         </div>
