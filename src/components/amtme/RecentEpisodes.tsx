@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { episodes } from "@/data/episodes";
 import { PlayIcon, SectionLabel } from "./icons";
 
@@ -18,8 +17,7 @@ export function RecentEpisodes() {
               key={ep.slug}
               className="group flex flex-col overflow-hidden rounded-3xl border border-navy/10 bg-white transition-all hover:-translate-y-1 hover:shadow-card-hover"
             >
-              <a href="/episodios/$slug"
-                params={{ slug: ep.slug }}
+              <a href={`/episodios/${ep.slug}`}
                 className="relative block aspect-square overflow-hidden"
               >
                 <img
@@ -42,13 +40,13 @@ export function RecentEpisodes() {
                   {ep.topic} · {ep.duration}
                 </div>
                 <h3 className="mt-3 font-display text-2xl leading-tight text-navy">
-                  <a href="/episodios/$slug" params={{ slug: ep.slug }} className="hover:underline">
+                  <a href={`/episodios/${ep.slug}`} className="hover:underline">
                     {ep.title}
                   </a>
                 </h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-navy/65">{ep.excerpt}</p>
                 <div className="mt-6 flex items-center justify-between border-t border-navy/10 pt-5">
-                  <a href="/episodios/$slug" params={{ slug: ep.slug }}
+                  <a href={`/episodios/${ep.slug}`}
                     className="text-sm font-semibold text-navy"
                   >
                     Escuchar →
