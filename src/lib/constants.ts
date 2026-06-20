@@ -6,10 +6,13 @@ export const BRAND = {
   handle: "@YOSOYVILLAMAR",
   tagline: "Lo que pensamos, lo que sentimos, pero que nadie nos explicó.",
   email: "hola@amtme.com",
-  instagram: "https://instagram.com/YOSOYVILLAMAR",
-  // NOTE: Replace with the real Spotify show ID for AMTME.
-  // From a Spotify URL like https://open.spotify.com/show/<SHOW_ID>
-  spotifyShowId: "REPLACE_WITH_REAL_SHOW_ID",
+  instagram: "https://instagram.com/yosoyvillamar",
+  podcastInstagram: "https://instagram.com/amitampocomeexplicaron",
+  spotifyShowId: "7w3r41VGcUjCRU8QF3pnRb",
+  spotifyUrl: "https://open.spotify.com/show/7w3r41VGcUjCRU8QF3pnRb",
+  spotifyEmbedUrl: "https://open.spotify.com/embed/show/7w3r41VGcUjCRU8QF3pnRb?utm_source=generator&theme=0",
+  applePodcastsUrl: "https://podcasts.apple.com/mx/podcast/a-mi-tampoco-me-explicaron/id1796503084",
+  ivooxUrl: "https://www.ivoox.com/podcast-a-mi-tampoco-me-explicaron_sq_f12702462_1.html",
 } as const;
 
 export const COLORS = {

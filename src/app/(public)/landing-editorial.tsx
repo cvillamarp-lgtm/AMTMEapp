@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { BRAND } from '@/lib/constants';
 
 export function LandingEditorial() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -381,7 +382,7 @@ export function LandingEditorial() {
                   >
                     <iframe
                       title="Spotify Player"
-                      src="https://open.spotify.com/embed/episode/PLACEHOLDER?utm_source=generator"
+                      src={BRAND.spotifyEmbedUrl}
                       width="100%"
                       height="152"
                       frameBorder="0"
@@ -953,13 +954,12 @@ export function LandingEditorial() {
               </div>
             </div>
 
-            <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-5">
+            <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
               {[
-                { name: 'Spotify', sub: 'Principal', url: 'https://open.spotify.com/' },
-                { name: 'Apple Podcasts', sub: 'iOS', url: 'https://podcasts.apple.com/' },
-                { name: 'YouTube', sub: 'Video & audio', url: 'https://youtube.com/' },
-                { name: 'iVoox', sub: 'Comunidad ES', url: 'https://www.ivoox.com/' },
-                { name: 'RSS', sub: 'Feed directo', url: '#' },
+                { name: 'Spotify', sub: 'Principal', url: BRAND.spotifyUrl },
+                { name: 'Apple Podcasts', sub: 'iOS', url: BRAND.applePodcastsUrl },
+                { name: 'iVoox', sub: 'Comunidad ES', url: BRAND.ivooxUrl },
+                { name: 'Instagram', sub: 'Comunidad', url: BRAND.podcastInstagram },
               ].map((p) => (
                 <a
                   key={p.name}
@@ -1054,23 +1054,23 @@ export function LandingEditorial() {
               </h4>
               <ul className="mt-5 space-y-3 text-sm" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                 <li>
-                  <a href="https://open.spotify.com/" target="_blank" rel="noreferrer">
+                  <a href={BRAND.spotifyUrl} target="_blank" rel="noreferrer">
                     Spotify
                   </a>
                 </li>
                 <li>
-                  <a href="https://podcasts.apple.com/" target="_blank" rel="noreferrer">
+                  <a href={BRAND.applePodcastsUrl} target="_blank" rel="noreferrer">
                     Apple Podcasts
                   </a>
                 </li>
                 <li>
-                  <a href="https://youtube.com/" target="_blank" rel="noreferrer">
-                    YouTube
+                  <a href={BRAND.ivooxUrl} target="_blank" rel="noreferrer">
+                    iVoox
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.ivoox.com/" target="_blank" rel="noreferrer">
-                    iVoox
+                  <a href={BRAND.podcastInstagram} target="_blank" rel="noreferrer">
+                    Instagram
                   </a>
                 </li>
               </ul>
@@ -1085,7 +1085,7 @@ export function LandingEditorial() {
                 <li>Prensa y colaboraciones</li>
                 <li>
                   <a
-                    href="https://instagram.com/YOSOYVILLAMAR"
+                    href={BRAND.instagram}
                     target="_blank"
                     rel="noreferrer"
                     className="relative inline-block"
