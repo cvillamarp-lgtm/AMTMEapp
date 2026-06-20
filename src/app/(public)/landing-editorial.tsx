@@ -169,8 +169,12 @@ export function LandingEditorial() {
                 Episodio 014 · Nuevo
               </div>
               <h1
-                className="font-black text-[clamp(2.4rem,7vw,6.8rem)] leading-[0.95] uppercase tracking-tight"
-                style={{ color: '#0c1f36' }}
+                className="font-black text-[clamp(2.4rem,7vw,6.8rem)] leading-[0.95] tracking-tight"
+                style={{
+                  color: '#0c1f36',
+                  textTransform: 'uppercase',
+                  letterSpacing: '-0.02em'
+                }}
               >
                 A mí tampoco me{' '}
                 <span className="relative inline-block">
