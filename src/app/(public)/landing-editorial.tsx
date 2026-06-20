@@ -249,11 +249,11 @@ export function LandingEditorial() {
               ></div>
               <div
                 className="relative z-10 overflow-hidden rounded-3xl border"
-                style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'white' }}
+                style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}
               >
                 <img
-                  src="/christian-hero.jpg"
-                  alt="Christian Villamar"
+                  src="/images/christian-hero-headshot.jpg"
+                  alt="Christian Villamar - Host de A Mí Tampoco Me Explicaron"
                   className="h-full w-full object-cover"
                 />
               </div>
