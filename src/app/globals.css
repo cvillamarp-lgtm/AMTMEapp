@@ -41,8 +41,8 @@
 
 /* Display font utility */
 .font-display {
-  font-family: 'Archivo Black', var(--font-archivo-black), 'Anton', sans-serif;
-  font-weight: 900;
+  font-family: 'Archivo Black', var(--font-archivo-black), 'Anton', sans-serif !important;
+  font-weight: 900 !important;
   letter-spacing: -0.02em;
   text-transform: uppercase;
   line-height: 0.92;
@@ -50,7 +50,7 @@
 
 /* Underline lime highlight */
 .underline-lime {
-  background-image: linear-gradient(transparent 70%, rgba(254, 233, 75, 0.4) 70%, rgba(254, 233, 75, 0.4) 88%, transparent 88%);
+  background-image: linear-gradient(transparent 68%, rgba(254, 233, 75, 0.65) 68%, rgba(254, 233, 75, 0.65) 90%, transparent 90%);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   padding: 0 0.05em;

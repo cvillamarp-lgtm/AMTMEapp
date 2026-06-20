@@ -192,7 +192,7 @@ export function LandingEditorial() {
               <div className="mt-10 flex flex-wrap items-center gap-4">
                 <button
                   onClick={() => scrollToSection('featured')}
-                  className="inline-flex items-center gap-3 rounded-full px-7 py-4 text-sm font-bold transition-transform hover:-translate-y-[2px]"
+                  className="inline-flex items-center gap-3 rounded-full px-7 py-4 text-sm font-black transition-transform hover:-translate-y-[2px] shadow-soft"
                   style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -202,7 +202,7 @@ export function LandingEditorial() {
                 </button>
                 <button
                   onClick={() => scrollToSection('episodios')}
-                  className="inline-flex items-center gap-2 rounded-full border px-7 py-4 text-sm font-semibold transition-colors hover:text-white"
+                  className="inline-flex items-center gap-2 rounded-full border-2 px-7 py-4 text-sm font-black transition-colors hover:text-white"
                   style={{ borderColor: '#0c1f36', color: '#0c1f36' }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#0c1f36';
