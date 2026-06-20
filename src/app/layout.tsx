@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Josefin_Sans, Crimson_Text, JetBrains_Mono } from 'next/font/google';
+import { RemoveLovableBadge } from '@/components/remove-lovable-badge';
 import './globals.css';
 
 // Display font for headers
@@ -44,7 +45,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       lang="es"
       className={`${josefinSans.variable} ${crimsonText.variable} ${jetbrainsMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <RemoveLovableBadge />
+        {children}
+      </body>
     </html>
   );
 }
