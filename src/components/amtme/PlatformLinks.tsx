@@ -1,5 +1,5 @@
-import { platforms } from '@/lib/editorial/platforms';
-import { SectionLabel, ArrowIcon } from './icons';
+import { platforms } from "@/data/platforms";
+import { SectionLabel, ArrowIcon } from "./icons";
 
 export function PlatformLinks() {
   return (
@@ -10,13 +10,8 @@ export function PlatformLinks() {
         </div>
         <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-5">
           {platforms.map((p) => (
-            <a
-              key={p.name}
-              href={p.href}
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center justify-between rounded-2xl border border-navy/15 bg-white p-5 transition-all hover:-translate-y-1 hover:border-navy hover:shadow-soft"
-            >
+            <a key={p.name} href={p.href} target="_blank" rel="noreferrer"
+              className="group flex items-center justify-between rounded-2xl border border-navy/15 bg-white p-5 transition-all hover:-translate-y-1 hover:border-navy hover:shadow-soft">
               <div>
                 <div className="font-display text-lg text-navy">{p.name}</div>
                 <div className="text-[10px] uppercase tracking-wider text-bluegray">{p.meta}</div>

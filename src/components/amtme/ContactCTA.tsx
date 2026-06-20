@@ -1,4 +1,4 @@
-import { PlayIcon } from './icons';
+import { PlayIcon } from "./icons";
 
 export function ContactCTA() {
   return (
@@ -9,23 +9,15 @@ export function ContactCTA() {
           <span className="h-px w-8 bg-lime" /> Manifiesto
         </div>
         <p className="font-display text-[clamp(2rem,5.2vw,5rem)] leading-[1.02] text-cream">
-          No era intensidad.
-          <br />
-          Era una <span className="underline-lime !text-navy">herida intentando</span>
-          <br />
+          No era intensidad.<br />
+          Era una <span className="underline-lime !text-navy">herida intentando</span><br />
           explicar por qué dolía tanto.
         </p>
         <div className="mt-14 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="#featured"
-            className="inline-flex items-center gap-3 rounded-full bg-lime px-8 py-4 text-sm font-bold text-navy transition-transform hover:-translate-y-[2px]"
-          >
+          <a href="#featured" className="inline-flex items-center gap-3 rounded-full bg-lime px-8 py-4 text-sm font-bold text-navy transition-transform hover:-translate-y-[2px]">
             <PlayIcon /> Escuchar el podcast
           </a>
-          <a
-            href="#newsletter"
-            className="inline-flex items-center gap-2 rounded-full border border-cream/30 px-8 py-4 text-sm font-semibold text-cream transition-colors hover:bg-cream hover:text-navy"
-          >
+          <a href="#newsletter" className="inline-flex items-center gap-2 rounded-full border border-cream/30 px-8 py-4 text-sm font-semibold text-cream transition-colors hover:bg-cream hover:text-navy">
             Unirme a la newsletter
           </a>
         </div>

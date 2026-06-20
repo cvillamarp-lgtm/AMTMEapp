@@ -1,5 +1,5 @@
-import { topics } from '@/lib/editorial/topics';
-import { SectionLabel } from './icons';
+import { topics } from "@/data/topics";
+import { SectionLabel } from "./icons";
 
 export function TopicsGrid() {
   return (
@@ -8,13 +8,13 @@ export function TopicsGrid() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionLabel kicker="Temas" title="Lo que abordamos." />
           <span className="text-sm text-bluegray">
-            {String(topics.length).padStart(2, '0')} territorios emocionales
+            {String(topics.length).padStart(2, "0")} territorios emocionales
           </span>
         </div>
         <div className="mt-12 flex flex-wrap gap-3">
           {topics.map((t, i) => (
             <button key={t} type="button" className="tag-chip">
-              <span className="mr-2 text-bluegray">{String(i + 1).padStart(2, '0')}</span>
+              <span className="mr-2 text-bluegray">{String(i + 1).padStart(2, "0")}</span>
               {t}
             </button>
           ))}

@@ -1,8 +1,10 @@
-'use client';
-
-import { useState } from 'react';
-import { BRAND, NAV_LINKS } from '@/lib/editorial/constants';
-import { MenuIcon } from './icons';
+"use client";
+import { useState } from "react";
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { BRAND, NAV_LINKS } from "@/lib/constants";
+import { MenuIcon } from "./icons";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -10,7 +12,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-navy/10 bg-cream/85 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-[1320px] items-center justify-between px-6 lg:px-12">
-        <a href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <span className="font-display text-xl tracking-tight text-navy">{BRAND.short}</span>
           <span className="hidden text-[10px] uppercase tracking-[0.2em] text-bluegray md:inline">
             podcast
@@ -19,11 +21,7 @@ export function Header() {
 
         <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
           {NAV_LINKS.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              className="relative py-2 transition-colors hover:text-navy/70"
-            >
+            <a key={l.label} href={l.href} className="relative py-2 transition-colors hover:text-navy/70">
               {l.label}
             </a>
           ))}
@@ -37,15 +35,9 @@ export function Header() {
             <span className="h-1.5 w-1.5 rounded-full bg-lime" />
             Escuchar ahora
           </a>
-          <a
-            href="/studio"
-            className="hidden md:inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:border-navy hover:bg-navy hover:text-cream"
-          >
-            Entrar a Studio
-          </a>
           <button
             type="button"
-            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className="grid h-10 w-10 place-items-center rounded-full border border-navy/15 text-navy md:hidden"
@@ -75,13 +67,6 @@ export function Header() {
             >
               <span className="h-1.5 w-1.5 rounded-full bg-lime" />
               Escuchar ahora
-            </a>
-            <a
-              href="/studio"
-              onClick={() => setOpen(false)}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full border border-navy/20 px-5 py-3 text-sm font-semibold text-navy hover:bg-navy hover:text-cream"
-            >
-              Entrar a Studio
             </a>
           </nav>
         </div>

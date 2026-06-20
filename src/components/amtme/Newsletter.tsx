@@ -1,9 +1,8 @@
-'use client';
-
-import { useState } from 'react';
+"use client";
+import { useState } from "react";
 
 export function Newsletter() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   function onSubmit(e: React.FormEvent) {
@@ -23,8 +22,8 @@ export function Newsletter() {
               Recibe una carta cuando haya algo que valga la pena decir.
             </h2>
             <p className="mt-6 max-w-xl text-lg text-navy/75">
-              Reflexiones, episodios nuevos y recordatorios para no volver a negociarte por migajas.
-              Sin spam. Sin ruido. Solo cuando importa.
+              Reflexiones, episodios nuevos y recordatorios para no volver a
+              negociarte por migajas. Sin spam. Sin ruido. Solo cuando importa.
             </p>
 
             {submitted ? (
@@ -34,9 +33,7 @@ export function Newsletter() {
             ) : (
               <form onSubmit={onSubmit} className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <input
-                  type="email"
-                  required
-                  value={email}
+                  type="email" required value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@correo.com"
                   className="flex-1 rounded-full border border-navy/20 bg-cream px-6 py-4 text-navy placeholder:text-navy/40 focus:border-navy focus:outline-none"
@@ -58,9 +55,7 @@ export function Newsletter() {
               <div className="font-display text-[8rem] leading-none text-navy/90">“</div>
               <div>
                 <p className="font-display text-3xl leading-tight text-navy">
-                  Sentirse acompañado
-                  <br /> también es una forma
-                  <br /> de sanar.
+                  Sentirse acompañado<br /> también es una forma<br /> de sanar.
                 </p>
                 <div className="mt-6 text-xs uppercase tracking-[0.2em] text-navy/60">
                   — Una oyente · México

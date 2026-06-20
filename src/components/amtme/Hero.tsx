@@ -1,6 +1,5 @@
+import Image from 'next/image';
 import { PlayIcon } from './icons';
-
-const heroImg = '/amtme-editorial/christian-hero.jpg';
 
 export function Hero() {
   return (
@@ -51,11 +50,12 @@ export function Hero() {
         <div className="relative lg:col-span-5">
           <div className="absolute -left-6 top-12 z-0 hidden h-72 w-72 rounded-full bg-lime/70 blur-[2px] lg:block" />
           <div className="relative z-10 overflow-hidden rounded-3xl border border-navy/10 bg-card shadow-soft">
-            <img
-              src={heroImg}
+            <Image
+              src="/images/christian-hero.jpg"
               alt="Christian Villamar, host de A Mí Tampoco Me Explicaron"
               width={1080}
               height={1600}
+              priority
               className="h-full w-full object-cover"
             />
           </div>
