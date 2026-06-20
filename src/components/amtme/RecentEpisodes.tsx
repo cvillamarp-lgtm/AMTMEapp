@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { episodes } from "@/data/episodes";
 import { PlayIcon, SectionLabel } from "./icons";
 

@@ -15,7 +15,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <h4 className="text-xs uppercase tracking-[0.2em] text-lime">Navegar</h4>
             <ul className="mt-5 space-y-3 text-sm text-cream/80">
-              <li><Link href="/">Inicio</a></li>
+              <li><a href="/">Inicio</a></li>
               <li><a href="/#episodios">Episodios</a></li>
               <li><a href="/#manifiesto">Sobre AMTME</a></li>
               <li><a href="/#christian">Christian</a></li>

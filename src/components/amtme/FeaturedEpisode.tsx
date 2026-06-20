@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { featuredEpisode } from "@/data/episodes";
 import { SectionLabel } from "./icons";

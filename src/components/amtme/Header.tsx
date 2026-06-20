@@ -1,7 +1,5 @@
 "use client";
 import { useState } from "react";
-"use client";
-import { useState } from "react";
 import Link from "next/link";
 import { BRAND, NAV_LINKS } from "@/lib/constants";
 import { MenuIcon } from "./icons";
@@ -17,7 +15,7 @@ export function Header() {
           <span className="hidden text-[10px] uppercase tracking-[0.2em] text-bluegray md:inline">
             podcast
           </span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
           {NAV_LINKS.map((l) => (

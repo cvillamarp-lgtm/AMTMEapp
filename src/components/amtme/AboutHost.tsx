@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { BRAND } from "@/lib/constants";
 import { SectionLabel } from "./icons";
 
