@@ -1,8 +1,8 @@
-"use client";
-import { useState } from "react";
-import Link from "next/link";
-import { BRAND, NAV_LINKS } from "@/lib/constants";
-import { MenuIcon } from "./icons";
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import { BRAND, NAV_LINKS } from '@/lib/constants';
+import { MenuIcon } from './icons';
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -19,7 +19,11 @@ export function Header() {
 
         <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
           {NAV_LINKS.map((l) => (
-            <a key={l.label} href={l.href} className="relative py-2 transition-colors hover:text-navy/70">
+            <a
+              key={l.label}
+              href={l.href}
+              className="relative py-2 transition-colors hover:text-navy/70"
+            >
               {l.label}
             </a>
           ))}
@@ -35,7 +39,7 @@ export function Header() {
           </a>
           <button
             type="button"
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             className="grid h-10 w-10 place-items-center rounded-full border border-navy/15 text-navy md:hidden"

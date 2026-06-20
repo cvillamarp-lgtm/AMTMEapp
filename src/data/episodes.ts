@@ -1,7 +1,3 @@
-import cover1 from "@/assets/episode-cover-1.jpg";
-import cover2 from "@/assets/episode-cover-2.jpg";
-import cover3 from "@/assets/episode-cover-3.jpg";
-
 export type Episode = {
   slug: string;
   number: string;
@@ -31,7 +27,7 @@ export const episodes: Episode[] = [
       "Esa cosa rara donde la mente entiende, el cuerpo recuerda y la historia vuelve a llamarte a la puerta. Un episodio sobre el ciclo, el cuerpo y lo que realmente se está soltando cuando crees que estás soltando.",
     duration: "48 min",
     publishedAt: "2026-06-10",
-    cover: cover1,
+    cover: "/images/episode-cover-1.jpg",
     spotifyEpisodeId: "REPLACE_WITH_REAL_EPISODE_ID_014",
     applePodcastsUrl: "#",
     youtubeUrl: "#",
@@ -48,7 +44,7 @@ export const episodes: Episode[] = [
       "Hablamos sobre cómo nuestras heridas más antiguas suelen disfrazarse de pasión. Lo que llamamos intensidad muchas veces es el sistema nervioso pidiendo regulación, no amor.",
     duration: "52 min",
     publishedAt: "2026-05-27",
-    cover: cover2,
+    cover: "/images/episode-cover-2.jpg",
     spotifyEpisodeId: "REPLACE_WITH_REAL_EPISODE_ID_013",
     applePodcastsUrl: "#",
     youtubeUrl: "#",
@@ -65,7 +61,7 @@ export const episodes: Episode[] = [
       "No siempre vas a recibir el cierre que mereces. Y aun así puedes irte. Este episodio es sobre darte permiso de soltar incluso cuando el otro no entiende, no responde o no quiere ver.",
     duration: "41 min",
     publishedAt: "2026-05-13",
-    cover: cover3,
+    cover: "/images/episode-cover-3.jpg",
     spotifyEpisodeId: "REPLACE_WITH_REAL_EPISODE_ID_012",
     applePodcastsUrl: "#",
     youtubeUrl: "#",

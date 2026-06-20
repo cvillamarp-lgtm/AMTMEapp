@@ -1,5 +1,5 @@
-import { episodes } from "@/data/episodes";
-import { PlayIcon, SectionLabel } from "./icons";
+import { episodes } from '@/data/episodes';
+import { PlayIcon, SectionLabel } from './icons';
 
 export function RecentEpisodes() {
   return (
@@ -17,12 +17,16 @@ export function RecentEpisodes() {
               key={ep.slug}
               className="group flex flex-col overflow-hidden rounded-3xl border border-navy/10 bg-white transition-all hover:-translate-y-1 hover:shadow-card-hover"
             >
-              <a href={`/episodios/${ep.slug}`}
+              <a
+                href={`/episodios/${ep.slug}`}
                 className="relative block aspect-square overflow-hidden"
               >
                 <img
-                  src={ep.cover} alt={ep.title}
-                  width={800} height={800} loading="lazy"
+                  src={ep.cover}
+                  alt={ep.title}
+                  width={800}
+                  height={800}
+                  loading="lazy"
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <span className="absolute left-4 top-4 rounded-full bg-cream px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-navy">
@@ -46,9 +50,7 @@ export function RecentEpisodes() {
                 </h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-navy/65">{ep.excerpt}</p>
                 <div className="mt-6 flex items-center justify-between border-t border-navy/10 pt-5">
-                  <a href={`/episodios/${ep.slug}`}
-                    className="text-sm font-semibold text-navy"
-                  >
+                  <a href={`/episodios/${ep.slug}`} className="text-sm font-semibold text-navy">
                     Escuchar →
                   </a>
                   <div className="flex gap-1.5">

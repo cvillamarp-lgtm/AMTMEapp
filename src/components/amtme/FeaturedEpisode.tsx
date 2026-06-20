@@ -1,6 +1,6 @@
-import { featuredEpisode } from "@/data/episodes";
-import { SectionLabel } from "./icons";
-import { EpisodeSpotifyPlayer } from "./SpotifyPlayer";
+import { featuredEpisode } from '@/data/episodes';
+import { SectionLabel } from './icons';
+import { EpisodeSpotifyPlayer } from './SpotifyPlayer';
 
 export function FeaturedEpisode() {
   const ep = featuredEpisode;
@@ -13,7 +13,9 @@ export function FeaturedEpisode() {
             <img
               src={ep.cover}
               alt={`Carátula · ${ep.title}`}
-              width={800} height={800} loading="lazy"
+              width={800}
+              height={800}
+              loading="lazy"
               className="aspect-square h-full w-full object-cover"
             />
             <div className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full bg-lime px-3 py-1 text-xs font-bold text-navy">
@@ -38,9 +40,12 @@ export function FeaturedEpisode() {
                   Ver episodio completo →
                 </a>
                 <div className="flex flex-wrap gap-2">
-                  {["Spotify", "Apple Podcasts", "YouTube", "iVoox"].map((p) => (
-                    <a key={p} href="#"
-                      className="inline-flex items-center gap-2 rounded-full border border-cream/20 px-4 py-2 text-xs font-medium text-cream/80 transition-colors hover:border-lime hover:text-lime">
+                  {['Spotify', 'Apple Podcasts', 'YouTube', 'iVoox'].map((p) => (
+                    <a
+                      key={p}
+                      href="#"
+                      className="inline-flex items-center gap-2 rounded-full border border-cream/20 px-4 py-2 text-xs font-medium text-cream/80 transition-colors hover:border-lime hover:text-lime"
+                    >
                       {p}
                     </a>
                   ))}
