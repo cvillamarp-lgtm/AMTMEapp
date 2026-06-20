@@ -169,15 +169,15 @@ export function LandingEditorial() {
                 Episodio 014 · Nuevo
               </div>
               <h1
-                className="font-bold text-[clamp(2.4rem,7vw,6.8rem)] leading-[1.05]"
+                className="font-black text-[clamp(2.4rem,7vw,6.8rem)] leading-[0.95] uppercase tracking-tight"
                 style={{ color: '#0c1f36' }}
               >
-                A mí tampoco me explicaron{' '}
+                A mí tampoco me{' '}
                 <span className="relative inline-block">
-                  cómo se suelta
+                  explicaron cómo se suelta
                   <span
-                    className="absolute bottom-1 left-0 right-0 h-3"
-                    style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
+                    className="absolute bottom-2 left-0 right-0 h-4"
+                    style={{ backgroundColor: 'rgba(254, 233, 75, 0.65)', zIndex: -1 }}
                   ></span>
                 </span>{' '}
                 lo que todavía duele.
