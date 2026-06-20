@@ -105,10 +105,7 @@ const config: Config = {
           'Segoe UI',
           'sans-serif',
         ],
-        display: ['var(--font-josefin)', 'system-ui', 'sans-serif'],
-        body: ['var(--font-body)', 'system-ui', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
-        josefin: ['var(--font-josefin)', 'system-ui', 'sans-serif'],
+        display: ['Archivo Black', 'var(--font-archivo-black)', 'Anton', 'sans-serif'],
       },
       transitionDuration: {
         fast: 'var(--amtme-duration-fast)',

@@ -1,50 +1,37 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { Josefin_Sans, Crimson_Text, JetBrains_Mono } from 'next/font/google';
+import { Inter, Archivo_Black } from 'next/font/google';
 import { RemoveLovableBadge } from '@/components/remove-lovable-badge';
 import './globals.css';
 
-// Display font for headers
-const josefinSans = Josefin_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['700'],
-  variable: '--font-josefin',
+  variable: '--font-inter',
   display: 'swap',
 });
 
-// Body font for readability
-const crimsonText = Crimson_Text({
+const archivoBlack = Archivo_Black({
   subsets: ['latin'],
-  weight: ['400', '600'],
-  variable: '--font-body',
-  display: 'swap',
-});
-
-// Monospace for code
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '600'],
-  variable: '--font-mono',
+  weight: ['400'],
+  variable: '--font-archivo-black',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'A Mí Tampoco Me Explicaron',
-  description: 'Pódcast sobre amor, apego e identidad. Escucha gratis en Spotify.',
-  robots: { index: false, follow: false },
+  title: 'AMTME — A Mí Tampoco Me Explicaron · Podcast de Christian Villamar',
+  description:
+    'Podcast emocional sobre amor, apego, vínculos, límites y volver a uno mismo. Conducido por Christian Villamar.',
+  robots: { index: true, follow: true },
   openGraph: {
     title: 'A Mí Tampoco Me Explicaron',
-    description: 'Un pódcast honesto sobre amor, apego, identidad y todo eso que sentimos.',
+    description: 'Lo que pensamos, lo que sentimos, pero que nadie nos explicó.',
     type: 'website',
   },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html
-      lang="es"
-      className={`${josefinSans.variable} ${crimsonText.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="es" className={`${inter.variable} ${archivoBlack.variable}`}>
       <body>
         <RemoveLovableBadge />
         {children}

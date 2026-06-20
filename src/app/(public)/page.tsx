@@ -1,9 +1,10 @@
 import { LandingEditorial } from './landing-editorial';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'A Mí Tampoco Me Explicaron | Podcast sobre amor, apego e identidad',
+export const metadata: Metadata = {
+  title: 'AMTME — A Mí Tampoco Me Explicaron · Podcast de Christian Villamar',
   description:
-    'Un podcast honesto sobre amor, apego, identidad y todo eso que sentimos pero nadie nos enseñó a nombrar. Tarot como espejo. 42+ episodios.',
+    'Podcast emocional sobre amor, apego, vínculos, límites y volver a uno mismo. Conducido por Christian Villamar.',
 };
 
 export default function HomePage() {
