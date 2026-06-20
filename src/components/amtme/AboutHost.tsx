@@ -7,7 +7,7 @@ export function AboutHost() {
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="order-2 lg:order-1 lg:col-span-5">
           <div className="overflow-hidden rounded-3xl border border-navy/10 shadow-soft">
-            <img src={backImg} alt={`${BRAND.host} de espaldas`}
+            <img src="/images/christian-back.jpg" alt={`${BRAND.host} de espaldas`}
               width={1200} height={1400} loading="lazy"
               className="h-full w-full object-cover" />
           </div>

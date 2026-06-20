@@ -18,8 +18,7 @@ export function RecentEpisodes() {
               key={ep.slug}
               className="group flex flex-col overflow-hidden rounded-3xl border border-navy/10 bg-white transition-all hover:-translate-y-1 hover:shadow-card-hover"
             >
-              <Link
-                to="/episodios/$slug"
+              <a href="/episodios/$slug"
                 params={{ slug: ep.slug }}
                 className="relative block aspect-square overflow-hidden"
               >
@@ -37,24 +36,23 @@ export function RecentEpisodes() {
                 >
                   <PlayIcon size={16} />
                 </span>
-              </Link>
+              </a>
               <div className="flex flex-1 flex-col p-7">
                 <div className="text-xs uppercase tracking-[0.18em] text-bluegray">
                   {ep.topic} · {ep.duration}
                 </div>
                 <h3 className="mt-3 font-display text-2xl leading-tight text-navy">
-                  <Link to="/episodios/$slug" params={{ slug: ep.slug }} className="hover:underline">
+                  <a href="/episodios/$slug" params={{ slug: ep.slug }} className="hover:underline">
                     {ep.title}
-                  </Link>
+                  </a>
                 </h3>
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-navy/65">{ep.excerpt}</p>
                 <div className="mt-6 flex items-center justify-between border-t border-navy/10 pt-5">
-                  <Link
-                    to="/episodios/$slug" params={{ slug: ep.slug }}
+                  <a href="/episodios/$slug" params={{ slug: ep.slug }}
                     className="text-sm font-semibold text-navy"
                   >
                     Escuchar →
-                  </Link>
+                  </a>
                   <div className="flex gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-lime" />
                     <span className="h-2 w-2 rounded-full bg-navy" />
