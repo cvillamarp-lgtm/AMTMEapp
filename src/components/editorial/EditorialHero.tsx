@@ -25,16 +25,21 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             className="font-black text-[clamp(2.4rem,7vw,6.8rem)] leading-[0.95] tracking-tight"
             style={{
               color: '#0c1f36',
-              textTransform: 'uppercase',
-              letterSpacing: '-0.02em',
             }}
           >
             A mí tampoco me{' '}
             <span className="relative inline-block">
-              explicaron cómo se suelta
+              explicaron
               <span
-                className="absolute bottom-2 left-0 right-0 h-4"
-                style={{ backgroundColor: 'rgba(254, 233, 75, 0.65)', zIndex: -1 }}
+                className="absolute bottom-1 left-0 right-0 h-3"
+                style={{ backgroundColor: 'rgba(254, 233, 75, 0.7)', zIndex: -1 }}
+              ></span>
+            </span>{' '}
+            <span className="relative inline-block">
+              cómo se suelta
+              <span
+                className="absolute bottom-1 left-0 right-0 h-3"
+                style={{ backgroundColor: 'rgba(254, 233, 75, 0.7)', zIndex: -1 }}
               ></span>
             </span>{' '}
             lo que todavía duele.
@@ -48,13 +53,13 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             sentimos, pero que nadie nos enseñó a nombrar.
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="mt-12 flex flex-wrap items-center gap-4">
             <button
               onClick={onListenClick}
-              className="inline-flex items-center gap-3 rounded-full px-7 py-4 text-sm font-black transition-transform hover:-translate-y-[2px] shadow-soft"
+              className="inline-flex items-center gap-3 rounded-full px-8 py-4 text-sm font-bold transition-transform hover:scale-105 active:scale-95 shadow-soft"
               style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 4l14 8-14 8V4z"></path>
               </svg>
               Escuchar episodio destacado
@@ -62,7 +67,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
 
             <button
               onClick={onEpisodesClick}
-              className="inline-flex items-center gap-2 rounded-full border-2 px-7 py-4 text-sm font-black transition-colors hover:bg-navy hover:text-cream"
+              className="inline-flex items-center gap-2 rounded-full border-2 px-8 py-4 text-sm font-bold transition-all hover:bg-navy hover:text-cream"
               style={{ borderColor: '#0c1f36', color: '#0c1f36' }}
             >
               Ver episodios
@@ -132,7 +137,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
           color: '#f5f2ea',
         }}
       >
-        <div className="flex animate-[scroll_40s_linear_infinite] whitespace-nowrap py-5">
+        <div className="flex animate-[scroll_40s_linear_infinite] whitespace-nowrap py-6">
           {[
             'Amor vs apego',
             'Dignidad',
@@ -143,9 +148,9 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             'Ansiedad afectiva',
             'Tarot como espejo',
           ].map((tema, i) => (
-            <span key={i} className="mx-10 font-bold text-2xl tracking-wide">
+            <span key={i} className="mx-12 font-black text-xl tracking-widest md:text-2xl">
               {tema}
-              <span className="ml-10" style={{ color: '#fee94b' }}>
+              <span className="ml-12" style={{ color: '#fee94b' }}>
                 ✦
               </span>
             </span>
@@ -160,9 +165,9 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             'Ansiedad afectiva',
             'Tarot como espejo',
           ].map((tema, i) => (
-            <span key={`r-${i}`} className="mx-10 font-bold text-2xl tracking-wide">
+            <span key={`r-${i}`} className="mx-12 font-black text-xl tracking-widest md:text-2xl">
               {tema}
-              <span className="ml-10" style={{ color: '#fee94b' }}>
+              <span className="ml-12" style={{ color: '#fee94b' }}>
                 ✦
               </span>
             </span>
