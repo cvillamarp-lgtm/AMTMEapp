@@ -15,7 +15,7 @@
     background-color: var(--cream);
     color: var(--navy);
     font-family: var(--font-inter), system-ui, sans-serif;
-    font-feature-settings: "ss01", "cv11";
+    font-feature-settings: 'ss01', 'cv11';
     -webkit-font-smoothing: antialiased;
   }
 
@@ -50,7 +50,12 @@
 
 /* Underline lime highlight */
 .underline-lime {
-  background-image: linear-gradient(transparent 68%, rgba(254, 233, 75, 0.65) 68%, rgba(254, 233, 75, 0.65) 90%, transparent 90%);
+  background-image: linear-gradient(
+    transparent 68%,
+    rgba(254, 233, 75, 0.65) 68%,
+    rgba(254, 233, 75, 0.65) 90%,
+    transparent 90%
+  );
   background-repeat: no-repeat;
   background-size: 100% 100%;
   padding: 0 0.05em;

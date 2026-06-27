@@ -167,22 +167,22 @@ export default function NotasPage() {
     pinned: false,
   });
 
-useEffect(() => {
-              load();
-              const sb = getSupabaseAuthBrowserClient();
-              if (!sb) return;
-              const {
-                                data: { subscription },
-              } = sb.auth.onAuthStateChange((_event, session) => {
-                                if (session) {
-                                                      load();
-                                } else {
-                                                      setNotes([]);
-                                                      setAuthenticated(false);
-                                }
-              });
-              return () => subscription.unsubscribe();
-}, []);
+  useEffect(() => {
+    load();
+    const sb = getSupabaseAuthBrowserClient();
+    if (!sb) return;
+    const {
+      data: { subscription },
+    } = sb.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        load();
+      } else {
+        setNotes([]);
+        setAuthenticated(false);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function load() {
     try {

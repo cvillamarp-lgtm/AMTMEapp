@@ -1,6 +1,6 @@
-import type { Episode } from "@/data/episodes";
+import type { Episode } from '@/data/episodes';
 
-type Variant = "compact" | "full";
+type Variant = 'compact' | 'full';
 
 /**
  * Reproductor de Spotify embebido para episodios o show.
@@ -9,8 +9,8 @@ type Variant = "compact" | "full";
 export function SpotifyPlayer({
   episodeId,
   showId,
-  variant = "compact",
-  title = "Reproductor de Spotify",
+  variant = 'compact',
+  title = 'Reproductor de Spotify',
 }: {
   episodeId?: string;
   showId?: string;
@@ -21,7 +21,7 @@ export function SpotifyPlayer({
   if (!path) return null;
 
   const src = `https://open.spotify.com/embed/${path}?utm_source=generator&theme=0`;
-  const height = variant === "full" ? 352 : 152;
+  const height = variant === 'full' ? 352 : 152;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-navy/10 bg-white shadow-soft">
@@ -42,8 +42,11 @@ export function SpotifyPlayer({
 
 export function EpisodeSpotifyPlayer({
   episode,
-  variant = "compact",
-}: { episode: Episode; variant?: Variant }) {
+  variant = 'compact',
+}: {
+  episode: Episode;
+  variant?: Variant;
+}) {
   return (
     <SpotifyPlayer
       episodeId={episode.spotifyEpisodeId}
