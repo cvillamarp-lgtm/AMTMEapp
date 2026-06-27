@@ -10,7 +10,10 @@ function isPublicRoute(pathname: string) {
   return (
     pathname === '/' ||
     pathname.startsWith('/episodios') ||
-    pathname.startsWith('/api/public')
+    pathname.startsWith('/api/public') ||
+    pathname === '/sobre' ||
+    pathname === '/privacy' ||
+    pathname === '/terms'
   );
 }
 
