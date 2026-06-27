@@ -1,5 +1,3 @@
-'use client';
-
 import { EditorialHeader } from '@/components/editorial/EditorialHeader';
 import { EditorialHero } from '@/components/editorial/EditorialHero';
 import { EditorialFeaturedEpisode } from '@/components/editorial/EditorialFeaturedEpisode';
@@ -12,7 +10,7 @@ import { EditorialNewsletter } from '@/components/editorial/EditorialNewsletter'
 import { EditorialPlatforms } from '@/components/editorial/EditorialPlatforms';
 import { EditorialFooter } from '@/components/editorial/EditorialFooter';
 
-export function LandingEditorial() {
+export async function LandingEditorial() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}>
       <EditorialHeader />

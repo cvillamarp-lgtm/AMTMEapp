@@ -1,48 +1,42 @@
-'use client';
-
 import Link from 'next/link';
+import { getSupabaseServiceRoleClient } from '@/lib/supabase/server';
 
 interface Episode {
-  slug: string;
-  title: string;
-  tags: string;
-  time: string;
-  desc: string;
-  ep: string;
-  img: string;
+  id: string;
+  episode_number?: number;
+  title?: string;
+  theme?: string;
+  description?: string;
+  cover_url?: string;
 }
 
-const RECENT_EPISODES: Episode[] = [
-  {
-    slug: 'por-que-vuelves-aunque-ya-lo-sabes',
-    title: 'Por qué vuelves aunque ya lo sabes',
-    tags: 'Apego · Dignidad',
-    time: '48 min',
-    desc: 'Sobre ese ciclo donde la mente entiende pero el cuerpo todavía busca lo que lo hirió.',
-    ep: '014',
-    img: '/episode-cover-1.jpg',
-  },
-  {
-    slug: 'no-era-intensidad-era-una-herida',
-    title: 'No era intensidad, era una herida',
-    tags: 'Amor vs apego',
-    time: '52 min',
-    desc: 'Cuando confundimos la urgencia emocional con conexión y llamamos amor a lo que solo era miedo.',
-    ep: '013',
-    img: '/episode-cover-2.jpg',
-  },
-  {
-    slug: 'soltar-sin-pedir-permiso',
-    title: 'Soltar sin pedir permiso',
-    tags: 'Límites · Duelo',
-    time: '41 min',
-    desc: 'Una conversación íntima sobre cerrar capítulos sin necesitar la aprobación de quien te rompió.',
-    ep: '012',
-    img: '/episode-cover-3.jpg',
-  },
-];
+const CHRISTIAN_UUID = 'c5b87e86-8520-42a1-b9b4-48f8315a147a';
+const CHRISTIAN_UUID_FILTER = `user_id.is.null,user_id.eq.${CHRISTIAN_UUID}`;
 
-export function EditorialRecentEpisodes() {
+async function getRecentEpisodes() {
+  try {
+    const sb = getSupabaseServiceRoleClient();
+    if (!sb) return [];
+    const { data } = await sb
+      .from('episodes')
+      .select('id,payload')
+      .or(CHRISTIAN_UUID_FILTER)
+      .order('payload->>episode_number', { ascending: false })
+      .limit(3);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data || []).map((r: any) => ({
+      id: r.id,
+      ...r.payload,
+    })) as Episode[];
+  } catch {
+    return [];
+  }
+}
+
+export async function EditorialRecentEpisodes() {
+  const episodes = await getRecentEpisodes();
+
   return (
     <section id="episodios" className="px-6 py-24 lg:px-12 lg:py-32">
       <div className="mx-auto max-w-[1320px]">
@@ -75,84 +69,104 @@ export function EditorialRecentEpisodes() {
           </Link>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {RECENT_EPISODES.map((ep) => (
-            <article
-              key={ep.slug}
-              className="group flex flex-col overflow-hidden rounded-3xl border bg-white transition-all hover:-translate-y-1 hover:shadow-lg"
-              style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
-            >
-              <Link
-                href={`/episodios/${ep.slug}`}
-                className="relative block aspect-square overflow-hidden"
+        {episodes.length > 0 ? (
+          <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {episodes.map((ep) => (
+              <article
+                key={ep.id}
+                className="group flex flex-col overflow-hidden rounded-3xl border bg-white transition-all hover:-translate-y-1 hover:shadow-lg"
+                style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
               >
-                <img
-                  src={ep.img}
-                  alt={ep.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span
-                  className="absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
-                  style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}
-                >
-                  EP {ep.ep}
-                </span>
-                <span
-                  aria-label="Reproducir"
-                  className="absolute bottom-4 right-4 grid h-12 w-12 place-items-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                  style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M6 4l14 8-14 8V4z"></path>
-                  </svg>
-                </span>
-              </Link>
-
-              <div className="flex flex-1 flex-col p-7">
-                <div className="text-xs uppercase tracking-[0.18em]" style={{ color: '#687680' }}>
-                  {ep.tags} · {ep.time}
-                </div>
-                <h3 className="mt-3 font-bold text-2xl leading-tight">
-                  <Link href={`/episodios/${ep.slug}`} className="hover:underline">
-                    {ep.title}
-                  </Link>
-                </h3>
-                <p
-                  className="mt-3 flex-1 text-sm leading-relaxed"
-                  style={{ color: 'rgba(12, 31, 54, 0.65)' }}
-                >
-                  {ep.desc}
-                </p>
-
-                <div
-                  className="mt-6 flex items-center justify-between border-t pt-5"
-                  style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
-                >
-                  <Link
-                    href={`/episodios/${ep.slug}`}
-                    className="text-sm font-semibold hover:opacity-70"
+                <div className="relative block aspect-square overflow-hidden bg-gradient-to-br from-[#0c1f36] to-[#fee94b]">
+                  {ep.cover_url ? (
+                    <img
+                      src={ep.cover_url}
+                      alt={ep.title || 'Episodio'}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full w-full">
+                      <span
+                        className="text-2xl font-bold"
+                        style={{ color: 'rgba(255, 255, 255, 0.3)' }}
+                      >
+                        EP
+                      </span>
+                    </div>
+                  )}
+                  <span
+                    className="absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
+                    style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}
                   >
-                    Escuchar →
-                  </Link>
-                  <div className="flex gap-1.5">
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: '#fee94b' }}
-                    ></span>
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: '#0c1f36' }}
-                    ></span>
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: '#e74c3c' }}
-                    ></span>
+                    EP {ep.episode_number}
+                  </span>
+                  <span
+                    aria-label="Reproducir"
+                    className="absolute bottom-4 right-4 grid h-12 w-12 place-items-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
+                    style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 4l14 8-14 8V4z"></path>
+                    </svg>
+                  </span>
+                </div>
+
+                <div className="flex flex-1 flex-col p-7">
+                  <div className="text-xs uppercase tracking-[0.18em]" style={{ color: '#687680' }}>
+                    {ep.theme || 'Tema'}
+                  </div>
+                  <h3 className="mt-3 font-bold text-2xl leading-tight">
+                    <span className="hover:underline cursor-pointer">
+                      {ep.title || 'Sin título'}
+                    </span>
+                  </h3>
+                  <p
+                    className="mt-3 flex-1 text-sm leading-relaxed line-clamp-2"
+                    style={{ color: 'rgba(12, 31, 54, 0.65)' }}
+                  >
+                    {ep.description || 'Episodio del podcast AMTME'}
+                  </p>
+
+                  <div
+                    className="mt-6 flex items-center justify-between border-t pt-5"
+                    style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
+                  >
+                    <Link href="/episodios" className="text-sm font-semibold hover:opacity-70">
+                      Escuchar →
+                    </Link>
+                    <div className="flex gap-1.5">
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: '#fee94b' }}
+                      ></span>
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: '#0c1f36' }}
+                      ></span>
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: '#e74c3c' }}
+                      ></span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-14 text-center py-12">
+            <p style={{ color: '#687680' }}>
+              Los episodios se cargan desde Spotify. Explora todos aquí:
+            </p>
+            <Link
+              href="/episodios"
+              className="mt-6 inline-block rounded-full px-8 py-3 text-sm font-semibold"
+              style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
+            >
+              Ver todos los episodios
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
