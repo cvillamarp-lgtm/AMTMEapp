@@ -18,11 +18,7 @@ function isPublicRoute(pathname: string) {
 }
 
 function isPublicAsset(pathname: string) {
-  return (
-    pathname.startsWith('/_next')
-    || pathname.startsWith('/favicon')
-    || pathname.includes('.')
-  );
+  return pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.includes('.');
 }
 
 export async function middleware(request: NextRequest) {
@@ -61,4 +57,4 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-};// Mon Jun  1 01:31:03 EST 2026
+}; // Mon Jun  1 01:31:03 EST 2026
