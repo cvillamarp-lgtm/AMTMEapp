@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /studio
+Disallow: /auth
+
+Sitemap: https://www.amitampocomeexplicaron.com/sitemap.xml

@@ -112,7 +112,7 @@ export function EditorialFeaturedEpisode() {
                     Apple Podcasts
                   </a>
                   <a
-                    href="https://youtube.com/"
+                    href={BRAND.youtubeUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"

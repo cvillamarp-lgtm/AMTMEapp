@@ -14,6 +14,7 @@ export const BRAND = {
     'https://open.spotify.com/embed/show/7w3r41VGcUjCRU8QF3pnRb?utm_source=generator&theme=0',
   applePodcastsUrl: 'https://podcasts.apple.com/mx/podcast/a-mi-tampoco-me-explicaron/id1796503084',
   ivooxUrl: 'https://www.ivoox.com/podcast-a-mi-tampoco-me-explicaron_sq_f12702462_1.html',
+  youtubeUrl: 'https://www.youtube.com/@AmitampocoExplicaron',
 } as const;
 
 export const COLORS = {
