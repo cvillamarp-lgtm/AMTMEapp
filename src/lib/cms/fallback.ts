@@ -78,11 +78,10 @@ export const LANDING_FALLBACK_SECTIONS: SiteSection[] = [
         'Esa cosa rara donde la mente entiende, el cuerpo recuerda y la historia vuelve a llamarte a la puerta. Un episodio sobre el ciclo, el cuerpo y lo que realmente se está soltando cuando crees que estás soltando.',
       imageUrl: '/episode-cover-1.jpg',
       imageAlt: 'Por qué vuelves aunque ya lo sabes',
-      spotifyEmbedUrl:
-        'https://open.spotify.com/embed/episode/YOUR_EPISODE_ID?utm_source=generator',
+      spotifyEmbedUrl: '',
       episodeUrl: '/episodios/por-que-vuelves-aunque-ya-lo-sabes',
-      spotifyUrl: 'https://open.spotify.com/show/YOUR_SHOW_ID',
-      applePodcastsUrl: 'https://podcasts.apple.com/podcast/YOUR_PODCAST_ID',
+      spotifyUrl: '',
+      applePodcastsUrl: '',
     },
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -213,7 +212,7 @@ export const LANDING_FALLBACK_SECTIONS: SiteSection[] = [
       imageAlt: 'Christian Villamar',
       socialLinks: {
         instagram: 'https://instagram.com/amitampocomeexplicaron',
-        spotify: 'https://open.spotify.com/show/YOUR_SHOW_ID',
+        spotify: 'https://open.spotify.com/show/',
         linkedin: 'https://linkedin.com/in/christianvillamar',
       },
     },
@@ -251,12 +250,12 @@ export const LANDING_FALLBACK_SECTIONS: SiteSection[] = [
       platforms: [
         {
           name: 'Spotify',
-          url: 'https://open.spotify.com/show/YOUR_SHOW_ID',
+          url: 'https://open.spotify.com/show/',
           icon: 'spotify',
         },
         {
           name: 'Apple Podcasts',
-          url: 'https://podcasts.apple.com/podcast/YOUR_PODCAST_ID',
+          url: 'https://podcasts.apple.com/podcast/',
           icon: 'apple',
         },
         {
@@ -302,7 +301,7 @@ export const LANDING_FALLBACK_SECTIONS: SiteSection[] = [
         },
         {
           name: 'Spotify',
-          url: 'https://open.spotify.com/show/YOUR_SHOW_ID',
+          url: 'https://open.spotify.com/show/',
         },
         {
           name: 'YouTube',

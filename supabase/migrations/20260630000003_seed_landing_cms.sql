@@ -88,10 +88,10 @@ select
     'episodeDescription', 'Esa cosa rara donde la mente entiende, el cuerpo recuerda y la historia vuelve a llamarte a la puerta. Un episodio sobre el ciclo, el cuerpo y lo que realmente se está soltando cuando crees que estás soltando.',
     'imageUrl', '/episode-cover-1.jpg',
     'imageAlt', 'Por qué vuelves aunque ya lo sabes',
-    'spotifyEmbedUrl', 'https://open.spotify.com/embed/episode/YOUR_EPISODE_ID?utm_source=generator',
+    'spotifyEmbedUrl', 'https://open.spotify.com/embed/episode/?utm_source=generator',
     'episodeUrl', '/episodios/por-que-vuelves-aunque-ya-lo-sabes',
-    'spotifyUrl', 'https://open.spotify.com/show/YOUR_SHOW_ID',
-    'applePodcastsUrl', 'https://podcasts.apple.com/podcast/YOUR_PODCAST_ID'
+    'spotifyUrl', 'https://open.spotify.com/show/',
+    'applePodcastsUrl', 'https://podcasts.apple.com/podcast/'
   )
 from page;
 
@@ -237,7 +237,7 @@ select
     'imageAlt', 'Christian Villamar',
     'socialLinks', jsonb_build_object(
       'instagram', 'https://instagram.com/amitampocomeexplicaron',
-      'spotify', 'https://open.spotify.com/show/YOUR_SHOW_ID',
+      'spotify', 'https://open.spotify.com/show/',
       'linkedin', 'https://linkedin.com/in/christianvillamar'
     )
   )
@@ -281,12 +281,12 @@ select
     'platforms', jsonb_build_array(
       jsonb_build_object(
         'name', 'Spotify',
-        'url', 'https://open.spotify.com/show/YOUR_SHOW_ID',
+        'url', 'https://open.spotify.com/show/',
         'icon', 'spotify'
       ),
       jsonb_build_object(
         'name', 'Apple Podcasts',
-        'url', 'https://podcasts.apple.com/podcast/YOUR_PODCAST_ID',
+        'url', 'https://podcasts.apple.com/podcast/',
         'icon', 'apple'
       ),
       jsonb_build_object(
@@ -330,7 +330,7 @@ select
     ),
     'socialLinks', jsonb_build_array(
       jsonb_build_object('name', 'Instagram', 'url', 'https://instagram.com/amitampocomeexplicaron'),
-      jsonb_build_object('name', 'Spotify', 'url', 'https://open.spotify.com/show/YOUR_SHOW_ID'),
+      jsonb_build_object('name', 'Spotify', 'url', 'https://open.spotify.com/show/'),
       jsonb_build_object('name', 'YouTube', 'url', 'https://youtube.com/@amitampocomeexplicaron'),
       jsonb_build_object('name', 'TikTok', 'url', 'https://tiktok.com/@amitampocomeexplicaron')
     )

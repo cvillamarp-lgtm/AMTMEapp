@@ -84,9 +84,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update section - use type assertion due to Supabase strict typing
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updateResult = await supabase
       .from('landing_sections')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .update(updateFields as any)
       .eq('landing_page_id', pageData.id)
       .eq('section_key', sectionKey)

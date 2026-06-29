@@ -1,7 +1,6 @@
 /**
  * Editorial Component Wrappers
  * Wraps editorial components to accept CMS data while maintaining backward compatibility
- * TODO: Update components to accept and use cmsData/fallbackData props
  */
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
