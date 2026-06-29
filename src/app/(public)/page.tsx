@@ -1,21 +1,26 @@
 import { LandingEditorial } from './landing-editorial';
-import { getPublishedLandingPage } from '@/lib/landing-cms/queries';
+import { getPublishedLandingPage } from '@/lib/cms/queries';
+import { getLandingPageWithFallback } from '@/lib/cms/fallback';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Fetch CMS data for SEO
-  const { page } = await getPublishedLandingPage('home');
+  const { page } = await getPublishedLandingPage();
+  const fallbackPage = getLandingPageWithFallback(page);
+
+  const seo = fallbackPage.payload?.seo as Record<string, unknown> | undefined;
+  const title =
+    (seo?.title as string) || 'AMTME — A Mí Tampoco Me Explicaron · Podcast de Christian Villamar';
+  const description =
+    (seo?.description as string) ||
+    'Podcast emocional sobre amor, apego, vínculos, límites y volver a uno mismo. Conducido por Christian Villamar.';
 
   return {
-    title:
-      page?.title || 'AMITAMPOCOMEEXPLICARON — Podcast de Claridad Emocional · Christian Tebaldi',
-    description:
-      page?.description || 'Un podcast sobre claridad emocional, relaciones y autoconocimiento.',
-    keywords: page?.meta_keywords || 'podcast, emocional, claridad, relaciones',
+    title,
+    description,
     openGraph: {
-      title: page?.title || 'AMITAMPOCOMEEXPLICARON',
-      description: page?.description || 'Podcast de claridad emocional',
-      images: page?.og_image_url ? [{ url: page.og_image_url }] : [],
+      title: (seo?.ogTitle as string) || title,
+      description: (seo?.ogDescription as string) || description,
+      images: seo?.ogImage ? [{ url: seo.ogImage as string }] : [],
     },
   };
 }

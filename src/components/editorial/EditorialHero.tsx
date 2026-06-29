@@ -1,11 +1,71 @@
 'use client';
 
-interface EditorialHeroProps {
-  onListenClick?: () => void;
-  onEpisodesClick?: () => void;
+interface CmsHeroData {
+  cms?: Record<string, unknown>;
+  fallbackData?: Record<string, unknown>;
 }
 
-export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroProps) {
+interface EditorialHeroProps extends CmsHeroData {
+  onListenClick?: () => void;
+  onEpisodesClick?: () => void;
+  cmsData?: Record<string, unknown>;
+  fallbackData?: Record<string, unknown>;
+}
+
+export function EditorialHero({
+  onListenClick,
+  onEpisodesClick,
+  cmsData = {},
+  fallbackData = {},
+}: EditorialHeroProps) {
+  // Extract data with fallbacks
+  const cms = (cmsData as Record<string, unknown>)?.cms as Record<string, unknown> | undefined;
+  const fallback = (fallbackData as Record<string, unknown>)?.cms as
+    | Record<string, unknown>
+    | undefined;
+
+  const tagline =
+    (cms?.tagline as string) || (fallback?.tagline as string) || 'Episodio 014 · Nuevo';
+  const mainHeading =
+    (cms?.mainHeading as string) ||
+    (fallback?.mainHeading as string) ||
+    'A mí tampoco me explicaron cómo se suelta lo que todavía duele.';
+  const subtitle =
+    (cms?.subtitle as string) ||
+    (fallback?.subtitle as string) ||
+    'Un podcast para entender el amor, el apego, los vínculos, la dignidad y todo eso que sentimos, pero que nadie nos enseñó a nombrar.';
+  const primaryCta =
+    (cms?.primaryCta as string) ||
+    (fallback?.primaryCta as string) ||
+    'Escuchar episodio destacado';
+  const secondaryCta =
+    (cms?.secondaryCta as string) || (fallback?.secondaryCta as string) || 'Ver episodios';
+  const imageUrl =
+    (cms?.imageUrl as string) ||
+    (fallback?.imageUrl as string) ||
+    '/images/christian-hero-headshot.jpg';
+  const imageAlt =
+    (cms?.imageAlt as string) ||
+    (fallback?.imageAlt as string) ||
+    'Christian Villamar - Host de A Mí Tampoco Me Explicaron';
+  const stats = (cms?.stats as Array<{ label: string; value: string }>) ||
+    (fallback?.stats as Array<{ label: string; value: string }>) || [
+      { label: 'Temporadas', value: '03' },
+      { label: 'Episodios', value: '42' },
+      { label: 'Oyentes', value: '120K+' },
+    ];
+  const topics = (cms?.topics as string[]) ||
+    (fallback?.topics as string[]) || [
+      'Amor vs apego',
+      'Dignidad',
+      'Volver a uno mismo',
+      'Duelo emocional',
+      'Límites',
+      'Rechazo',
+      'Ansiedad afectiva',
+      'Tarot como espejo',
+    ];
+
   return (
     <section
       style={{ borderBottomColor: 'rgba(12, 31, 54, 0.1)' }}
@@ -18,7 +78,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             style={{ color: '#687680' }}
           >
             <span className="h-px w-10" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
-            Episodio 014 · Nuevo
+            {tagline}
           </div>
 
           <h1
@@ -27,30 +87,28 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
               color: '#0c1f36',
             }}
           >
-            A mí tampoco me{' '}
+            {mainHeading.split(' ').slice(0, 3).join(' ')}{' '}
             <span className="relative inline-block">
-              explicaron
+              {mainHeading.split(' ')[3]}
               <span
                 className="absolute bottom-1 left-0 right-0 h-3"
                 style={{ backgroundColor: 'rgba(254, 233, 75, 0.7)', zIndex: -1 }}
               ></span>
             </span>{' '}
             <span className="relative inline-block">
-              cómo se suelta
+              {mainHeading.split(' ').slice(4).join(' ')}
               <span
                 className="absolute bottom-1 left-0 right-0 h-3"
                 style={{ backgroundColor: 'rgba(254, 233, 75, 0.7)', zIndex: -1 }}
               ></span>
-            </span>{' '}
-            lo que todavía duele.
+            </span>
           </h1>
 
           <p
             className="mt-8 max-w-xl text-lg leading-relaxed"
             style={{ color: 'rgba(12, 31, 54, 0.75)' }}
           >
-            Un podcast para entender el amor, el apego, los vínculos, la dignidad y todo eso que
-            sentimos, pero que nadie nos enseñó a nombrar.
+            {subtitle}
           </p>
 
           <div className="mt-12 flex flex-wrap items-center gap-4">
@@ -62,7 +120,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 4l14 8-14 8V4z"></path>
               </svg>
-              Escuchar episodio destacado
+              {primaryCta}
             </button>
 
             <button
@@ -70,7 +128,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
               className="inline-flex items-center gap-2 rounded-full border-2 px-8 py-4 text-sm font-bold transition-all hover:bg-navy hover:text-cream"
               style={{ borderColor: '#0c1f36', color: '#0c1f36' }}
             >
-              Ver episodios
+              {secondaryCta}
             </button>
           </div>
 
@@ -79,24 +137,14 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             className="mt-16 grid max-w-md grid-cols-3 gap-6 border-t pt-8 text-sm"
             style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
           >
-            <div>
-              <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
-                Temporadas
-              </dt>
-              <dd className="mt-1 font-bold text-2xl">03</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
-                Episodios
-              </dt>
-              <dd className="mt-1 font-bold text-2xl">42</dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
-                Oyentes
-              </dt>
-              <dd className="mt-1 font-bold text-2xl">120K+</dd>
-            </div>
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <dt className="text-xs uppercase tracking-wider" style={{ color: '#687680' }}>
+                  {stat.label}
+                </dt>
+                <dd className="mt-1 font-bold text-2xl">{stat.value}</dd>
+              </div>
+            ))}
           </dl>
         </div>
 
@@ -110,11 +158,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
             className="relative z-10 overflow-hidden rounded-3xl border"
             style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: '#f5f2ea' }}
           >
-            <img
-              src="/images/christian-hero-headshot.jpg"
-              alt="Christian Villamar - Host de A Mí Tampoco Me Explicaron"
-              className="h-full w-full object-cover"
-            />
+            <img src={imageUrl} alt={imageAlt} className="h-full w-full object-cover" />
           </div>
           <div
             className="absolute -bottom-4 -right-4 z-20 hidden rounded-2xl px-5 py-4 text-white md:block"
@@ -138,16 +182,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
         }}
       >
         <div className="flex animate-[scroll_40s_linear_infinite] whitespace-nowrap py-6">
-          {[
-            'Amor vs apego',
-            'Dignidad',
-            'Volver a uno mismo',
-            'Duelo emocional',
-            'Límites',
-            'Rechazo',
-            'Ansiedad afectiva',
-            'Tarot como espejo',
-          ].map((tema, i) => (
+          {topics.map((tema, i) => (
             <span key={i} className="mx-12 font-black text-xl tracking-widest md:text-2xl">
               {tema}
               <span className="ml-12" style={{ color: '#fee94b' }}>
@@ -155,16 +190,7 @@ export function EditorialHero({ onListenClick, onEpisodesClick }: EditorialHeroP
               </span>
             </span>
           ))}
-          {[
-            'Amor vs apego',
-            'Dignidad',
-            'Volver a uno mismo',
-            'Duelo emocional',
-            'Límites',
-            'Rechazo',
-            'Ansiedad afectiva',
-            'Tarot como espejo',
-          ].map((tema, i) => (
+          {topics.map((tema, i) => (
             <span key={`r-${i}`} className="mx-12 font-black text-xl tracking-widest md:text-2xl">
               {tema}
               <span className="ml-12" style={{ color: '#fee94b' }}>
