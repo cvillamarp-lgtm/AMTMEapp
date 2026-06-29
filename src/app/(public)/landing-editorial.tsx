@@ -1,3 +1,4 @@
+import { getLandingPageWithFallback } from '@/lib/landing-cms/queries';
 import { EditorialHeader } from '@/components/editorial/EditorialHeader';
 import { EditorialHero } from '@/components/editorial/EditorialHero';
 import { EditorialFeaturedEpisode } from '@/components/editorial/EditorialFeaturedEpisode';
@@ -11,6 +12,11 @@ import { EditorialPlatforms } from '@/components/editorial/EditorialPlatforms';
 import { EditorialFooter } from '@/components/editorial/EditorialFooter';
 
 export async function LandingEditorial() {
+  // Fetch landing page from CMS (with fallback for future use)
+  // Currently, components still use hardcoded content
+  // In V2, we can pass CMS data to individual components
+  await getLandingPageWithFallback('home');
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}>
       <EditorialHeader />

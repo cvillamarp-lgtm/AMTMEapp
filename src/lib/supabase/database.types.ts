@@ -3306,6 +3306,169 @@ export type Database = {
           },
         ];
       };
+      cms_admins: {
+        Row: {
+          created_at: string;
+          granted_by: string | null;
+          id: string;
+          is_active: boolean;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          granted_by?: string | null;
+          id?: string;
+          is_active?: boolean;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          granted_by?: string | null;
+          id?: string;
+          is_active?: boolean;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'cms_admins_granted_by_fkey';
+            columns: ['granted_by'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'cms_admins_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: true;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      landing_pages: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          id: string;
+          is_published: boolean;
+          meta_keywords: string | null;
+          og_image_url: string | null;
+          published_at: string | null;
+          slug: string;
+          title: string;
+          updated_at: string;
+          updated_by: string | null;
+          version: number;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_published?: boolean;
+          meta_keywords?: string | null;
+          og_image_url?: string | null;
+          published_at?: string | null;
+          slug?: string;
+          title: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          version?: number;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_published?: boolean;
+          meta_keywords?: string | null;
+          og_image_url?: string | null;
+          published_at?: string | null;
+          slug?: string;
+          title?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          version?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'landing_pages_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'landing_pages_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      landing_sections: {
+        Row: {
+          content: Json;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          is_visible: boolean;
+          landing_page_id: string;
+          section_key: string;
+          section_order: number;
+          updated_at: string;
+          updated_by: string | null;
+        };
+        Insert: {
+          content: Json;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_visible?: boolean;
+          landing_page_id: string;
+          section_key: string;
+          section_order?: number;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Update: {
+          content?: Json;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          is_visible?: boolean;
+          landing_page_id?: string;
+          section_key?: string;
+          section_order?: number;
+          updated_at?: string;
+          updated_by?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'landing_sections_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'landing_sections_landing_page_id_fkey';
+            columns: ['landing_page_id'];
+            isOneToOne: false;
+            referencedRelation: 'landing_pages';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'landing_sections_updated_by_fkey';
+            columns: ['updated_by'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       v_catalogo_episodios: {
