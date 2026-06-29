@@ -9,8 +9,14 @@ import { EditorialAboutChristian } from '@/components/editorial/EditorialAboutCh
 import { EditorialNewsletter } from '@/components/editorial/EditorialNewsletter';
 import { EditorialPlatforms } from '@/components/editorial/EditorialPlatforms';
 import { EditorialFooter } from '@/components/editorial/EditorialFooter';
+import { getPublishedLandingPage } from '@/lib/cms/queries';
+import { getLandingPageWithFallback } from '@/lib/cms/fallback';
 
 export async function LandingEditorial() {
+  // Load CMS data (or empty if Supabase unavailable)
+  const { page } = await getPublishedLandingPage();
+  getLandingPageWithFallback(page);
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}>
       <EditorialHeader />
