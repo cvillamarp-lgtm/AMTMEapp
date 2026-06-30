@@ -322,16 +322,82 @@ export async function getVisualAssets(): Promise<VisualAsset[]> {
 export async function createVisualAsset(
   asset: Omit<VisualAsset, 'id' | 'created_at' | 'updated_at' | 'user_id'>
 ): Promise<VisualAsset> {
-  return insertOne<VisualAsset>('visual_assets', asset);
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) throw new Error('No autenticado: no se puede crear el registro.');
+
+  // visual_assets usa schema legacy con owner_id y workspace_key
+  const { data, error } = await sb
+    .from('visual_assets')
+    .insert([
+      {
+        owner_id: activeUserId,
+        workspace_key: 'primary',
+        payload: asset,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  // Mapear response a VisualAsset type (tratando owner_id como user_id)
+  return {
+    ...data.payload,
+    id: data.id,
+    user_id: data.owner_id,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+  } as VisualAsset;
 }
 export async function updateVisualAsset(
   id: string,
   updates: Partial<VisualAsset>
 ): Promise<VisualAsset> {
-  return updateOne<VisualAsset>('visual_assets', id, updates);
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) throw new Error('No autenticado');
+
+  // Filtrar campos de control que no van en payload
+  const payloadUpdates = Object.fromEntries(
+    Object.entries(updates).filter(
+      ([key]) => !['id', 'user_id', 'created_at', 'updated_at'].includes(key)
+    )
+  );
+
+  const { data, error } = await sb
+    .from('visual_assets')
+    .update({ payload: payloadUpdates })
+    .eq('id', id)
+    .eq('owner_id', activeUserId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return {
+    ...data.payload,
+    id: data.id,
+    user_id: data.owner_id,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+  } as VisualAsset;
 }
+
 export async function deleteVisualAsset(id: string): Promise<void> {
-  return deleteOne('visual_assets', id);
+  const sb = getClient();
+  if (!sb) throw new Error('Supabase no configurado');
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) throw new Error('No autenticado');
+
+  const { error } = await sb
+    .from('visual_assets')
+    .delete()
+    .eq('id', id)
+    .eq('owner_id', activeUserId);
+
+  if (error) throw error;
 }
 
 // ---- AUTOMATION RULES ----
