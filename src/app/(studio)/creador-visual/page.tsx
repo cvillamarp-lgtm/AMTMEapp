@@ -2,45 +2,62 @@
 
 import { useState } from 'react';
 import { Badge, Button, Card, Field, Input, Select, Textarea } from '@/components/ui';
-import { useStudio } from '@/components/studio-provider';
 import { generateVisualPrompt, generateVisualSpec } from '@/lib/studio-generators';
-import type { VisualAsset } from '@/lib/studio-types';
+import { createVisualAsset } from '@/lib/database';
+import type { VisualAsset, VisualType, VisualFormat } from '@/types/database';
 
-const emptyVisual = (): VisualAsset => ({
-  id: `vis-${Date.now()}`,
-  type: 'Carrusel portada',
+type DraftVisualAsset = Omit<VisualAsset, 'id' | 'user_id' | 'created_at' | 'updated_at'>;
+
+const emptyVisual = (): DraftVisualAsset => ({
+  type: 'carrusel-portada',
   format: '1080x1350',
   title: '',
-  mainText: '',
-  secondaryText: '',
+  main_text: '',
+  secondary_text: '',
   cta: 'Desliza',
   prompt: '',
-  technicalSpec: '',
-  templateVariables: '{titulo}, {cta}',
+  technical_spec: '',
+  template_variables: { titulo: '', cta: '' },
   palette: 'Navy profundo, amarillo AMTME, blanco, crema cálido',
   status: 'Borrador',
-  episodeId: '',
-  createdAt: new Date().toISOString().slice(0, 10),
+  episode_id: '',
+  content_id: null,
+  visual_reference: null,
 });
 
 export default function CreadorVisualPage() {
-  const { setState } = useStudio();
-  const [draft, setDraft] = useState<VisualAsset>(emptyVisual());
+  const [draft, setDraft] = useState<DraftVisualAsset>(emptyVisual());
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
   const generatePrompt = () => {
     setDraft((current) => ({
       ...current,
-      prompt: generateVisualPrompt(current),
-      technicalSpec: generateVisualSpec(current.format),
+      prompt: generateVisualPrompt({
+        type: current.type,
+        mainText: current.main_text || '',
+        secondaryText: current.secondary_text || '',
+        cta: current.cta || '',
+        palette: current.palette,
+      }),
+      technical_spec: generateVisualSpec(current.format),
       status: 'Listo',
     }));
   };
 
-  const saveVisual = () => {
-    setState((current) => ({
-      ...current,
-      visualAssets: [draft, ...current.visualAssets],
-    }));
+  const saveVisual = async () => {
+    try {
+      setSaveStatus('saving');
+      await createVisualAsset(draft);
+      setSaveStatus('saved');
+      setTimeout(() => {
+        setSaveStatus('idle');
+        setDraft(emptyVisual());
+      }, 2000);
+    } catch (error) {
+      console.error('Error saving visual asset:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
   };
 
   return (
@@ -59,26 +76,25 @@ export default function CreadorVisualPage() {
           <Field label="Tipo de pieza">
             <Select
               value={draft.type}
-              onChange={(event) => setDraft({ ...draft, type: event.target.value })}
+              onChange={(event) => setDraft({ ...draft, type: event.target.value as VisualType })}
             >
-              <option>Carrusel portada</option>
-              <option>Frase viral feed</option>
-              <option>Story nuevo episodio</option>
-              <option>Story reproductor</option>
-              <option>Carrusel slide texto</option>
-              <option>Carrusel cierre</option>
-              <option>Reel cover</option>
-              <option>Manifiesto visual</option>
-              <option>Anuncio plataformas</option>
-              <option>Tarot / autoconocimiento</option>
-              <option>Promoción de episodio</option>
-              <option>Pieza DM</option>
+              <option value="carrusel-portada">Carrusel portada</option>
+              <option value="portada-podcast">Portada podcast</option>
+              <option value="story">Story</option>
+              <option value="reel-cover">Reel cover</option>
+              <option value="post-tipografico">Post tipográfico</option>
+              <option value="prompt-editorial">Prompt editorial</option>
+              <option value="imagen-ia">Imagen IA</option>
+              <option value="banner">Banner</option>
+              <option value="miniatura-youtube">Miniatura YouTube</option>
             </Select>
           </Field>
           <Field label="Formato">
             <Select
               value={draft.format}
-              onChange={(event) => setDraft({ ...draft, format: event.target.value })}
+              onChange={(event) =>
+                setDraft({ ...draft, format: event.target.value as VisualFormat })
+              }
             >
               <option>1080x1350</option>
               <option>1080x1920</option>
@@ -99,20 +115,20 @@ export default function CreadorVisualPage() {
           <Field label="Texto principal">
             <Textarea
               rows={3}
-              value={draft.mainText}
-              onChange={(event) => setDraft({ ...draft, mainText: event.target.value })}
+              value={draft.main_text || ''}
+              onChange={(event) => setDraft({ ...draft, main_text: event.target.value })}
             />
           </Field>
           <Field label="Texto secundario">
             <Textarea
               rows={3}
-              value={draft.secondaryText}
-              onChange={(event) => setDraft({ ...draft, secondaryText: event.target.value })}
+              value={draft.secondary_text || ''}
+              onChange={(event) => setDraft({ ...draft, secondary_text: event.target.value })}
             />
           </Field>
           <Field label="CTA">
             <Input
-              value={draft.cta}
+              value={draft.cta || ''}
               onChange={(event) => setDraft({ ...draft, cta: event.target.value })}
             />
           </Field>
@@ -125,8 +141,11 @@ export default function CreadorVisualPage() {
         </div>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button onClick={generatePrompt}>Generar prompt visual</Button>
-          <Button variant="secondary" onClick={saveVisual}>
-            Guardar pieza
+          <Button variant="secondary" onClick={saveVisual} disabled={saveStatus === 'saving'}>
+            {saveStatus === 'saving' && 'Guardando...'}
+            {saveStatus === 'saved' && '✓ Guardado'}
+            {saveStatus === 'error' && '✗ Error al guardar'}
+            {saveStatus === 'idle' && 'Guardar pieza'}
           </Button>
         </div>
       </Card>
@@ -139,18 +158,25 @@ export default function CreadorVisualPage() {
               rows={8}
               value={
                 draft.prompt ||
-                'Haz clic en “Generar prompt visual” para ver la instrucción completa.'
+                'Haz clic en "Generar prompt visual" para ver la instrucción completa.'
               }
               readOnly
             />
           </Field>
           <Field label="Especificación técnica">
-            <Textarea rows={4} value={draft.technicalSpec} readOnly />
+            <Textarea rows={4} value={draft.technical_spec || ''} readOnly />
           </Field>
           <Field label="Variables de plantilla">
-            <Input
-              value={draft.templateVariables}
-              onChange={(event) => setDraft({ ...draft, templateVariables: event.target.value })}
+            <Textarea
+              rows={2}
+              value={JSON.stringify(draft.template_variables, null, 2)}
+              onChange={(event) => {
+                try {
+                  setDraft({ ...draft, template_variables: JSON.parse(event.target.value) });
+                } catch {
+                  // Invalid JSON, ignore
+                }
+              }}
             />
           </Field>
           <div className="rounded-3xl border border-black/8 bg-amtme-cream p-4 text-sm text-black/60">
