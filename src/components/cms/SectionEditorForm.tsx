@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { SiteSection } from '@/lib/cms/types';
 
 interface SectionEditorFormProps {
@@ -16,6 +16,10 @@ export function SectionEditorForm({
 }: SectionEditorFormProps) {
   const [payload, setPayload] = useState<Record<string, unknown>>(section?.payload || {});
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setPayload(section?.payload || {});
+  }, [section?.section_key]);
 
   const handleSave = async () => {
     if (!section) return;
