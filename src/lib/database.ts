@@ -319,6 +319,20 @@ export async function deleteScript(id: string): Promise<void> {
 export async function getVisualAssets(): Promise<VisualAsset[]> {
   return getAll<VisualAsset>('visual_assets');
 }
+export async function createVisualAsset(
+  asset: Omit<VisualAsset, 'id' | 'created_at' | 'updated_at' | 'user_id'>
+): Promise<VisualAsset> {
+  return insertOne<VisualAsset>('visual_assets', asset);
+}
+export async function updateVisualAsset(
+  id: string,
+  updates: Partial<VisualAsset>
+): Promise<VisualAsset> {
+  return updateOne<VisualAsset>('visual_assets', id, updates);
+}
+export async function deleteVisualAsset(id: string): Promise<void> {
+  return deleteOne('visual_assets', id);
+}
 
 // ---- AUTOMATION RULES ----
 export async function getAutomationRules(): Promise<AutomationRule[]> {
