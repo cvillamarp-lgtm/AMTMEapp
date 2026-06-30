@@ -317,7 +317,27 @@ export async function deleteScript(id: string): Promise<void> {
 
 // ---- VISUAL ASSETS ----
 export async function getVisualAssets(): Promise<VisualAsset[]> {
-  return getAll<VisualAsset>('visual_assets');
+  const sb = getClient();
+  if (!sb) return [];
+  const activeUserId = await getActiveUserId();
+  if (!activeUserId) return [];
+
+  // visual_assets usa schema legacy con owner_id en lugar de user_id
+  const { data, error } = await sb
+    .from('visual_assets')
+    .select('*')
+    .eq('owner_id', activeUserId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data || []).map((row: any) => ({
+    ...row.payload,
+    id: row.id,
+    user_id: row.owner_id,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  }));
 }
 export async function createVisualAsset(
   asset: Omit<VisualAsset, 'id' | 'created_at' | 'updated_at' | 'user_id'>
