@@ -362,6 +362,136 @@ export type AIMode =
   | 'calendario'
   | 'archivo';
 
+// Landing CMS Types
+export type LandingPage = {
+  id: string;
+  slug: string;
+  version: number;
+  title: string;
+  description: string | null;
+  meta_keywords: string | null;
+  og_image_url: string | null;
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+};
+
+export type LandingSection = {
+  id: string;
+  landing_page_id: string;
+  section_key: LandingSectionKey;
+  section_order: number;
+  is_visible: boolean;
+  content: LandingSectionContent;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+};
+
+export type LandingSectionKey =
+  | 'hero'
+  | 'featured_episode'
+  | 'about'
+  | 'topics'
+  | 'recent_episodes'
+  | 'manifesto'
+  | 'about_christian'
+  | 'newsletter'
+  | 'platforms'
+  | 'footer';
+
+export type LandingSectionContent = Record<string, unknown>;
+
+export type HeroSectionContent = {
+  title: string;
+  subtitle: string;
+  description: string;
+  cta_text: string;
+  cta_url: string;
+  hero_image_url: string;
+};
+
+export type FeaturedEpisodeSectionContent = {
+  title: string;
+  episode_title: string;
+  episode_description: string;
+  episode_url: string;
+  episode_image_url: string;
+};
+
+export type AboutSectionContent = {
+  title: string;
+  description: string;
+  cta_text: string;
+  cta_url: string;
+};
+
+export type TopicsSectionContent = {
+  title: string;
+  topics: Array<{
+    name: string;
+    icon: string;
+  }>;
+};
+
+export type RecentEpisodesSectionContent = {
+  title: string;
+  description: string;
+  show_count: number;
+};
+
+export type ManifestoSectionContent = {
+  title: string;
+  content: string;
+  cta_text: string;
+  cta_url: string;
+};
+
+export type AboutChristianSectionContent = {
+  title: string;
+  name: string;
+  bio: string;
+  image_url: string;
+  cta_text: string;
+  cta_url: string;
+};
+
+export type NewsletterSectionContent = {
+  title: string;
+  description: string;
+  placeholder: string;
+  cta_text: string;
+};
+
+export type PlatformsSectionContent = {
+  title: string;
+  platforms: Array<{
+    name: string;
+    url: string;
+    icon: string;
+  }>;
+};
+
+export type FooterSectionContent = {
+  copyright: string;
+  links: Array<{
+    text: string;
+    url: string;
+  }>;
+};
+
+export type CMSAdmin = {
+  id: string;
+  user_id: string;
+  is_active: boolean;
+  created_at: string;
+  granted_by: string | null;
+};
+
 export type AppConfig = {
   id: string;
   user_id: string;
