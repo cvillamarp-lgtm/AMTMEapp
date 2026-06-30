@@ -39,6 +39,7 @@ const ALL_NAV_ITEMS = [
   { href: '/guiones', label: 'Guiones', icon: Article },
   { href: '/contenido', label: 'Contenido', icon: Image },
   { href: '/creador-visual', label: 'Creador visual', icon: Palette },
+  { href: '/studio/landing-editor', label: 'Editor de landing', icon: Article },
   { href: '/calendario', label: 'Calendario', icon: Calendar },
   { href: '/metricas', label: 'Métricas', icon: ChartLine },
   { href: '/monetizacion', label: 'Monetización', icon: CurrencyDollar },
