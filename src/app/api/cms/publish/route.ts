@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSupabaseAuthServerClient } from '@/lib/supabase/auth-server';
 import { publishLandingPage, checkIsCMSAdmin } from '@/lib/cms/queries';
 
@@ -34,6 +35,9 @@ export async function POST() {
     if (!result.success) {
       return NextResponse.json(result, { status: 400 });
     }
+
+    // Revalidate landing page to reflect published changes
+    revalidatePath('/');
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
