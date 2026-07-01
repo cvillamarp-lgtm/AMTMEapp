@@ -23,38 +23,56 @@ export function WrappedEditorialHero({ cmsData, fallbackData }: CmsWrapperProps)
   return <EditorialHero cmsData={cmsData} fallbackData={fallbackData} />;
 }
 
-export function WrappedEditorialFeaturedEpisode(_props: CmsWrapperProps) {
+export function WrappedEditorialFeaturedEpisode({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialFeaturedEpisode />;
 }
 
-export function WrappedEditorialAboutSection(_props: CmsWrapperProps) {
+export function WrappedEditorialAboutSection({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialAboutSection />;
 }
 
-export function WrappedEditorialTopicsGrid(_props: CmsWrapperProps) {
+export function WrappedEditorialTopicsGrid({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialTopicsGrid />;
 }
 
-export function WrappedEditorialRecentEpisodes(_props: CmsWrapperProps) {
+export function WrappedEditorialRecentEpisodes({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialRecentEpisodes />;
 }
 
-export function WrappedEditorialManifesto(_props: CmsWrapperProps) {
+export function WrappedEditorialManifesto({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialManifesto />;
 }
 
-export function WrappedEditorialAboutChristian(_props: CmsWrapperProps) {
+export function WrappedEditorialAboutChristian({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialAboutChristian />;
 }
 
-export function WrappedEditorialNewsletter(_props: CmsWrapperProps) {
+export function WrappedEditorialNewsletter({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialNewsletter />;
 }
 
-export function WrappedEditorialPlatforms(_props: CmsWrapperProps) {
+export function WrappedEditorialPlatforms({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialPlatforms />;
 }
 
-export function WrappedEditorialFooter(_props: CmsWrapperProps) {
+export function WrappedEditorialFooter({ cmsData, fallbackData }: CmsWrapperProps) {
+  void cmsData;
+  void fallbackData;
   return <EditorialFooter />;
 }
