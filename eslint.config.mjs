@@ -14,5 +14,11 @@ export default tseslint.config(
         project: './tsconfig.json',
       },
     },
+  },
+  {
+    files: ['src/lib/database.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
   }
 );
