@@ -1,68 +1,64 @@
-'use client';
-
 import Link from 'next/link';
 import { BRAND } from '@/lib/constants';
 
+const PLATFORM_LINKS = [
+  { label: 'Spotify', href: BRAND.spotifyUrl },
+  { label: 'Apple Podcasts', href: BRAND.applePodcastsUrl },
+  { label: 'YouTube', href: BRAND.youtubeUrl },
+  { label: 'iVoox', href: BRAND.ivooxUrl },
+] as const;
+
 export function EditorialFeaturedEpisode() {
   return (
-    <section id="featured" className="px-6 py-24 lg:px-12 lg:py-32">
+    <section id="featured" className="px-6 py-24 lg:px-12 lg:py-32" aria-labelledby="featured-title">
       <div className="mx-auto max-w-[1320px]">
         <div>
-          <div
-            className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
-            style={{ color: '#687680' }}
-          >
-            <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}></span>
+          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
+            <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }} />
             Episodio destacado
           </div>
-          <h2 className="mt-5 font-bold text-4xl lg:text-6xl">Lo que está sonando ahora</h2>
+          <h2 id="featured-title" className="mt-5 font-display text-4xl leading-none lg:text-6xl" style={{ color: '#0c1f36' }}>
+            Lo que está sonando ahora
+          </h2>
         </div>
 
-        <div
-          className="mt-12 grid grid-cols-1 overflow-hidden rounded-3xl text-white lg:grid-cols-12"
-          style={{ backgroundColor: '#111111' }}
+        <article
+          className="mt-12 grid grid-cols-1 overflow-hidden rounded-[2rem] shadow-card-hover lg:grid-cols-12"
+          style={{ backgroundColor: '#0d0d0d', color: '#f5f2ea' }}
         >
           <div className="relative lg:col-span-5">
             <img
-              src="/episode-cover-1.jpg"
-              alt="Por qué vuelves aunque ya lo sabes"
+              src="/images/episode-cover-1.jpg"
+              alt="Carátula editorial de episodio destacado de AMTME"
               className="aspect-square h-full w-full object-cover"
+              loading="lazy"
             />
             <div
               className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold"
               style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
             >
-              <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: '#0c1f36' }}
-              ></span>
-              NUEVO · EP 014
+              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: '#0c1f36' }} />
+              EPISODIO DESTACADO
             </div>
           </div>
 
           <div className="flex flex-col justify-between gap-8 p-8 lg:col-span-7 lg:p-12">
             <div>
-              <div className="text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
-                Apego · Dignidad · 48 min
+              <div className="text-xs uppercase tracking-[0.25em]" style={{ color: '#90a4b8' }}>
+                Apego · Dignidad · Volver a uno mismo
               </div>
-              <h3 className="mt-4 font-bold text-4xl lg:text-6xl">
+              <h3 className="mt-4 font-display text-4xl leading-none lg:text-6xl">
                 Por qué vuelves aunque ya lo sabes
               </h3>
-              <p className="mt-6 max-w-xl" style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                Esa cosa rara donde la mente entiende, el cuerpo recuerda y la historia vuelve a
-                llamarte a la puerta. Un episodio sobre el ciclo, el cuerpo y lo que realmente se
-                está soltando cuando crees que estás soltando.
+              <p className="mt-6 max-w-xl text-base leading-relaxed" style={{ color: 'rgba(245, 242, 234, 0.72)' }}>
+                Esa parte de ti que ya entendió con la cabeza, pero todavía tiembla en el cuerpo. Un episodio sobre el ciclo, el apego y la dignidad que empieza cuando dejas de negociar tu paz.
               </p>
             </div>
 
             <div className="space-y-6">
-              {/* Spotify Embed */}
-              <div
-                className="overflow-hidden rounded-2xl border"
-                style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'white' }}
-              >
+              <div className="overflow-hidden rounded-2xl border bg-white" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
                 <iframe
-                  title="Spotify Player"
+                  title="AMTME en Spotify"
                   src={BRAND.spotifyEmbedUrl}
                   width="100%"
                   height="152"
@@ -70,76 +66,36 @@ export function EditorialFeaturedEpisode() {
                   loading="lazy"
                   allowFullScreen
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                ></iframe>
+                />
               </div>
 
-              {/* Links Section */}
-              <div
-                className="flex flex-wrap items-center justify-between gap-4 border-t pt-6"
-                style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
-              >
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t pt-6" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
                 <Link
-                  href="/episodios/por-que-vuelves-aunque-ya-lo-sabes"
-                  className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold hover:opacity-90"
+                  href="/episodios"
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-transform hover:-translate-y-[2px]"
                   style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
                 >
-                  Ver episodio completo →
+                  Ver episodios →
                 </Link>
 
                 <div className="flex flex-wrap gap-2">
-                  <a
-                    href={BRAND.spotifyUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                    style={{
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                    }}
-                  >
-                    Spotify
-                  </a>
-                  <a
-                    href={BRAND.applePodcastsUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                    style={{
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                    }}
-                  >
-                    Apple Podcasts
-                  </a>
-                  <a
-                    href={BRAND.youtubeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                    style={{
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                    }}
-                  >
-                    YouTube
-                  </a>
-                  <a
-                    href={BRAND.ivooxUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-yellow-300 hover:text-yellow-300"
-                    style={{
-                      borderColor: 'rgba(255, 255, 255, 0.2)',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                    }}
-                  >
-                    iVoox
-                  </a>
+                  {PLATFORM_LINKS.map((platform) => (
+                    <a
+                      key={platform.label}
+                      href={platform.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors hover:border-[#fee94b] hover:text-[#fee94b]"
+                      style={{ borderColor: 'rgba(255, 255, 255, 0.2)', color: 'rgba(245, 242, 234, 0.82)' }}
+                    >
+                      {platform.label}
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     </section>
   );

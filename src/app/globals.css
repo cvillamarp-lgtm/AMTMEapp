@@ -30,8 +30,8 @@
   --cream: #f5f2ea;
   --lime: #fee94b;
   --amtme-red: #e0211e;
-  --ink: #111111;
-  --bluegray: #90a4b8;
+  --ink: #0d0d0d;
+  --bluegray: #687680;
   --card: #ffffff;
 
   --color-border: rgba(12, 31, 54, 0.12);
@@ -74,7 +74,7 @@
   font-weight: 500;
   transition: all 0.2s;
   display: inline-flex;
-  cursor: pointer;
+  cursor: default;
 }
 .tag-chip:hover {
   background: var(--lime);
@@ -88,4 +88,28 @@
 }
 .shadow-card-hover {
   box-shadow: 0 28px 80px rgba(12, 31, 54, 0.16);
+}
+
+/* Editorial marquee */
+@keyframes editorial-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+.editorial-marquee {
+  animation: editorial-scroll 42s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .editorial-marquee {
+    animation: none;
+  }
 }
