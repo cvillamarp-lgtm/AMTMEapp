@@ -38,115 +38,64 @@ export async function EditorialRecentEpisodes() {
   const episodes = await getRecentEpisodes();
 
   return (
-    <section id="episodios" className="px-6 py-24 lg:px-12 lg:py-32">
+    <section id="episodios" className="px-6 py-24 lg:px-12 lg:py-32" aria-labelledby="recent-episodes-title">
       <div className="mx-auto max-w-[1320px]">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <div
-              className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]"
-              style={{ color: '#687680' }}
-            >
-              <span
-                className="h-px w-8"
-                style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }}
-              ></span>
+            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.25em]" style={{ color: '#687680' }}>
+              <span className="h-px w-8" style={{ backgroundColor: 'rgba(12, 31, 54, 0.3)' }} />
               Catálogo
             </div>
-            <h2 className="mt-5 font-bold text-4xl lg:text-6xl">Episodios recientes.</h2>
+            <h2 id="recent-episodes-title" className="mt-5 font-display text-4xl leading-none lg:text-6xl" style={{ color: '#0c1f36' }}>
+              Episodios recientes
+            </h2>
           </div>
-          <Link
-            href="/episodios"
-            className="text-sm font-semibold relative inline-block"
-            style={{ color: '#0c1f36' }}
-          >
-            <span className="relative inline-block">
-              Ver todos los episodios →
-              <span
-                className="absolute bottom-0 left-0 right-0 h-2"
-                style={{ backgroundColor: 'rgba(254, 233, 75, 0.5)', zIndex: -1 }}
-              ></span>
-            </span>
+          <Link href="/episodios" className="text-sm font-semibold" style={{ color: '#0c1f36' }}>
+            <span className="underline-lime inline-block">Ver todos los episodios →</span>
           </Link>
         </div>
 
         {episodes.length > 0 ? (
           <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {episodes.map((ep) => (
-              <article
-                key={ep.id}
-                className="group flex flex-col overflow-hidden rounded-3xl border bg-white transition-all hover:-translate-y-1 hover:shadow-lg"
-                style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
-              >
-                <div className="relative block aspect-square overflow-hidden bg-gradient-to-br from-[#0c1f36] to-[#fee94b]">
+              <article key={ep.id} className="group flex flex-col overflow-hidden rounded-[2rem] border bg-white transition-all hover:-translate-y-1 hover:shadow-card-hover" style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}>
+                <Link href="/episodios" className="relative block aspect-square overflow-hidden" aria-label={`Escuchar ${ep.title || 'episodio de AMTME'}`}>
                   {ep.cover_url ? (
-                    <img
-                      src={ep.cover_url}
-                      alt={ep.title || 'Episodio'}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
+                    <img src={ep.cover_url} alt={ep.title || 'Episodio de AMTME'} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                   ) : (
-                    <div className="flex items-center justify-center h-full w-full">
-                      <span
-                        className="text-2xl font-bold"
-                        style={{ color: 'rgba(255, 255, 255, 0.3)' }}
-                      >
-                        EP
-                      </span>
+                    <div className="flex h-full w-full items-center justify-center" style={{ background: 'linear-gradient(135deg, #0c1f36 0%, #0c1f36 58%, #fee94b 58%, #fee94b 100%)' }}>
+                      <span className="font-display text-4xl" style={{ color: 'rgba(245, 242, 234, 0.38)' }}>AMTME</span>
                     </div>
                   )}
-                  <span
-                    className="absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
-                    style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}
-                  >
-                    EP {ep.episode_number}
+                  <span className="absolute left-4 top-4 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ backgroundColor: '#f5f2ea', color: '#0c1f36' }}>
+                    {ep.episode_number ? `EP ${ep.episode_number}` : 'AMTME'}
                   </span>
-                  <span
-                    aria-label="Reproducir"
-                    className="absolute bottom-4 right-4 grid h-12 w-12 place-items-center rounded-full opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M6 4l14 8-14 8V4z"></path>
-                    </svg>
+                  <span aria-hidden="true" className="absolute bottom-4 right-4 grid h-12 w-12 place-items-center rounded-full opacity-0 transition-opacity group-hover:opacity-100" style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8V4z" /></svg>
                   </span>
-                </div>
+                </Link>
 
                 <div className="flex flex-1 flex-col p-7">
                   <div className="text-xs uppercase tracking-[0.18em]" style={{ color: '#687680' }}>
-                    {ep.theme || 'Tema'}
+                    {ep.theme || 'Vínculos · Dignidad'}
                   </div>
-                  <h3 className="mt-3 font-bold text-2xl leading-tight">
-                    <span className="hover:underline cursor-pointer">
-                      {ep.title || 'Sin título'}
-                    </span>
+                  <h3 className="mt-3 font-display text-2xl leading-tight" style={{ color: '#0c1f36' }}>
+                    <Link href="/episodios" className="hover:underline">
+                      {ep.title || 'Episodio AMTME'}
+                    </Link>
                   </h3>
-                  <p
-                    className="mt-3 flex-1 text-sm leading-relaxed line-clamp-2"
-                    style={{ color: 'rgba(12, 31, 54, 0.65)' }}
-                  >
-                    {ep.description || 'Episodio del podcast AMTME'}
+                  <p className="mt-3 flex-1 text-sm leading-relaxed line-clamp-2" style={{ color: 'rgba(12, 31, 54, 0.65)' }}>
+                    {ep.description || 'Una conversación honesta sobre amor, apego, límites y volver a uno mismo.'}
                   </p>
 
-                  <div
-                    className="mt-6 flex items-center justify-between border-t pt-5"
-                    style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}
-                  >
-                    <Link href="/episodios" className="text-sm font-semibold hover:opacity-70">
+                  <div className="mt-6 flex items-center justify-between border-t pt-5" style={{ borderColor: 'rgba(12, 31, 54, 0.1)' }}>
+                    <Link href="/episodios" className="text-sm font-semibold hover:opacity-70" style={{ color: '#0c1f36' }}>
                       Escuchar →
                     </Link>
-                    <div className="flex gap-1.5">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: '#fee94b' }}
-                      ></span>
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: '#0c1f36' }}
-                      ></span>
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: '#e74c3c' }}
-                      ></span>
+                    <div className="flex gap-1.5" aria-hidden="true">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: '#fee94b' }} />
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: '#0c1f36' }} />
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: '#e0211e' }} />
                     </div>
                   </div>
                 </div>
@@ -154,15 +103,9 @@ export async function EditorialRecentEpisodes() {
             ))}
           </div>
         ) : (
-          <div className="mt-14 text-center py-12">
-            <p style={{ color: '#687680' }}>
-              Los episodios se cargan desde Spotify. Explora todos aquí:
-            </p>
-            <Link
-              href="/episodios"
-              className="mt-6 inline-block rounded-full px-8 py-3 text-sm font-semibold"
-              style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}
-            >
+          <div className="mt-14 rounded-[2rem] border p-10 text-center" style={{ borderColor: 'rgba(12, 31, 54, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.45)' }}>
+            <p style={{ color: '#687680' }}>Los episodios se cargan desde el catálogo público. También puedes explorarlos directamente aquí:</p>
+            <Link href="/episodios" className="mt-6 inline-block rounded-full px-8 py-3 text-sm font-semibold transition-transform hover:-translate-y-[2px]" style={{ backgroundColor: '#fee94b', color: '#0c1f36' }}>
               Ver todos los episodios
             </Link>
           </div>
