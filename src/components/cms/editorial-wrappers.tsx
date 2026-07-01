@@ -1,10 +1,7 @@
 /**
  * Editorial Component Wrappers
- * Wraps editorial components to accept CMS data while maintaining backward compatibility
+ * Keep CMS adapter compatibility while rendering the editorial landing system.
  */
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
-'use client';
 
 import { EditorialHero } from '@/components/editorial/EditorialHero';
 import { EditorialFeaturedEpisode } from '@/components/editorial/EditorialFeaturedEpisode';
@@ -17,112 +14,47 @@ import { EditorialNewsletter } from '@/components/editorial/EditorialNewsletter'
 import { EditorialPlatforms } from '@/components/editorial/EditorialPlatforms';
 import { EditorialFooter } from '@/components/editorial/EditorialFooter';
 
-/**
- * Hero wrapper accepts CMS data
- * For now, passes directly through since Hero has been updated
- */
-export function WrappedEditorialHero({
-  cmsData,
-  fallbackData,
-}: {
+type CmsWrapperProps = {
   cmsData?: Record<string, unknown>;
   fallbackData?: Record<string, unknown>;
-}) {
+};
+
+export function WrappedEditorialHero({ cmsData, fallbackData }: CmsWrapperProps) {
   return <EditorialHero cmsData={cmsData} fallbackData={fallbackData} />;
 }
 
-/**
- * Featured Episode wrapper
- * Passes through CMS data but component will use hardcoded fallback if not provided
- */
-export function WrappedEditorialFeaturedEpisode({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
-  // For now, render the original component
-  // Future: pass cmsData to component once it's updated to accept props
+export function WrappedEditorialFeaturedEpisode(_props: CmsWrapperProps) {
   return <EditorialFeaturedEpisode />;
 }
 
-export function WrappedEditorialAboutSection({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialAboutSection(_props: CmsWrapperProps) {
   return <EditorialAboutSection />;
 }
 
-export function WrappedEditorialTopicsGrid({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialTopicsGrid(_props: CmsWrapperProps) {
   return <EditorialTopicsGrid />;
 }
 
-export function WrappedEditorialRecentEpisodes({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialRecentEpisodes(_props: CmsWrapperProps) {
   return <EditorialRecentEpisodes />;
 }
 
-export function WrappedEditorialManifesto({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialManifesto(_props: CmsWrapperProps) {
   return <EditorialManifesto />;
 }
 
-export function WrappedEditorialAboutChristian({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialAboutChristian(_props: CmsWrapperProps) {
   return <EditorialAboutChristian />;
 }
 
-export function WrappedEditorialNewsletter({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialNewsletter(_props: CmsWrapperProps) {
   return <EditorialNewsletter />;
 }
 
-export function WrappedEditorialPlatforms({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialPlatforms(_props: CmsWrapperProps) {
   return <EditorialPlatforms />;
 }
 
-export function WrappedEditorialFooter({
-  cmsData,
-  fallbackData,
-}: {
-  cmsData?: Record<string, unknown>;
-  fallbackData?: Record<string, unknown>;
-}) {
+export function WrappedEditorialFooter(_props: CmsWrapperProps) {
   return <EditorialFooter />;
 }
